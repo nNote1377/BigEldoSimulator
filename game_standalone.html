@@ -1525,6 +1525,274 @@ body:not(.crt-enabled) .crt-flicker {
   font-weight: bold;
 }
 
+/* --- 2.0 OVERHAUL ICONS --- */
+.icon-pnl { background: #153322; border: 2px solid #33ffaa; border-radius: 4px; }
+.icon-pnl::after { content: "P&L"; font-family: var(--pixel-font); font-size: 8px; color: #33ffaa; position: absolute; bottom: 4px; left: 6px; }
+
+.icon-raid { background: #332211; border: 2px solid #ff9933; border-radius: 4px; }
+.icon-raid::after { content: "RAID"; font-family: var(--pixel-font); font-size: 7px; color: #ff9933; position: absolute; bottom: 4px; left: 4px; }
+
+.icon-forensics { background: #221533; border: 2px solid #cc44ff; border-radius: 4px; }
+.icon-forensics::after { content: "CARV"; font-family: var(--pixel-font); font-size: 7px; color: #cc44ff; position: absolute; bottom: 4px; left: 4px; }
+
+.icon-defender { background: #112233; border: 2px solid #44aaff; border-radius: 4px; }
+.icon-defender::after { content: "SEC"; font-family: var(--pixel-font); font-size: 8px; color: #44aaff; position: absolute; bottom: 4px; left: 6px; }
+
+/* --- P&L LAYOUT --- */
+.pnl-layout {
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.pnl-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+.pnl-card {
+  background: #0d121c;
+  border: 1px solid #28364d;
+  padding: 8px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.pnl-card.alert-card {
+  border-color: #ff4455;
+  background: rgba(255, 68, 85, 0.08);
+}
+.pnl-label {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+.pnl-details-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+.pnl-column {
+  background: #0c1018;
+  border: 1px solid #1f2b3e;
+  padding: 10px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.pnl-column h4 {
+  margin: 0 0 6px 0;
+  font-size: 13px;
+  border-bottom: 1px solid #28364d;
+  padding-bottom: 4px;
+}
+.pnl-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+}
+.pnl-footer-bar {
+  background: #090c14;
+  border-top: 1px solid #222f42;
+  padding: 8px;
+  font-size: 12px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* --- RAID CONTROLLER LAYOUT --- */
+.raid-layout {
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.raid-active-section, .raid-create-section {
+  background: #0d121c;
+  border: 1px solid #24334a;
+  padding: 10px;
+  border-radius: 4px;
+}
+.raid-card {
+  background: #141c2a;
+  border: 1px solid #3a4d6b;
+  padding: 8px 10px;
+  margin-bottom: 8px;
+  border-radius: 3px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.raid-card-title {
+  font-weight: bold;
+  color: var(--crt-cyan);
+}
+.raid-disks-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #080b12;
+  border: 1px solid #1e293b;
+  padding: 8px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+.raid-checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+
+/* --- FORENSICS LAYOUT --- */
+.forensics-layout {
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.forensics-scanner-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  background: #0d121c;
+  border: 1px solid #24334a;
+  padding: 8px 10px;
+}
+.forensics-status-box {
+  background: #060810;
+  border: 1px solid #cc44ff;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.progress-bar-wrap {
+  background: #111;
+  border: 1px solid #333;
+  height: 12px;
+  border-radius: 2px;
+  overflow: hidden;
+}
+#forensics-progress-bar {
+  background: linear-gradient(90deg, #cc44ff, #00f0ff);
+  height: 100%;
+}
+.forensics-files-table-wrapper {
+  background: #080b12;
+  border: 1px solid #1e293b;
+  min-height: 140px;
+  max-height: 220px;
+  overflow-y: auto;
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.forensics-file-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #101724;
+  border: 1px solid #28374d;
+  padding: 5px 8px;
+  border-radius: 3px;
+}
+
+/* --- DEFENDER & FIREWALL LAYOUT --- */
+.defender-layout {
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.defender-status-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #0d1422;
+  border: 1px solid #2a3c5a;
+  padding: 12px;
+  border-radius: 4px;
+}
+.defender-status-icon {
+  font-size: 32px;
+}
+.defender-status-text h3 {
+  margin: 0 0 4px 0;
+  font-size: 15px;
+  color: var(--crt-cyan);
+}
+.defender-status-text p {
+  margin: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+.defender-firewall-toggle-box {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #0d121c;
+  border: 1px solid #24334a;
+  padding: 10px;
+  border-radius: 3px;
+}
+.defender-threats-section {
+  background: #0c1018;
+  border: 1px solid #222f42;
+  padding: 10px;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.defender-threats-list {
+  min-height: 60px;
+  max-height: 120px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.threat-badge {
+  background: rgba(255, 68, 85, 0.15);
+  border: 1px solid #ff4455;
+  color: #ff6677;
+  padding: 4px 8px;
+  border-radius: 2px;
+  font-size: 11px;
+}
+
+/* --- LEASE BREACH MODAL --- */
+.alert-dialog {
+  border: 2px solid #ff3344 !important;
+  box-shadow: 0 0 25px rgba(255, 51, 68, 0.5) !important;
+}
+.alert-header {
+  background: #4a1118 !important;
+  color: #ff4455 !important;
+}
+.breach-info-card {
+  background: #140d10;
+  border: 1px solid #4a1e24;
+  padding: 8px 12px;
+  margin: 8px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.breach-warning {
+  color: #ffaa55;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1547,8 +1815,10 @@ body:not(.crt-enabled) .crt-flicker {
       </div>
       <div class="quick-status">
         <div class="stat-pill"><span class="label">CZAS:</span> <span id="time-display">Dzień 1, 08:00</span></div>
-        <div class="stat-pill"><span class="label">ŚRODKI:</span> <span id="money-display" class="cash-value">450.00 PLN</span></div>
+        <div class="stat-pill"><span class="label">ŚRODKI:</span> <span id="money-display" class="cash-value">150.00 PLN</span></div>
         <div class="stat-pill"><span class="label">KRYPTO:</span> <span id="crypto-display" class="crypto-value">0.0000 Ⓦ</span></div>
+        <div class="stat-pill alert-pill hidden" id="debt-pill"><span class="label">DŁUG:</span> <span id="debt-display" class="cash-value">0.00 PLN</span></div>
+        <div class="stat-pill" id="weather-pill"><span class="label">DWÓR:</span> <span id="weather-display">20.0°C</span></div>
         <div class="stat-pill alert-pill"><span class="label">CZYNSZ:</span> <span id="rent-timer">Za 6 dni (500 PLN)</span></div>
         <div class="stat-pill" id="power-pill"><span class="label">MOC:</span> <span id="power-display">120W / 400W</span></div>
         <div class="stat-pill" id="temp-pill"><span class="label">TEMP:</span> <span id="temp-display">21.5°C</span></div>
@@ -1619,6 +1889,22 @@ body:not(.crt-enabled) .crt-flicker {
         <div class="desktop-icon" data-app="app-guide">
           <div class="icon-img icon-doc"></div>
           <span>Instrukcja.txt</span>
+        </div>
+        <div class="desktop-icon" data-app="app-pnl">
+          <div class="icon-img icon-pnl"></div>
+          <span>Finanse & P&L</span>
+        </div>
+        <div class="desktop-icon" data-app="app-raid">
+          <div class="icon-img icon-raid"></div>
+          <span>Kreator RAID</span>
+        </div>
+        <div class="desktop-icon" data-app="app-forensics">
+          <div class="icon-img icon-forensics"></div>
+          <span>Odzysk Danych</span>
+        </div>
+        <div class="desktop-icon" data-app="app-defender">
+          <div class="icon-img icon-defender"></div>
+          <span>Firewall & AV</span>
         </div>
       </div>
 
@@ -1833,6 +2119,17 @@ body:not(.crt-enabled) .crt-flicker {
               </div>
             </div>
 
+            <div class="debt-box" id="bank-debt-section" style="margin-bottom:12px; padding:10px; border:1px solid #ff4455; background:rgba(255,50,50,0.08); border-radius:4px;">
+              <h3 style="color:#ff4455; margin-top:0;">Dług Bankowy & Linia Kredytowa</h3>
+              <div class="acc-row"><span>Stan Zadłużenia:</span> <strong id="bank-debt-amount" style="color:#ff4455;">0.00 PLN</strong></div>
+              <div class="acc-row"><span>Oprocentowanie Dziennie:</span> <strong>5.0% (Lichwa)</strong></div>
+              <div class="acc-row"><span>Termin przed Komornikiem:</span> <strong id="bank-debt-deadline">Brak zadłużenia</strong></div>
+              <div class="crypto-exchange-row" style="margin-top:8px;">
+                <input type="number" id="debt-repay-amount" value="50" min="1" step="10">
+                <button id="btn-repay-debt" class="tool-btn">Spłać Część / Całość Długu</button>
+              </div>
+            </div>
+
             <div class="bills-card">
               <h3>Nadchodzące Zobowiązania</h3>
               <div class="bill-row">
@@ -1907,6 +2204,161 @@ body:not(.crt-enabled) .crt-flicker {
           </div>
         </div>
 
+        <!-- WINDOW: P&L FINANCIAL AUDIT -->
+        <div id="app-pnl" class="cyber-window minimized" style="top: 40px; left: 160px; width: 680px; height: 500px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">📊</span> FINANSE // AUDYT PRZYCHODÓW, KOSZTÓW & P&L</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body pnl-layout">
+            <div class="pnl-summary-grid">
+              <div class="pnl-card">
+                <span class="pnl-label">Gotówka PLN:</span>
+                <strong id="pnl-cash-val" class="cash-value">150.00 PLN</strong>
+              </div>
+              <div class="pnl-card alert-card">
+                <span class="pnl-label">Dług Bankowy (5%/d):</span>
+                <strong id="pnl-debt-val">0.00 PLN</strong>
+                <small id="pnl-debt-days">Brak zadłużenia</small>
+              </div>
+              <div class="pnl-card">
+                <span class="pnl-label">Bilans Dzisiaj:</span>
+                <strong id="pnl-today-net">+0.00 PLN</strong>
+              </div>
+              <div class="pnl-card">
+                <span class="pnl-label">Wynik Wczorajszy:</span>
+                <strong id="pnl-yesterday-net">+0.00 PLN</strong>
+              </div>
+            </div>
+
+            <div class="pnl-details-section">
+              <div class="pnl-column">
+                <h4>🟢 Przychody (Suma)</h4>
+                <div class="pnl-row"><span>Usługi The Wired:</span> <strong id="pnl-inc-services">0.00 PLN</strong></div>
+                <div class="pnl-row"><span>Dzierżawa Wolumenów (SLA):</span> <strong id="pnl-inc-leasing">0.00 PLN</strong></div>
+                <div class="pnl-row"><span>Koparka WiredCoin:</span> <strong id="pnl-inc-mining">0.0000 Ⓦ</strong></div>
+                <div class="pnl-row"><span>Odzysk Danych (Złom):</span> <strong id="pnl-inc-forensics">0.00 PLN</strong></div>
+              </div>
+              <div class="pnl-column">
+                <h4>🔴 Koszty i Kary</h4>
+                <div class="pnl-row"><span>Energia Elektryczna:</span> <strong id="pnl-cost-power">0.00 PLN</strong></div>
+                <div class="pnl-row"><span>Amortyzacja Dysków:</span> <strong id="pnl-cost-wear">0.00 PLN</strong></div>
+                <div class="pnl-row"><span>Kary za Zerwanie SLA:</span> <strong id="pnl-cost-penalties">0.00 PLN</strong></div>
+                <div class="pnl-row"><span>Mandaty za Hałas:</span> <strong id="pnl-cost-fines">0.00 PLN</strong></div>
+              </div>
+            </div>
+
+            <div class="pnl-footer-bar">
+              <span>Hałas Pokoju: <strong id="pnl-noise-val">12 dB</strong> (<span id="pnl-complaints-val">0% skarg sąsiadów</span>)</span>
+              <span>Zapylenie: <strong id="pnl-dust-val">0%</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: RAID CONTROLLER -->
+        <div id="app-raid" class="cyber-window minimized" style="top: 60px; left: 190px; width: 680px; height: 470px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🧱</span> MDADM // KREATOR MACIERZY PROGRAMOWYCH RAID</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body raid-layout">
+            <div class="raid-active-section">
+              <h3>Aktywne Macierze RAID (/dev/md*)</h3>
+              <div id="raid-list" class="raid-list">
+                <!-- Dynamically populated -->
+              </div>
+            </div>
+
+            <div class="raid-create-section">
+              <h3>Utwórz Nową Macierz RAID</h3>
+              <div class="form-group">
+                <label>Poziom RAID:</label>
+                <select id="raid-type-select">
+                  <option value="RAID0">RAID 0 (Striping - 2x Prędkość I/O, 2x Bonus Koparki, 0 Redundancji)</option>
+                  <option value="RAID1">RAID 1 (Mirroring - Pełna Kopia Lustrzana, Odporność na Awarię Dysku)</option>
+                  <option value="JBOD">JBOD (Spanning - Połączenie Dysków w Jeden Wolumen)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Wybierz Dyski Składowe (min. 2 dyski bez partycji):</label>
+                <div id="raid-disks-select" class="raid-disks-checkboxes">
+                  <!-- Dynamically populated -->
+                </div>
+              </div>
+              <button id="btn-create-raid" class="cyber-btn highlight-btn">Utwórz Macierz RAID</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: DATA FORENSICS & CARVING -->
+        <div id="app-forensics" class="cyber-window minimized" style="top: 80px; left: 220px; width: 680px; height: 480px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🔬</span> FORENSICS // EKSTRAKCJA DANYCH ZE ZŁOMU (CARVING)</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body forensics-layout">
+            <div class="forensics-scanner-bar">
+              <label>Dysk do analizy:</label>
+              <select id="forensics-disk-select"></select>
+              <button id="btn-start-carving" class="cyber-btn highlight-btn">🔍 Uruchom Data Carving</button>
+            </div>
+            <div id="forensics-progress" class="forensics-status-box hidden">
+              <span id="forensics-status-text">Skanowanie sektorów surowych...</span>
+              <div class="progress-bar-wrap"><div id="forensics-progress-bar" style="width: 0%;"></div></div>
+            </div>
+            <div class="forensics-results-box">
+              <h3>Odzyskane Pliki & Wrażliwe Dane</h3>
+              <div id="forensics-files-list" class="forensics-files-table-wrapper">
+                <!-- Dynamically populated files -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: FIREWALL & DEFENDER -->
+        <div id="app-defender" class="cyber-window minimized" style="top: 100px; left: 250px; width: 620px; height: 440px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🛡️</span> DEFENDER // TARCZA BEZPIECZEŃSTWA & FIREWALL</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body defender-layout">
+            <div class="defender-status-card">
+              <div class="defender-status-icon" id="defender-shield-icon">🛡️</div>
+              <div class="defender-status-text">
+                <h3 id="defender-status-headline">Ochrona Aktywna</h3>
+                <p id="defender-status-sub">Brak krytycznych naruszeń integralności partycji.</p>
+              </div>
+            </div>
+
+            <div class="defender-firewall-toggle-box">
+              <div>
+                <strong>Zapora Sieciowa NAVI-WALL:</strong>
+                <p>Filtruje złośliwe pakiety DarkNetu (-90% szansy na atak Ransomware).</p>
+              </div>
+              <button id="btn-toggle-firewall" class="cyber-btn active-btn">Firewall: WŁĄCZONY</button>
+            </div>
+
+            <div class="defender-threats-section">
+              <h3>Wykryte Zagrożenia & Ransomware (<span id="defender-threats-count">0</span>)</h3>
+              <div id="defender-threats-list" class="defender-threats-list">
+                <!-- Injected threats -->
+              </div>
+              <button id="btn-clean-all-threats" class="cyber-btn alert-tool-btn">Kwarantanna & Usunięcie (30 PLN)</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Desktop Bottom Taskbar -->
@@ -1984,6 +2436,31 @@ body:not(.crt-enabled) .crt-flicker {
       </div>
     </div>
 
+    <!-- MODAL: LEASE BREACH CONFIRMATION -->
+    <div id="modal-lease-breach" class="cyber-modal hidden">
+      <div class="modal-dialog alert-dialog">
+        <div class="modal-header alert-header">
+          <span>⚠️ ZERWANIE UMOWY NAJMU PARTYCJI</span>
+          <button class="win-btn modal-breach-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <p><strong>UWAGA:</strong> Ta partycja jest obecnie wynajmowana zewnętrznemu klientowi w ramach umowy SLA!</p>
+          <div class="breach-info-card">
+            <div><strong>Klient:</strong> <span id="breach-client-name">-</span></div>
+            <div><strong>Kara umowna:</strong> <span id="breach-penalty-val" class="cash-value">-</span></div>
+            <div><strong>Utrata reputacji:</strong> <span class="cash-value" style="color:var(--crt-red);">-20 REP</span></div>
+          </div>
+          <p class="breach-warning">
+            Formatowanie lub usunięcie partycji przed końcem kontraktu zerwie umowę SLA. Jeśli nie posiadasz wystarczającej gotówki, kwota kary zostanie doliczona do <strong>długu w E-Banku z 5% dziennym oprocentowaniem lichwiarskim</strong>!
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-breach-cancel" class="cyber-btn">Anuluj (Zachowaj partycję)</button>
+          <button id="btn-breach-confirm" class="cyber-btn alert-tool-btn">Potwierdź Zerwanie & Zapłać Karę</button>
+        </div>
+      </div>
+    </div>
+
     <!-- INTERACTIVE TUTORIAL WIDGET -->
     <div id="tutorial-widget" class="tutorial-card">
       <div class="tutorial-header">
@@ -2014,8 +2491,10 @@ body:not(.crt-enabled) .crt-flicker {
 
   </div>
 
-  <!-- Audio and Game Logic Scripts -->
-  <script>
+  <!-- Inlined Scripts for Standalone Play -->
+<script>
+
+/* === audio.js === */
 /**
  * NAVI // PARTITION.SYS - PROCEDURAL WEB AUDIO SYNTHESIZER
  * Synthesizes mechanical HDD seeks, fan hum, circuit breaker trips, PC beeps & cyber ambient.
@@ -2239,11 +2718,12 @@ class RetroAudioEngine {
 // Global audio singleton
 window.audioEngine = new RetroAudioEngine();
 
-</script>
-  <script>
+
+/* === state.js === */
 /**
- * NAVI // PARTITION.SYS - CENTRAL REACTIVE STATE STORE
- * Manages player finances, room environment, electrical grid, disk hardware, progression & saves.
+ * NAVI // PARTITION.SYS 2.0 - CENTRAL REACTIVE STATE STORE
+ * Manages player finances, bank debt, room environment, electrical grid, disk hardware,
+ * leasing contracts, RAID arrays, cyber threats, data forensics, progression & saves.
  */
 
 class GameState {
@@ -2260,8 +2740,8 @@ class GameState {
       minute: 0
     };
 
-    // Economy & Player stats
-    this.money = 450.00; // PLN
+    // Economy & Player stats (Rebalanced hardcore start)
+    this.money = 150.00; // PLN (Rebalanced from 450 to 150)
     this.crypto = 0.0000; // Ⓦ WiredCoin
     this.cryptoRate = 2400.00; // PLN per 1 Ⓦ
     this.hunger = 15; // 0-100%
@@ -2272,24 +2752,40 @@ class GameState {
     this.powerKwhAccrued = 0.0;
     this.powerBillAmount = 0.0;
 
-    // Room Environment & Electrical Grid
+    // Bank Debt & Usury / Debt Collector
+    this.debtBalance = 0.0; // PLN
+    this.debtDaysRemaining = 5;
+    this.debtDailyInterestRate = 0.05; // 5% per day
+
+    // Hardware Slots & Expansion
+    this.maxDiskSlots = 2; // Starter motherboard has 2 SATA/IDE ports
+    this.installedPCIeControllers = 0;
+
+    // Room Environment, Weather & Electrical Grid
     this.roomTier = 1; // 1 to 4 (Lain's NAVI shrine at 4)
     this.roomTemp = 21.5; // °C
-    this.ambientTemp = 19.0; // Outdoor °C
+    this.outdoorTemp = 22.0; // Calculated dynamically by hour and heatwave
     this.windowOpen = false;
+    this.noiseLevel = 15; // Noise in room
+    this.neighborComplaints = 0; // 0-100%
+    this.dustLevel = 5; // 0-100% (reduces cooling efficiency)
     this.coolingPumpActive = false;
     this.coolingFluidLevel = 100; // %
+    this.acInstalled = false; // Air conditioner unit
+    this.acActive = false;
     this.fuseTripped = false;
     this.fuseMaxWatts = 400; // Tier 1 standard apartment circuit
     this.currentWatts = 80; // Baseline PC idle power
 
-    // Law Enforcement & Security
+    // Law Enforcement & Cyber Threats
     this.policeThreat = 0; // 0-100%
     this.policeRaidPending = false;
+    this.malwareActive = []; // Array of { id, name, type, targetPartId, drainWatts, ransomAmount }
+    this.firewallActive = true;
 
     // Tooling Progression (1=fdisk CLI, 2=GUI Partition Wizard, 3=LVM/GPT Pro, 4=NAVI Hyper-Storage)
     this.toolTier = 1;
-    this.reputation = 0;
+    this.reputation = 20; // 0 to 1000
 
     // Interactive Tutorial state
     this.tutorialStep = 1;
@@ -2324,7 +2820,10 @@ class GameState {
             encrypted: false,
             serviceId: null,
             corrupted: false,
-            isSystem: true
+            isSystem: true,
+            leasedContractId: null,
+            inRaid: false,
+            raidId: null
           }
         ]
       }
@@ -2337,9 +2836,30 @@ class GameState {
     // Active & Registered Services
     this.services = [];
 
-    // Contracts Board
+    // Contracts Board & Active Leases
     this.contracts = [];
     this.activeContract = null;
+    this.leasedContracts = []; // { id, client, title, partId, daysRemaining, totalDays, dailyRent, deposit, penaltyAmount, slaTarget, uptimeTicks, totalTicks }
+
+    // RAID Arrays
+    this.raidArrays = []; // { id, name, type: 'RAID0'|'RAID1'|'JBOD', partIds: [], sizeGB, status: 'HEALTHY' }
+
+    // Data Forensics (Recovered scrap secrets)
+    this.recoveredDataFiles = []; // { id, name, desc, valuePLN, valueCrypto, sold: false }
+
+    // P&L Financial Audit Daily Tracking
+    this.pnlMetrics = {
+      todayIncome: 0,
+      todayExpenses: 0,
+      yesterdayIncome: 0,
+      yesterdayExpenses: 0,
+      incomeServices: 0,
+      incomeLeasing: 0,
+      incomeMining: 0,
+      costPower: 0,
+      costWear: 0,
+      costDebt: 0
+    };
 
     // View state
     this.activeView = "room"; // "room" or "desktop"
@@ -2363,6 +2883,10 @@ class GameState {
         time: this.inGameTime,
         money: this.money,
         crypto: this.crypto,
+        debtBalance: this.debtBalance,
+        debtDaysRemaining: this.debtDaysRemaining,
+        maxDiskSlots: this.maxDiskSlots,
+        installedPCIeControllers: this.installedPCIeControllers,
         hunger: this.hunger,
         energy: this.energy,
         rentDueDays: this.rentDueDays,
@@ -2370,8 +2894,13 @@ class GameState {
         roomTier: this.roomTier,
         roomTemp: this.roomTemp,
         windowOpen: this.windowOpen,
+        noiseLevel: this.noiseLevel,
+        neighborComplaints: this.neighborComplaints,
+        dustLevel: this.dustLevel,
         coolingPumpActive: this.coolingPumpActive,
         coolingFluidLevel: this.coolingFluidLevel,
+        acInstalled: this.acInstalled,
+        acActive: this.acActive,
         fuseTripped: this.fuseTripped,
         fuseMaxWatts: this.fuseMaxWatts,
         toolTier: this.toolTier,
@@ -2382,9 +2911,14 @@ class GameState {
         disks: this.disks,
         services: this.services,
         contracts: this.contracts,
+        leasedContracts: this.leasedContracts,
+        raidArrays: this.raidArrays,
+        recoveredDataFiles: this.recoveredDataFiles,
+        malwareActive: this.malwareActive,
+        pnlMetrics: this.pnlMetrics,
         policeThreat: this.policeThreat
       };
-      localStorage.setItem("NAVI_PARTITION_SAVE", JSON.stringify(data));
+      localStorage.setItem("NAVI_PARTITION_SAVE_V2", JSON.stringify(data));
       window.gameUI?.showToast("Stan gry został pomyślnie zapisany.", "success");
     } catch (e) {
       console.error("Save error:", e);
@@ -2393,12 +2927,16 @@ class GameState {
 
   loadGame() {
     try {
-      const raw = localStorage.getItem("NAVI_PARTITION_SAVE");
+      const raw = localStorage.getItem("NAVI_PARTITION_SAVE_V2") || localStorage.getItem("NAVI_PARTITION_SAVE");
       if (!raw) return false;
       const data = JSON.parse(raw);
       this.inGameTime = data.time || this.inGameTime;
       this.money = data.money ?? this.money;
       this.crypto = data.crypto ?? this.crypto;
+      this.debtBalance = data.debtBalance ?? this.debtBalance;
+      this.debtDaysRemaining = data.debtDaysRemaining ?? this.debtDaysRemaining;
+      this.maxDiskSlots = data.maxDiskSlots ?? this.maxDiskSlots;
+      this.installedPCIeControllers = data.installedPCIeControllers ?? this.installedPCIeControllers;
       this.hunger = data.hunger ?? this.hunger;
       this.energy = data.energy ?? this.energy;
       this.rentDueDays = data.rentDueDays ?? this.rentDueDays;
@@ -2406,8 +2944,13 @@ class GameState {
       this.roomTier = data.roomTier ?? this.roomTier;
       this.roomTemp = data.roomTemp ?? this.roomTemp;
       this.windowOpen = data.windowOpen ?? this.windowOpen;
+      this.noiseLevel = data.noiseLevel ?? this.noiseLevel;
+      this.neighborComplaints = data.neighborComplaints ?? this.neighborComplaints;
+      this.dustLevel = data.dustLevel ?? this.dustLevel;
       this.coolingPumpActive = data.coolingPumpActive ?? this.coolingPumpActive;
       this.coolingFluidLevel = data.coolingFluidLevel ?? this.coolingFluidLevel;
+      this.acInstalled = data.acInstalled ?? this.acInstalled;
+      this.acActive = data.acActive ?? this.acActive;
       this.fuseTripped = data.fuseTripped ?? this.fuseTripped;
       this.fuseMaxWatts = data.fuseMaxWatts ?? this.fuseMaxWatts;
       this.toolTier = data.toolTier ?? this.toolTier;
@@ -2416,6 +2959,15 @@ class GameState {
       this.tutorialCompleted = data.tutorialCompleted ?? this.tutorialCompleted;
       this.tutorialHidden = data.tutorialHidden ?? this.tutorialHidden;
       this.disks = data.disks || this.disks;
+      this.services = data.services || this.services;
+      this.contracts = data.contracts || this.contracts;
+      this.leasedContracts = data.leasedContracts || this.leasedContracts;
+      this.raidArrays = data.raidArrays || this.raidArrays;
+      this.recoveredDataFiles = data.recoveredDataFiles || this.recoveredDataFiles;
+      this.malwareActive = data.malwareActive || this.malwareActive;
+      this.pnlMetrics = data.pnlMetrics || this.pnlMetrics;
+      this.policeThreat = data.policeThreat ?? this.policeThreat;
+
       // Guarantee system partition protection even on legacy saves
       for (const d of this.disks) {
         for (const p of d.partitions) {
@@ -2425,9 +2977,7 @@ class GameState {
           }
         }
       }
-      this.services = data.services || this.services;
-      this.contracts = data.contracts || this.contracts;
-      this.policeThreat = data.policeThreat ?? this.policeThreat;
+
       this.notify();
       window.gameUI?.showToast("Wczytano zapis gry.", "success");
       return true;
@@ -2441,11 +2991,12 @@ class GameState {
 // Global state singleton
 window.gameState = new GameState();
 
-</script>
-  <script>
+
+/* === disk_engine.js === */
 /**
- * NAVI // PARTITION.SYS - DISK & PARTITION ENGINE
- * Manages partition tables (MBR/GPT), cluster sizes, file systems, S.M.A.R.T. bad sectors & dd wipes.
+ * NAVI // PARTITION.SYS 2.0 - DISK & PARTITION ENGINE
+ * Manages MBR/GPT tables, cluster sizes, file systems, S.M.A.R.T. bad sectors,
+ * lease breach penalties, Software RAID 0/1/JBOD and Scrap Data Forensics.
  */
 
 class DiskEngine {
@@ -2539,7 +3090,11 @@ class DiskEngine {
       mount: mount,
       encrypted: encrypted || (fs === "LUKS"),
       serviceId: null,
-      corrupted: false
+      corrupted: false,
+      isSystem: false,
+      leasedContractId: null,
+      inRaid: false,
+      raidId: null
     };
 
     disk.partitions.push(newPart);
@@ -2551,8 +3106,8 @@ class DiskEngine {
     return { success: true, part: newPart };
   }
 
-  // Delete partition
-  deletePartition(diskId, partId) {
+  // Delete partition (Checks for system protection and lease breach)
+  deletePartition(diskId, partId, forceBreach = false) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
@@ -2569,6 +3124,33 @@ class DiskEngine {
       };
     }
 
+    // Check if part is in RAID
+    if (part.inRaid) {
+      return {
+        success: false,
+        msg: "Partycja jest częścią aktywnej macierzy RAID! Rozwiąż macierz w Kreatorze RAID przed jej usunięciem."
+      };
+    }
+
+    // Check if part is leased to a client
+    if (part.leasedContractId && !forceBreach) {
+      const lease = this.state.leasedContracts.find(c => c.id === part.leasedContractId);
+      return {
+        requiresBreachConfirmation: true,
+        actionType: 'delete',
+        diskId: disk.id,
+        partId: part.id,
+        lease: lease,
+        penalty: lease ? lease.penaltyAmount : 300,
+        client: lease ? lease.client : "Klient Biznesowy"
+      };
+    }
+
+    // If force breach confirmed by user
+    if (part.leasedContractId && forceBreach) {
+      this.breakLease(part.leasedContractId);
+    }
+
     // Stop associated service if any
     if (part.serviceId) {
       window.servicesEngine?.stopService(part.serviceId);
@@ -2582,8 +3164,8 @@ class DiskEngine {
     return { success: true };
   }
 
-  // Format existing partition
-  formatPartition(diskId, partId, fs, clusterSize, mount, encrypted = false) {
+  // Format existing partition (Checks for system protection and lease breach)
+  formatPartition(diskId, partId, fs, clusterSize, mount, encrypted = false, forceBreach = false) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
@@ -2599,6 +3181,34 @@ class DiskEngine {
         };
       }
       mount = "/"; // Force keep root mount
+    }
+
+    // Check if part is in RAID
+    if (part.inRaid) {
+      return {
+        success: false,
+        msg: "Partycja jest częścią aktywnej macierzy RAID! Rozwiąż macierz w Kreatorze RAID przed jej formatowaniem."
+      };
+    }
+
+    // Check if leased to a client
+    if (part.leasedContractId && !forceBreach) {
+      const lease = this.state.leasedContracts.find(c => c.id === part.leasedContractId);
+      return {
+        requiresBreachConfirmation: true,
+        actionType: 'format',
+        diskId: disk.id,
+        partId: part.id,
+        lease: lease,
+        penalty: lease ? lease.penaltyAmount : 300,
+        client: lease ? lease.client : "Klient Biznesowy",
+        formatParams: { fs, clusterSize, mount, encrypted }
+      };
+    }
+
+    // If force breach confirmed
+    if (part.leasedContractId && forceBreach) {
+      this.breakLease(part.leasedContractId);
     }
 
     // Stop service if running
@@ -2617,6 +3227,38 @@ class DiskEngine {
     return { success: true };
   }
 
+  // Execute Lease Breach: charges penalty, enters debt if needed, drops reputation
+  breakLease(leaseId) {
+    const leaseIdx = this.state.leasedContracts.findIndex(c => c.id === leaseId);
+    if (leaseIdx === -1) return;
+    const lease = this.state.leasedContracts[leaseIdx];
+
+    const penalty = lease.penaltyAmount || 350.0;
+    this.state.money -= penalty;
+
+    // Bank Debt Line if money is negative
+    if (this.state.money < 0) {
+      this.state.debtBalance += Math.abs(this.state.money);
+      this.state.money = 0.0;
+      this.state.debtDaysRemaining = 5;
+    }
+
+    this.state.reputation = Math.max(0, this.state.reputation - 20);
+
+    // Unlink from partition
+    for (const d of this.state.disks) {
+      for (const p of d.partitions) {
+        if (p.leasedContractId === leaseId) {
+          p.leasedContractId = null;
+        }
+      }
+    }
+
+    this.state.leasedContracts.splice(leaseIdx, 1);
+    window.audioEngine?.playAlert();
+    window.gameUI?.showToast(`ZERWANO UMOWĘ Z KLIENTEM: Pobrano karę ${penalty.toFixed(2)} PLN! Reputacja -20 pkt.`, "error");
+  }
+
   // Convert partition table MBR <-> GPT
   changeTableType(diskId, newType) {
     const disk = this.state.disks.find(d => d.id === diskId);
@@ -2627,6 +3269,14 @@ class DiskEngine {
       return { 
         success: false, 
         msg: "BLOKADA JĄDRA: Dysk zawiera partycję systemową (SYSTEM_OS). Zmiana tablicy partycji skasowałaby system operacyjny!" 
+      };
+    }
+
+    const hasLeased = disk.partitions.some(p => p.leasedContractId != null);
+    if (hasLeased) {
+      return {
+        success: false,
+        msg: "BLOKADA: Dysk zawiera wynajęte partycje dla klientów! Zerwij lub dokończ umowy najmu przed konwersją tablicy dysku."
       };
     }
 
@@ -2644,6 +3294,132 @@ class DiskEngine {
     this.state.selectedPartId = null;
 
     window.audioEngine?.playHddSeek(2.0);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // --- SOFTWARE RAID ENGINE ---
+  createRaidArray(name, type, partId1, partId2) {
+    if (this.state.toolTier < 3) {
+      return { success: false, msg: "Tworzenie macierzy RAID wymaga pakietu GParted LVM & ZFS Pro (Tier 3)!" };
+    }
+
+    const all = window.servicesEngine.getAllPartitions();
+    const entry1 = all.find(e => e.part.id === partId1);
+    const entry2 = all.find(e => e.part.id === partId2);
+
+    if (!entry1 || !entry2) {
+      return { success: false, msg: "Nie znaleziono wskazanych partycji do macierzy." };
+    }
+
+    if (entry1.disk.id === entry2.disk.id && (type === 'RAID1' || type === 'RAID0')) {
+      return { success: false, msg: "Zalecenie inżynieryjne: Macierz RAID powinna łączyć partycje z DWÓCH RÓŻNYCH fizycznych dysków dla zysku I/O lub bezpieczeństwa!" };
+    }
+
+    const p1 = entry1.part;
+    const p2 = entry2.part;
+
+    if (p1.isSystem || p2.isSystem) {
+      return { success: false, msg: "Partycja systemowa nie może zostać włączona do macierzy RAID woluminów danych!" };
+    }
+
+    if (p1.leasedContractId || p2.leasedContractId) {
+      return { success: false, msg: "Partycje wynajęte dla klientów nie mogą być modyfikowane w macierz RAID!" };
+    }
+
+    if (p1.inRaid || p2.inRaid) {
+      return { success: false, msg: "Jedna z wybranych partycji jest już włączona do innej macierzy RAID!" };
+    }
+
+    if ((type === 'RAID0' || type === 'RAID1') && Math.abs(p1.sizeGB - p2.sizeGB) > 1) {
+      return { success: false, msg: `Wymóg ${type}: Obie partycje muszą mieć identyczny rozmiar! (${p1.sizeGB} GB vs ${p2.sizeGB} GB)` };
+    }
+
+    const arrayId = `raid-${Date.now()}`;
+    const effectiveSize = (type === 'RAID1') ? p1.sizeGB : (p1.sizeGB + p2.sizeGB);
+
+    const newRaid = {
+      id: arrayId,
+      name: name.trim() || `MD_${type}_0`,
+      type: type, // 'RAID0' | 'RAID1' | 'JBOD'
+      partIds: [p1.id, p2.id],
+      devNames: [p1.dev, p2.dev],
+      sizeGB: effectiveSize,
+      status: 'HEALTHY'
+    };
+
+    p1.inRaid = true;
+    p1.raidId = arrayId;
+    p2.inRaid = true;
+    p2.raidId = arrayId;
+
+    this.state.raidArrays.push(newRaid);
+    window.audioEngine?.playHddSeek(2.0);
+    this.state.notify();
+    return { success: true, raid: newRaid };
+  }
+
+  deleteRaidArray(raidId) {
+    const idx = this.state.raidArrays.findIndex(r => r.id === raidId);
+    if (idx === -1) return { success: false, msg: "Nie znaleziono macierzy." };
+
+    const raid = this.state.raidArrays[idx];
+    const all = window.servicesEngine.getAllPartitions();
+    all.forEach(e => {
+      if (raid.partIds.includes(e.part.id)) {
+        e.part.inRaid = false;
+        e.part.raidId = null;
+      }
+    });
+
+    this.state.raidArrays.splice(idx, 1);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // --- DATA FORENSICS & SCRAP CARVING ---
+  scanForRecoverableData(diskId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    window.audioEngine?.playHddSeek(2.8);
+
+    const secretPool = [
+      { name: "baza_klientow_tachibana.db", desc: "Poufna lista klientów korporacji z numerami kart.", valuePLN: 380, valueCrypto: 0.0012 },
+      { name: "portfel_btc_2011.dat", desc: "Zapomniany stary portfel z odnalezionym kluczem prywatnym.", valuePLN: 150, valueCrypto: 0.0045 },
+      { name: "raport_inwigilacji_policji.pdf", desc: "Tajny dokument operacyjny wydziału do walki z cyberprzestępczością.", valuePLN: 520, valueCrypto: 0.0008 },
+      { name: "schemat_chlodzenia_v2.cad", desc: "Plany przemysłowego radiatora o podwyższonej wydajności.", valuePLN: 240, valueCrypto: 0.0003 }
+    ];
+
+    // 40% chance of carving a file on used/scrap disks if not previously carved
+    if (Math.random() < 0.45) {
+      const template = secretPool[Math.floor(Math.random() * secretPool.length)];
+      const file = {
+        id: `file-${Date.now()}`,
+        name: template.name,
+        desc: template.desc,
+        valuePLN: template.valuePLN,
+        valueCrypto: template.valueCrypto,
+        sourceDisk: disk.dev,
+        sold: false
+      };
+      this.state.recoveredDataFiles.push(file);
+      this.state.notify();
+      return { success: true, found: true, file: file };
+    }
+
+    return { success: true, found: false };
+  }
+
+  sellRecoveredData(fileId) {
+    const file = this.state.recoveredDataFiles.find(f => f.id === fileId);
+    if (!file || file.sold) return { success: false, msg: "Plik nie istnieje lub został już sprzedany." };
+
+    file.sold = true;
+    this.state.money += file.valuePLN;
+    this.state.crypto += file.valueCrypto;
+    window.audioEngine?.playBeep(980, 0.15);
+    window.gameUI?.showToast(`Sprzedano na czarnym rynku: ${file.name} (+${file.valuePLN} PLN, +${file.valueCrypto} Ⓦ)!`, "success");
     this.state.notify();
     return { success: true };
   }
@@ -2710,6 +3486,7 @@ class DiskEngine {
     // Stop all services
     disk.partitions.forEach(p => {
       if (p.serviceId) window.servicesEngine?.stopService(p.serviceId);
+      if (p.leasedContractId) this.breakLease(p.leasedContractId);
     });
 
     disk.partitions = [];
@@ -2728,11 +3505,12 @@ class DiskEngine {
 // Global disk engine singleton
 window.diskEngine = new DiskEngine(window.gameState);
 
-</script>
-  <script>
+
+/* === services_engine.js === */
 /**
- * NAVI // PARTITION.SYS - THE WIRED SERVICES & DAEMONS ENGINE
- * Manages background daemons, partition requirements, cluster efficiency, income & police suspicion.
+ * NAVI // PARTITION.SYS 2.0 - WIRED SERVICES, LEASING & SIMULATION ENGINE
+ * Handles daemons, dynamic weather, noise, dust, AC, dedicated crypto mining,
+ * long-term volume leasing lifecycle, P&L financial auditing, and bank debt collectors.
  */
 
 class ServicesEngine {
@@ -2742,85 +3520,85 @@ class ServicesEngine {
       {
         id: "wired_relay",
         name: "Węzeł Przekaźnikowy The Wired",
-        desc: "Podstawowy routing pakietów sieciowych w The Wired. Wymaga stabilnego systemu plików i partycji min. 15 GB.",
+        desc: "Podstawowy routing pakietów sieciowych. Wymaga stabilnego systemu plików i min. 15 GB.",
         minSizeGB: 15,
         requiredFs: ["EXT4", "NTFS", "ZFS"],
         preferredClusters: ["4KB", "16KB"],
         requiredMount: "/mnt/wired",
-        powerWatts: 35,
-        heatRate: 0.15,
-        incomePerTick: 0.90, // PLN per 10 in-game minutes
-        cryptoPerTick: 0.00008,
+        powerWatts: 30,
+        heatRate: 0.12,
+        incomePerTick: 0.40, // ~24 PLN / day (Rebalanced)
+        cryptoPerTick: 0.0, // Standard services don't generate crypto magically!
         illegal: false
       },
       {
         id: "scraper_bot",
         name: "Sieciowy Scraper Danych & Indeksator",
-        desc: "Pobiera miliony mikroskopijnych plików i logów z sieci. Wymaga małych klastrów (512B lub 1KB), inaczej slack space zapycha dysk!",
+        desc: "Pobiera tysiące mikroskopijnych plików i logów. Wymaga małych klastrów (512B lub 1KB).",
         minSizeGB: 20,
         requiredFs: ["FAT32", "EXT4", "NTFS"],
         preferredClusters: ["512B", "1KB"],
         requiredMount: "/mnt/storage",
         powerWatts: 45,
-        heatRate: 0.20,
-        incomePerTick: 1.50,
-        cryptoPerTick: 0.00015,
+        heatRate: 0.18,
+        incomePerTick: 0.65, // ~39 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       },
       {
         id: "p2p_seeder",
         name: "P2P Warez & Anime Mirror",
-        desc: "Nocny seedbox dla cyfrowego podziemia. Lekki, działa nawet na starym FAT32, generuje stały drobny dochód.",
+        desc: "Lekki seedbox podziemia. Działa nawet na FAT32, generuje stały drobny dochód.",
         minSizeGB: 10,
         requiredFs: ["FAT32", "NTFS", "EXT4"],
         preferredClusters: ["16KB", "64KB"],
         requiredMount: "/mnt/storage",
         powerWatts: 20,
-        heatRate: 0.10,
-        incomePerTick: 0.65,
-        cryptoPerTick: 0.00005,
+        heatRate: 0.08,
+        incomePerTick: 0.25, // ~15 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       },
       {
-        id: "crypto_validator",
-        name: "Węzeł Walidacyjny WiredCoin (Mining)",
-        desc: "Koparka i walidator transakcji kryptograficznych. Wysoki pobór mocy i ciepła! Wymaga klastrów 16KB lub 64KB.",
+        id: "crypto_miner",
+        name: "Węzeł Wydobywczy WiredCoin (Mining Pool)",
+        desc: "Dedykowana koparka PoW/PoS! Pożera mnóstwo prądu (160W) i potężnie grzeje pokój. Wymaga klastrów 64KB. RAID 0 podwaja zysk!",
         minSizeGB: 35,
         requiredFs: ["EXT4", "ZFS", "NTFS"],
-        preferredClusters: ["16KB", "64KB"],
+        preferredClusters: ["64KB"],
         requiredMount: "/mnt/crypto",
-        powerWatts: 110,
-        heatRate: 0.55,
-        incomePerTick: 0.30,
-        cryptoPerTick: 0.00085,
+        powerWatts: 160, // Heavy wattage!
+        heatRate: 0.70, // Heavy heat!
+        incomePerTick: 0.05,
+        cryptoPerTick: 0.0018, // Intentional source of crypto!
         illegal: false
       },
       {
         id: "darknet_mirror",
         name: "Hosting Lustrzany DarkNetu",
-        desc: "Nielegalny węzeł darknetu. Ogromne zyski, ale przyciąga policję! Wymaga szyfrowania LUKS, inaczej nalot to kwestia czasu.",
+        desc: "Nielegalny węzeł darknetu. Bardzo wysoki zysk w PLN i Krypto, lecz przyciąga policję! Wymaga szyfrowania LUKS.",
         minSizeGB: 30,
         requiredFs: ["LUKS", "EXT4", "ZFS"],
         preferredClusters: ["4KB"],
         requiredMount: "/mnt/darknet",
-        powerWatts: 60,
-        heatRate: 0.35,
-        incomePerTick: 3.80,
-        cryptoPerTick: 0.0018,
+        powerWatts: 65,
+        heatRate: 0.30,
+        incomePerTick: 2.20, // ~132 PLN / day
+        cryptoPerTick: 0.0008,
         illegal: true
       },
       {
         id: "corporate_vault",
         name: "Skarbiec Kopii Zapasowych Tachibana",
-        desc: "Płatny bezpieczny skarbiec danych korporacyjnych. Wymaga odpornego na awarie systemu ZFS lub NTFS.",
+        desc: "Przechowywanie danych korporacyjnych z sumami kontrolnymi. Wymaga odpornego systemu ZFS lub NTFS.",
         minSizeGB: 50,
         requiredFs: ["ZFS", "NTFS"],
         preferredClusters: ["4KB", "16KB"],
         requiredMount: "/mnt/vault",
         powerWatts: 50,
-        heatRate: 0.25,
-        incomePerTick: 2.80,
-        cryptoPerTick: 0.0005,
+        heatRate: 0.20,
+        incomePerTick: 1.40, // ~84 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       }
     ];
@@ -2845,6 +3623,7 @@ class ServicesEngine {
     const mountOk = part.mount === serviceDef.requiredMount;
     const clusterIdeal = serviceDef.preferredClusters.includes(part.clusterSize);
     const willTripFuse = (this.state.currentWatts + serviceDef.powerWatts) > this.state.fuseMaxWatts;
+    const isLeased = part.leasedContractId != null;
 
     return {
       size: { ok: sizeOk, msg: `${part.sizeGB} GB (min. ${serviceDef.minSizeGB} GB)` },
@@ -2852,12 +3631,16 @@ class ServicesEngine {
       mount: { ok: mountOk, msg: `${part.mount} (wymagane: ${serviceDef.requiredMount})` },
       cluster: { ok: clusterIdeal, msg: `${part.clusterSize} ${clusterIdeal ? '(optymalne)' : '(-20% wydajności)'}` },
       power: { ok: !willTripFuse, msg: `+${serviceDef.powerWatts}W ${willTripFuse ? '⚠️ WYBIJE KORKI!' : '(w normie)'}` },
-      allValid: sizeOk && fsOk && mountOk
+      leased: { ok: !isLeased, msg: isLeased ? '🔒 Wynajęta dla klienta' : 'Wolna' },
+      allValid: sizeOk && fsOk && mountOk && !isLeased
     };
   }
 
   // Check if a partition meets service requirements
   validatePartitionForService(serviceDef, part) {
+    if (part.leasedContractId) {
+      return { valid: false, reason: "Partycja jest aktualnie wynajęta dla klienta! Nie możesz na niej uruchamiać własnych serwisów." };
+    }
     if (part.sizeGB < serviceDef.minSizeGB) {
       return { 
         valid: false, 
@@ -2880,9 +3663,17 @@ class ServicesEngine {
     // Cluster efficiency factor (0.5 to 1.2x)
     let clusterMultiplier = 1.0;
     if (serviceDef.preferredClusters.includes(part.clusterSize)) {
-      clusterMultiplier = 1.2; // Bonus for ideal allocation unit size
+      clusterMultiplier = 1.2;
     } else {
-      clusterMultiplier = 0.8; // Penalty for slack space or random access latency
+      clusterMultiplier = 0.8;
+    }
+
+    // RAID 0 bonus
+    if (part.inRaid && part.raidId) {
+      const raid = this.state.raidArrays.find(r => r.id === part.raidId);
+      if (raid && raid.type === 'RAID0') {
+        clusterMultiplier *= 1.8; // RAID 0 Striping speed boost!
+      }
     }
 
     return { valid: true, clusterMultiplier };
@@ -2913,7 +3704,7 @@ class ServicesEngine {
       diskId: entry.disk.id,
       partId: partId,
       clusterMultiplier: validation.clusterMultiplier,
-      trafficMBps: (1.5 + Math.random() * 8.0).toFixed(1)
+      trafficMBps: (1.2 + Math.random() * 5.0).toFixed(1)
     });
 
     window.audioEngine?.playHddSeek(1.2);
@@ -2937,118 +3728,240 @@ class ServicesEngine {
     }
   }
 
-  // Tick calculation for economy, power and heat
+  // Calculate dynamic outdoor weather temperature based on time of day
+  calculateOutdoorTemp(hour) {
+    if (hour >= 0 && hour < 6) return 16.0;
+    if (hour >= 6 && hour < 10) return 20.0 + (hour - 6) * 1.5;
+    if (hour >= 10 && hour <= 16) return 31.0 + Math.sin((hour - 10) / 6 * Math.PI) * 4.0; // Midday heatwave up to 35°C!
+    if (hour > 16 && hour < 21) return 28.0 - (hour - 16) * 2.0;
+    return 18.0;
+  }
+
+  // Main simulation tick: Power, Thermal, Leasing SLA, P&L, Debt, Malware
   tickProcess() {
-    if (this.state.fuseTripped) return; // No power, no services
+    const hour = this.state.inGameTime.hour;
+    this.state.outdoorTemp = this.calculateOutdoorTemp(hour);
 
     let totalWatts = 50; // Baseline PC idle
-    let totalHeat = 0.05; // Ambient baseline heat
-    let totalIncome = 0;
-    let totalCrypto = 0;
+    let totalHeat = 0.05; // Baseline ambient heat
+    let totalNoise = 10;
+    let incomeServices = 0;
+    let incomeMining = 0;
+    let incomeLeasing = 0;
+    let costPower = 0;
+    let costWear = 0;
 
-    // Disks idle power & heat
+    // Disks power, heat and wear
     for (const disk of this.state.disks) {
       totalWatts += disk.powerWatts;
       totalHeat += disk.heatRate;
+      totalNoise += 3;
+      costWear += 0.01; // Mechanical wear amortisation
     }
 
-    // Running services power, heat, and income
-    for (const s of this.state.services) {
-      const def = this.serviceCatalog.find(c => c.id === s.serviceId);
-      if (!def) continue;
+    // Fans & Coolers
+    if (this.state.coolingPumpActive) {
+      totalWatts += 40;
+      totalNoise += 6;
+    }
+    if (this.state.acActive && this.state.acInstalled) {
+      totalWatts += 450; // AC draws 450W!
+      totalNoise += 12;
+    }
 
-      totalWatts += def.powerWatts;
-      totalHeat += def.heatRate;
+    // Malware drain
+    for (const m of this.state.malwareActive) {
+      totalWatts += m.drainWatts || 30;
+      totalHeat += 0.15;
+    }
 
-      const earnedPLN = def.incomePerTick * s.clusterMultiplier;
-      const earnedCrypto = def.cryptoPerTick * s.clusterMultiplier;
+    // Running services calculation (Only if fuse is intact!)
+    const isPowered = !this.state.fuseTripped;
+    const isThrottled = this.state.roomTemp > 42.0;
+    const throttleMultiplier = isThrottled ? 0.5 : 1.0;
 
-      totalIncome += earnedPLN;
-      totalCrypto += earnedCrypto;
+    if (isPowered) {
+      for (const s of this.state.services) {
+        const def = this.serviceCatalog.find(c => c.id === s.serviceId);
+        if (!def) continue;
 
-      // Check illegal status and police threat
-      if (def.illegal) {
-        const all = this.getAllPartitions();
-        const entry = all.find(e => e.part.id === s.partId);
-        if (entry && !entry.part.encrypted && entry.part.fs !== "LUKS") {
-          // Unencrypted darknet data increases police suspicion!
-          this.state.policeThreat = Math.min(100, this.state.policeThreat + 1.2);
+        totalWatts += def.powerWatts;
+        totalHeat += def.heatRate;
+        totalNoise += 4;
+
+        const earnedPLN = def.incomePerTick * s.clusterMultiplier * throttleMultiplier;
+        const earnedCrypto = def.cryptoPerTick * s.clusterMultiplier * throttleMultiplier;
+
+        if (def.id === 'crypto_miner') {
+          incomeMining += earnedCrypto;
+          this.state.crypto += earnedCrypto;
         } else {
-          // Encrypted LUKS partition is safe from automated sniffer!
-          this.state.policeThreat = Math.max(0, this.state.policeThreat - 0.2);
+          incomeServices += earnedPLN;
+          this.state.money += earnedPLN;
+        }
+
+        // Darknet threat
+        if (def.illegal) {
+          const all = this.getAllPartitions();
+          const entry = all.find(e => e.part.id === s.partId);
+          if (entry && !entry.part.encrypted && entry.part.fs !== "LUKS") {
+            this.state.policeThreat = Math.min(100, this.state.policeThreat + 1.2);
+          } else {
+            this.state.policeThreat = Math.max(0, this.state.policeThreat - 0.2);
+          }
         }
       }
 
-      // Random I/O sound effect
-      if (Math.random() < 0.25) {
-        window.audioEngine?.playHddSeek(0.4);
-      }
-    }
+      // Leased Contracts processing
+      for (const lease of this.state.leasedContracts) {
+        lease.totalTicks = (lease.totalTicks || 0) + 1;
+        if (!isThrottled) {
+          lease.uptimeTicks = (lease.uptimeTicks || 0) + 1;
+        }
 
-    // Cooling pump power draw
-    if (this.state.coolingPumpActive) {
-      totalWatts += 40;
+        // Daily rent paid proportionally per tick
+        const tickRent = lease.dailyRent / 144; // 144 ticks = 1 in-game day
+        incomeLeasing += tickRent;
+        this.state.money += tickRent;
+      }
     }
 
     this.state.currentWatts = totalWatts;
-    this.state.money += totalIncome;
-    this.state.crypto += totalCrypto;
+    this.state.noiseLevel = totalNoise;
 
-    // Power bill accrual (kWh = Watts * hours / 1000; 1 tick = 1/6th hour)
+    // Power bill
     const kwhDelta = (totalWatts * (1 / 6)) / 1000;
     this.state.powerKwhAccrued += kwhDelta;
-    this.state.powerBillAmount += kwhDelta * this.state.powerKwhRate;
+    costPower = kwhDelta * this.state.powerKwhRate;
+    this.state.powerBillAmount += costPower;
 
-    // Circuit breaker overload check!
-    if (this.state.currentWatts > this.state.fuseMaxWatts) {
+    // Update P&L metrics
+    this.state.pnlMetrics.todayIncome += (incomeServices + incomeLeasing);
+    this.state.pnlMetrics.todayExpenses += (costPower + costWear);
+    this.state.pnlMetrics.incomeServices += incomeServices;
+    this.state.pnlMetrics.incomeLeasing += incomeLeasing;
+    this.state.pnlMetrics.incomeMining += incomeMining;
+    this.state.pnlMetrics.costPower += costPower;
+    this.state.pnlMetrics.costWear += costWear;
+
+    // Circuit Breaker Overload
+    if (this.state.currentWatts > this.state.fuseMaxWatts && !this.state.fuseTripped) {
       this.state.fuseTripped = true;
       window.audioEngine?.playFuseTrip();
-      window.gameUI?.showToast(`WYBIŁO BEZPIECZNIK! Pobór (${Math.round(this.state.currentWatts)}W) przekroczył limit (${this.state.fuseMaxWatts}W)!`, "error");
+      window.gameUI?.showToast(`WYBIŁO BEZPIECZNIK! Pobór ${Math.round(this.state.currentWatts)}W przekroczył limit ${this.state.fuseMaxWatts}W!`, "error");
       return;
     }
 
-    // Thermal simulation
+    // THERMAL SIMULATION OVERHAUL
     let tempDelta = (totalHeat * (1 / 6));
-    if (this.state.windowOpen) {
-      // Room cools towards ambient temp (19°C)
-      const diff = this.state.roomTemp - this.state.ambientTemp;
-      tempDelta -= diff * 0.08;
-    }
-    if (this.state.coolingPumpActive && this.state.coolingFluidLevel > 0) {
-      tempDelta -= 0.18;
-      this.state.coolingFluidLevel = Math.max(0, this.state.coolingFluidLevel - 0.05);
-    }
-    this.state.roomTemp = Math.max(16.0, this.state.roomTemp + tempDelta);
 
-    // Update dynamic fan speed sound based on load & temp
+    if (this.state.windowOpen) {
+      // Moves towards outdoor weather temp
+      const outdoorDiff = this.state.outdoorTemp - this.state.roomTemp;
+      tempDelta += outdoorDiff * 0.06;
+
+      // Dust accumulation from street
+      this.state.dustLevel = Math.min(100, this.state.dustLevel + 0.05);
+
+      // Neighbor complaints from noise
+      if (this.state.noiseLevel > 28) {
+        this.state.neighborComplaints = Math.min(100, this.state.neighborComplaints + 0.35);
+        if (this.state.neighborComplaints >= 100) {
+          this.state.neighborComplaints = 0;
+          this.state.money = Math.max(0, this.state.money - 200);
+          window.audioEngine?.playAlert();
+          window.gameUI?.showToast("MANDAT ZE SPÓŁDZIELNI: Hałas pracujących dysków przez otwarte okno oburzył sąsiadów (-200 PLN)!", "error");
+        }
+      }
+    } else {
+      // Window closed reduces neighbor complaints
+      this.state.neighborComplaints = Math.max(0, this.state.neighborComplaints - 0.2);
+    }
+
+    // Dust insulation penalty (reduces heat dissipation)
+    tempDelta *= (1 + this.state.dustLevel / 150);
+
+    // Liquid cooling pump
+    if (this.state.coolingPumpActive && this.state.coolingFluidLevel > 0) {
+      tempDelta -= 0.16;
+      this.state.coolingFluidLevel = Math.max(0, this.state.coolingFluidLevel - 0.04);
+    }
+
+    // Air Conditioner (AC)
+    if (this.state.acActive && this.state.acInstalled && isPowered) {
+      tempDelta -= 0.32; // Strong cooling!
+    }
+
+    this.state.roomTemp = Math.max(15.0, this.state.roomTemp + tempDelta);
+
+    // Audio fan speed update
     const loadFrac = Math.min(1.0, this.state.currentWatts / this.state.fuseMaxWatts);
     window.audioEngine?.updateFanSpeed(loadFrac, this.state.roomTemp);
 
-    // Thermal throttling & drive damage warning
-    if (this.state.roomTemp > 45.0 && Math.random() < 0.2) {
-      const damagedDisk = this.state.disks[Math.floor(Math.random() * this.state.disks.length)];
-      if (damagedDisk) {
-        damagedDisk.health = Math.max(5, damagedDisk.health - 2);
+    // Thermal damage & bad sectors if > 48°C
+    if (this.state.roomTemp > 48.0 && Math.random() < 0.25) {
+      const disk = this.state.disks[Math.floor(Math.random() * this.state.disks.length)];
+      if (disk) {
+        disk.health = Math.max(5, disk.health - 2);
         const badIdx = Math.floor(Math.random() * 128);
-        if (!damagedDisk.badSectors.includes(badIdx)) damagedDisk.badSectors.push(badIdx);
-        window.gameUI?.showToast(`PRZEGRZANIE (${this.state.roomTemp.toFixed(1)}°C)! Dysk ${damagedDisk.model} ulega degradacji termicznej!`, "error");
+        if (!disk.badSectors.includes(badIdx)) disk.badSectors.push(badIdx);
+        window.gameUI?.showToast(`KRYTYCZNY UPAŁ (${this.state.roomTemp.toFixed(1)}°C)! Dysk ${disk.model} łapie bad sectory!`, "error");
       }
     }
 
-    // Police Raid check if threat reaches 100%
-    if (this.state.policeThreat >= 100 && !this.state.policeRaidPending) {
-      this.state.policeRaidPending = true;
-      window.audioEngine?.playAlert();
-      window.gameUI?.showToast("ALARM: Wykryto nakaz przeszukania policji cybernetycznej! Masz 1 minutę na szyfrowanie lub czyszczenie dysków (/dev/zero)!", "error");
+    // Random Cyber Malware Attack (1% chance per tick if online in Darknet)
+    const hasDarknet = this.state.services.some(s => s.serviceId === 'darknet_mirror');
+    if (hasDarknet && Math.random() < 0.008 && this.state.malwareActive.length === 0) {
+      this.infectWithMalware();
     }
+  }
+
+  infectWithMalware() {
+    const all = this.getAllPartitions().filter(e => !e.part.isSystem);
+    if (all.length === 0) return;
+    const target = all[Math.floor(Math.random() * all.length)].part;
+
+    const malware = {
+      id: `malware-${Date.now()}`,
+      name: "Ransomware 'Crypt0Lain'",
+      type: "ransomware",
+      targetPartId: target.id,
+      targetDev: target.dev,
+      drainWatts: 45,
+      ransomAmount: 350
+    };
+
+    target.corrupted = true;
+    this.state.malwareActive.push(malware);
+    window.audioEngine?.playAlert();
+    window.gameUI?.showToast(`ALARM BEZPIECZEŃSTWA: Wykryto infekcję '${malware.name}' na partycji ${target.dev}! Użyj DEFENDER.EXE!`, "error");
+    this.state.notify();
+  }
+
+  cleanMalware(malwareId) {
+    const idx = this.state.malwareActive.findIndex(m => m.id === malwareId);
+    if (idx === -1) return { success: false, msg: "Nie znaleziono zagrożenia." };
+    const m = this.state.malwareActive[idx];
+
+    const all = this.getAllPartitions();
+    const target = all.find(e => e.part.id === m.targetPartId);
+    if (target) {
+      target.part.corrupted = false;
+    }
+
+    this.state.malwareActive.splice(idx, 1);
+    window.audioEngine?.playBeep(980, 0.2);
+    window.gameUI?.showToast(`Zneutralizowano złośliwe oprogramowanie: ${m.name}!`, "success");
+    this.state.notify();
+    return { success: true };
   }
 }
 
 // Global services engine singleton
 window.servicesEngine = new ServicesEngine(window.gameState);
 
-</script>
-  <script>
+
+/* === room_view.js === */
 /**
  * NAVI // PARTITION.SYS - 2D PIXEL-ART ROOM VIEW (LAIN'S SANCTUARY)
  * Renders the protagonist's room, evolving from a sparse bedroom to a sprawling NAVI cyber-shrine.
@@ -3073,7 +3986,8 @@ class RoomView {
       { id: 'window', name: 'Okno Pokoju [Otwórz/Zamknij]', x: 730, y: 90, w: 150, h: 180 },
       { id: 'bed', name: 'Materac / Łóżko [Odpocznij i zregeneruj siły]', x: 80, y: 340, w: 220, h: 140 },
       { id: 'fridge', name: 'Minilodówka & Zapasy [Zjedz / Kofeina]', x: 230, y: 220, w: 90, h: 110 },
-      { id: 'coolant', name: 'Chłodzenie Wodne & Zbiornik [Pompa / Płyn]', x: 670, y: 380, w: 110, h: 110 }
+      { id: 'coolant', name: 'Chłodzenie Wodne & Zbiornik [Pompa / Płyn]', x: 670, y: 380, w: 110, h: 110 },
+      { id: 'ac', name: 'Klimatyzator Pokojowy [Włącz/Wyłącz]', x: 740, y: 275, w: 100, h: 42 }
     ];
 
     this.bindEvents();
@@ -3175,6 +4089,16 @@ class RoomView {
         break;
       case 'coolant':
         this.toggleCoolingPump();
+        break;
+      case 'ac':
+        if (!this.state.acInstalled) {
+          window.gameUI?.showToast("Brak klimatyzatora! Kup go na Giełdzie Sprzętu w dziale Chłodzenie.");
+          return;
+        }
+        this.state.acActive = !this.state.acActive;
+        window.audioEngine?.playBeep(this.state.acActive ? 850 : 350, 0.1);
+        window.gameUI?.showToast(this.state.acActive ? "Włączono klimatyzator (AC) - mocny nawiew!" : "Wyłączono klimatyzator.");
+        this.state.notify();
         break;
     }
   }
@@ -3290,6 +4214,11 @@ class RoomView {
       this.renderCoolantSystem(ctx);
     }
 
+    // 9.5 AC Unit on Wall (If Installed)
+    if (this.state.acInstalled) {
+      this.renderAirConditioner(ctx);
+    }
+
     // 10. Ambient Particles (Floating dust motes & Cyber data dust)
     this.renderParticles(ctx);
 
@@ -3353,6 +4282,19 @@ class RoomView {
       ctx.fillRect(wx + 120, wy + 55, 2, 2);
     }
 
+    // Sun and heat glare during hot hours
+    if (!isNight && this.state.outdoorTemp > 26) {
+      const sunY = isDusk ? wy + 60 : wy + 35;
+      ctx.fillStyle = 'rgba(255, 220, 60, 0.3)';
+      ctx.beginPath();
+      ctx.arc(wx + 105, sunY, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffee66';
+      ctx.beginPath();
+      ctx.arc(wx + 105, sunY, 14, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     // Window panes
     ctx.strokeStyle = '#1b2230';
     ctx.lineWidth = 4;
@@ -3364,9 +4306,14 @@ class RoomView {
     ctx.lineTo(wx + ww, wy + wh / 2);
     ctx.stroke();
 
-    // If window open: draw curtain flutter
+    // Temperature text on window sill
+    ctx.fillStyle = '#ffaa33';
+    ctx.font = '12px "Share Tech Mono"';
+    ctx.fillText(`DWÓR: ${this.state.outdoorTemp.toFixed(1)}°C`, wx + 10, wy + wh - 8);
+
+    // If window open: draw curtain flutter and street dust/air breeze
     if (this.state.windowOpen) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
       const wave = Math.sin(this.animFrame * 0.08) * 8;
       ctx.beginPath();
       ctx.moveTo(wx, wy);
@@ -3374,6 +4321,14 @@ class RoomView {
       ctx.lineTo(wx, wy + wh);
       ctx.closePath();
       ctx.fill();
+
+      // Incoming air heat/dust particles
+      ctx.fillStyle = this.state.outdoorTemp > 28 ? 'rgba(255, 170, 50, 0.6)' : 'rgba(100, 200, 255, 0.6)';
+      for (let d = 0; d < 4; d++) {
+        const dx = wx + ((this.animFrame * 3 + d * 35) % ww);
+        const dy = wy + 40 + (d * 30);
+        ctx.fillRect(dx, dy, 2, 2);
+      }
     }
     ctx.restore();
   }
@@ -3675,8 +4630,46 @@ class RoomView {
     ctx.stroke();
   }
 
+  renderAirConditioner(ctx) {
+    const ax = 740, ay = 275, aw = 100, ah = 36;
+    // AC body
+    ctx.fillStyle = '#e2e6eb';
+    ctx.fillRect(ax, ay, aw, ah);
+    ctx.strokeStyle = '#8fa0b5';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ax, ay, aw, ah);
+
+    // Front vent grill
+    ctx.fillStyle = '#1c2430';
+    ctx.fillRect(ax + 10, ay + 20, aw - 20, 10);
+
+    // LED display
+    const isPowered = !this.state.fuseTripped;
+    ctx.fillStyle = '#0a1018';
+    ctx.fillRect(ax + aw - 32, ay + 6, 26, 10);
+    ctx.font = '8px monospace';
+    if (this.state.acActive && isPowered) {
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText('18°C', ax + aw - 30, ay + 14);
+
+      // Cool airflow wind lines
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+      ctx.lineWidth = 1.5;
+      for (let w = 0; w < 3; w++) {
+        const offset = ((this.animFrame * 2 + w * 15) % 40);
+        ctx.beginPath();
+        ctx.moveTo(ax + 20 + w * 25, ay + 32);
+        ctx.lineTo(ax + 10 + w * 25 - offset * 0.4, ay + 55 + offset);
+        ctx.stroke();
+      }
+    } else {
+      ctx.fillStyle = '#ff3344';
+      ctx.fillText('OFF', ax + aw - 28, ay + 14);
+    }
+  }
+
   renderParticles(ctx) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Normal ambient particles
     for (const p of this.particles) {
       p.x += p.vx;
       p.y += p.vy;
@@ -3686,6 +4679,17 @@ class RoomView {
 
       ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
       ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+
+    // Street dust particles scaling with dustLevel
+    if (this.state.dustLevel > 10) {
+      const dustCount = Math.floor(this.state.dustLevel * 0.5);
+      ctx.fillStyle = 'rgba(210, 190, 140, 0.35)';
+      for (let d = 0; d < dustCount; d++) {
+        const dx = (d * 87 + this.animFrame * 0.3) % 960;
+        const dy = (d * 53 + this.animFrame * 0.4) % 540;
+        ctx.fillRect(dx, dy, 1.5, 1.5);
+      }
     }
   }
 
@@ -3704,8 +4708,8 @@ class RoomView {
 // Global room view instance
 window.RoomView = RoomView;
 
-</script>
-  <script>
+
+/* === desktop_ui.js === */
 /**
  * NAVI // PARTITION.SYS - RETRO DESKTOP UI & WINDOW MANAGER
  * Controls draggable windows, partition strips, services cards, bazaar store, contracts, terminal & HUD.
@@ -4424,6 +5428,37 @@ class DesktopUI {
       this.state.notify();
     });
 
+    const btnRepayDebt = document.getElementById('btn-repay-debt');
+    if (btnRepayDebt) {
+      btnRepayDebt.addEventListener('click', () => {
+        if (this.state.debtBalance <= 0) {
+          this.showToast("Brak zadłużenia w banku.");
+          return;
+        }
+        const valInput = document.getElementById('debt-repay-amount');
+        const amount = parseFloat(valInput.value);
+        if (isNaN(amount) || amount <= 0) {
+          this.showToast("Podaj prawidłową kwotę spłaty długu!", "error");
+          return;
+        }
+        const repayAmt = Math.min(this.state.debtBalance, amount);
+        if (this.state.money < repayAmt) {
+          this.showToast(`Brak wystarczających środków! Masz tylko ${this.state.money.toFixed(2)} PLN.`, "error");
+          return;
+        }
+        this.state.money -= repayAmt;
+        this.state.debtBalance -= repayAmt;
+        if (this.state.debtBalance <= 0) {
+          this.state.debtBalance = 0;
+          this.state.debtDaysRemaining = 0;
+        }
+        window.audioEngine?.playBeep(920, 0.1);
+        this.showToast(`Spłacono ${repayAmt.toFixed(2)} PLN długu bankowego!`, "success");
+        this.renderBank();
+        this.state.notify();
+      });
+    }
+
     document.getElementById('btn-pay-rent').addEventListener('click', () => {
       if (this.state.money < this.state.rentAmount) {
         this.showToast(`Brak środków na opłacenie czynszu (${this.state.rentAmount} PLN)!`, "error");
@@ -4695,6 +5730,10 @@ class DesktopUI {
     this.renderServices();
     this.renderPowerGrid();
     this.renderBank();
+    this.renderPnL();
+    this.renderRaid();
+    this.renderForensics();
+    this.renderDefender();
     this.updateTaskbar();
     this.renderTutorial();
     this.checkTutorialProgress();
@@ -4705,6 +5744,8 @@ class DesktopUI {
     this.renderTopStatus();
     this.renderPowerGrid();
     this.renderBank();
+    this.renderPnL();
+    this.renderDefender();
     this.checkTutorialProgress();
   }
 
@@ -4731,6 +5772,20 @@ class DesktopUI {
       trayThreat.className = 'threat-indicator threat-warning';
     } else {
       trayThreat.className = 'threat-indicator';
+    }
+
+    const debtPill = document.getElementById('debt-pill');
+    if (debtPill) {
+      if (this.state.debtBalance > 0) {
+        debtPill.classList.remove('hidden');
+        document.getElementById('debt-display').innerText = `${this.state.debtBalance.toFixed(2)} PLN`;
+      } else {
+        debtPill.classList.add('hidden');
+      }
+    }
+    const weatherDisplay = document.getElementById('weather-display');
+    if (weatherDisplay) {
+      weatherDisplay.innerText = `${this.state.outdoorTemp.toFixed(1)}°C`;
     }
 
     // Room dock statuses
@@ -5065,8 +6120,8 @@ class DesktopUI {
 // Global UI instance
 window.DesktopUI = DesktopUI;
 
-</script>
-  <script>
+
+/* === game.js === */
 /**
  * NAVI // PARTITION.SYS - MAIN GAME LOOP & CONTROLLER
  * Coordinates time ticks, biological needs, rent deadlines, police checks and event dispatch.
@@ -5187,6 +6242,45 @@ class GameEngine {
 
     // Daily market refresh / small price fluctuation
     this.state.cryptoRate = Math.round(2200 + Math.random() * 600);
+
+    // Bank Debt & Usury Daily Interest (5%)
+    if (this.state.debtBalance > 0) {
+      const interest = Math.round(this.state.debtBalance * 0.05 * 100) / 100;
+      this.state.debtBalance += interest;
+      this.state.debtDaysRemaining -= 1;
+      window.audioEngine?.playAlert();
+      window.gameUI?.showToast(`E-BANK: Naliczone dzienne odsetki 5% (+${interest.toFixed(2)} PLN). Pozostało ${this.state.debtDaysRemaining} dni do egzekucji komorniczej!`, "error");
+
+      if (this.state.debtDaysRemaining <= 0) {
+        this.executeDebtCollection();
+      }
+    }
+
+    // Rollover daily P&L metrics
+    this.state.pnlMetrics.yesterdayIncome = this.state.pnlMetrics.todayIncome;
+    this.state.pnlMetrics.yesterdayExpenses = this.state.pnlMetrics.todayExpenses;
+    this.state.pnlMetrics.todayIncome = 0;
+    this.state.pnlMetrics.todayExpenses = 0;
+  }
+
+  executeDebtCollection() {
+    window.audioEngine?.playAlert();
+    // Find non-system disk to seize
+    const nonSysDiskIdx = this.state.disks.findIndex(d => !d.partitions.some(p => p.isSystem || p.mount === '/'));
+    if (nonSysDiskIdx !== -1) {
+      const removedDisk = this.state.disks.splice(nonSysDiskIdx, 1)[0];
+      const creditValue = Math.min(this.state.debtBalance, removedDisk.sizeGB * 1.5);
+      this.state.debtBalance = Math.max(0, this.state.debtBalance - creditValue);
+      this.state.debtDaysRemaining = 5;
+      alert(`KOMORNIK SĄDOWY: Wkroczył do mieszkania i zajął nośnik ${removedDisk.dev} (${removedDisk.model}) na poczet długu bankowego (- ${creditValue.toFixed(2)} PLN długu)!`);
+    } else {
+      // Seize all cash and crypto
+      this.state.money = 0;
+      this.state.crypto = 0;
+      this.state.debtDaysRemaining = 3;
+      alert("KOMORNIK SĄDOWY: Brak nośników do zajęcia! Zabezpieczono wszystkie środki z konta bankowego i portfela Wired. Wyznaczono ostateczny 3-dniowy termin spłaty!");
+    }
+    this.state.notify();
   }
 
   checkRandomEvents() {
@@ -5241,6 +6335,7 @@ class GameEngine {
 window.addEventListener('DOMContentLoaded', () => {
   window.gameEngine = new GameEngine();
 });
+
 
 </script>
 </body>

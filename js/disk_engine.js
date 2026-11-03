@@ -1,6 +1,7 @@
 /**
- * NAVI // PARTITION.SYS - DISK & PARTITION ENGINE
- * Manages partition tables (MBR/GPT), cluster sizes, file systems, S.M.A.R.T. bad sectors & dd wipes.
+ * NAVI // PARTITION.SYS 2.0 - DISK & PARTITION ENGINE
+ * Manages MBR/GPT tables, cluster sizes, file systems, S.M.A.R.T. bad sectors,
+ * lease breach penalties, Software RAID 0/1/JBOD and Scrap Data Forensics.
  */
 
 class DiskEngine {
@@ -94,7 +95,11 @@ class DiskEngine {
       mount: mount,
       encrypted: encrypted || (fs === "LUKS"),
       serviceId: null,
-      corrupted: false
+      corrupted: false,
+      isSystem: false,
+      leasedContractId: null,
+      inRaid: false,
+      raidId: null
     };
 
     disk.partitions.push(newPart);
@@ -106,8 +111,8 @@ class DiskEngine {
     return { success: true, part: newPart };
   }
 
-  // Delete partition
-  deletePartition(diskId, partId) {
+  // Delete partition (Checks for system protection and lease breach)
+  deletePartition(diskId, partId, forceBreach = false) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
@@ -124,6 +129,33 @@ class DiskEngine {
       };
     }
 
+    // Check if part is in RAID
+    if (part.inRaid) {
+      return {
+        success: false,
+        msg: "Partycja jest częścią aktywnej macierzy RAID! Rozwiąż macierz w Kreatorze RAID przed jej usunięciem."
+      };
+    }
+
+    // Check if part is leased to a client
+    if (part.leasedContractId && !forceBreach) {
+      const lease = this.state.leasedContracts.find(c => c.id === part.leasedContractId);
+      return {
+        requiresBreachConfirmation: true,
+        actionType: 'delete',
+        diskId: disk.id,
+        partId: part.id,
+        lease: lease,
+        penalty: lease ? lease.penaltyAmount : 300,
+        client: lease ? lease.client : "Klient Biznesowy"
+      };
+    }
+
+    // If force breach confirmed by user
+    if (part.leasedContractId && forceBreach) {
+      this.breakLease(part.leasedContractId);
+    }
+
     // Stop associated service if any
     if (part.serviceId) {
       window.servicesEngine?.stopService(part.serviceId);
@@ -137,8 +169,8 @@ class DiskEngine {
     return { success: true };
   }
 
-  // Format existing partition
-  formatPartition(diskId, partId, fs, clusterSize, mount, encrypted = false) {
+  // Format existing partition (Checks for system protection and lease breach)
+  formatPartition(diskId, partId, fs, clusterSize, mount, encrypted = false, forceBreach = false) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
@@ -154,6 +186,34 @@ class DiskEngine {
         };
       }
       mount = "/"; // Force keep root mount
+    }
+
+    // Check if part is in RAID
+    if (part.inRaid) {
+      return {
+        success: false,
+        msg: "Partycja jest częścią aktywnej macierzy RAID! Rozwiąż macierz w Kreatorze RAID przed jej formatowaniem."
+      };
+    }
+
+    // Check if leased to a client
+    if (part.leasedContractId && !forceBreach) {
+      const lease = this.state.leasedContracts.find(c => c.id === part.leasedContractId);
+      return {
+        requiresBreachConfirmation: true,
+        actionType: 'format',
+        diskId: disk.id,
+        partId: part.id,
+        lease: lease,
+        penalty: lease ? lease.penaltyAmount : 300,
+        client: lease ? lease.client : "Klient Biznesowy",
+        formatParams: { fs, clusterSize, mount, encrypted }
+      };
+    }
+
+    // If force breach confirmed
+    if (part.leasedContractId && forceBreach) {
+      this.breakLease(part.leasedContractId);
     }
 
     // Stop service if running
@@ -172,6 +232,38 @@ class DiskEngine {
     return { success: true };
   }
 
+  // Execute Lease Breach: charges penalty, enters debt if needed, drops reputation
+  breakLease(leaseId) {
+    const leaseIdx = this.state.leasedContracts.findIndex(c => c.id === leaseId);
+    if (leaseIdx === -1) return;
+    const lease = this.state.leasedContracts[leaseIdx];
+
+    const penalty = lease.penaltyAmount || 350.0;
+    this.state.money -= penalty;
+
+    // Bank Debt Line if money is negative
+    if (this.state.money < 0) {
+      this.state.debtBalance += Math.abs(this.state.money);
+      this.state.money = 0.0;
+      this.state.debtDaysRemaining = 5;
+    }
+
+    this.state.reputation = Math.max(0, this.state.reputation - 20);
+
+    // Unlink from partition
+    for (const d of this.state.disks) {
+      for (const p of d.partitions) {
+        if (p.leasedContractId === leaseId) {
+          p.leasedContractId = null;
+        }
+      }
+    }
+
+    this.state.leasedContracts.splice(leaseIdx, 1);
+    window.audioEngine?.playAlert();
+    window.gameUI?.showToast(`ZERWANO UMOWĘ Z KLIENTEM: Pobrano karę ${penalty.toFixed(2)} PLN! Reputacja -20 pkt.`, "error");
+  }
+
   // Convert partition table MBR <-> GPT
   changeTableType(diskId, newType) {
     const disk = this.state.disks.find(d => d.id === diskId);
@@ -182,6 +274,14 @@ class DiskEngine {
       return { 
         success: false, 
         msg: "BLOKADA JĄDRA: Dysk zawiera partycję systemową (SYSTEM_OS). Zmiana tablicy partycji skasowałaby system operacyjny!" 
+      };
+    }
+
+    const hasLeased = disk.partitions.some(p => p.leasedContractId != null);
+    if (hasLeased) {
+      return {
+        success: false,
+        msg: "BLOKADA: Dysk zawiera wynajęte partycje dla klientów! Zerwij lub dokończ umowy najmu przed konwersją tablicy dysku."
       };
     }
 
@@ -199,6 +299,132 @@ class DiskEngine {
     this.state.selectedPartId = null;
 
     window.audioEngine?.playHddSeek(2.0);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // --- SOFTWARE RAID ENGINE ---
+  createRaidArray(name, type, partId1, partId2) {
+    if (this.state.toolTier < 3) {
+      return { success: false, msg: "Tworzenie macierzy RAID wymaga pakietu GParted LVM & ZFS Pro (Tier 3)!" };
+    }
+
+    const all = window.servicesEngine.getAllPartitions();
+    const entry1 = all.find(e => e.part.id === partId1);
+    const entry2 = all.find(e => e.part.id === partId2);
+
+    if (!entry1 || !entry2) {
+      return { success: false, msg: "Nie znaleziono wskazanych partycji do macierzy." };
+    }
+
+    if (entry1.disk.id === entry2.disk.id && (type === 'RAID1' || type === 'RAID0')) {
+      return { success: false, msg: "Zalecenie inżynieryjne: Macierz RAID powinna łączyć partycje z DWÓCH RÓŻNYCH fizycznych dysków dla zysku I/O lub bezpieczeństwa!" };
+    }
+
+    const p1 = entry1.part;
+    const p2 = entry2.part;
+
+    if (p1.isSystem || p2.isSystem) {
+      return { success: false, msg: "Partycja systemowa nie może zostać włączona do macierzy RAID woluminów danych!" };
+    }
+
+    if (p1.leasedContractId || p2.leasedContractId) {
+      return { success: false, msg: "Partycje wynajęte dla klientów nie mogą być modyfikowane w macierz RAID!" };
+    }
+
+    if (p1.inRaid || p2.inRaid) {
+      return { success: false, msg: "Jedna z wybranych partycji jest już włączona do innej macierzy RAID!" };
+    }
+
+    if ((type === 'RAID0' || type === 'RAID1') && Math.abs(p1.sizeGB - p2.sizeGB) > 1) {
+      return { success: false, msg: `Wymóg ${type}: Obie partycje muszą mieć identyczny rozmiar! (${p1.sizeGB} GB vs ${p2.sizeGB} GB)` };
+    }
+
+    const arrayId = `raid-${Date.now()}`;
+    const effectiveSize = (type === 'RAID1') ? p1.sizeGB : (p1.sizeGB + p2.sizeGB);
+
+    const newRaid = {
+      id: arrayId,
+      name: name.trim() || `MD_${type}_0`,
+      type: type, // 'RAID0' | 'RAID1' | 'JBOD'
+      partIds: [p1.id, p2.id],
+      devNames: [p1.dev, p2.dev],
+      sizeGB: effectiveSize,
+      status: 'HEALTHY'
+    };
+
+    p1.inRaid = true;
+    p1.raidId = arrayId;
+    p2.inRaid = true;
+    p2.raidId = arrayId;
+
+    this.state.raidArrays.push(newRaid);
+    window.audioEngine?.playHddSeek(2.0);
+    this.state.notify();
+    return { success: true, raid: newRaid };
+  }
+
+  deleteRaidArray(raidId) {
+    const idx = this.state.raidArrays.findIndex(r => r.id === raidId);
+    if (idx === -1) return { success: false, msg: "Nie znaleziono macierzy." };
+
+    const raid = this.state.raidArrays[idx];
+    const all = window.servicesEngine.getAllPartitions();
+    all.forEach(e => {
+      if (raid.partIds.includes(e.part.id)) {
+        e.part.inRaid = false;
+        e.part.raidId = null;
+      }
+    });
+
+    this.state.raidArrays.splice(idx, 1);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // --- DATA FORENSICS & SCRAP CARVING ---
+  scanForRecoverableData(diskId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    window.audioEngine?.playHddSeek(2.8);
+
+    const secretPool = [
+      { name: "baza_klientow_tachibana.db", desc: "Poufna lista klientów korporacji z numerami kart.", valuePLN: 380, valueCrypto: 0.0012 },
+      { name: "portfel_btc_2011.dat", desc: "Zapomniany stary portfel z odnalezionym kluczem prywatnym.", valuePLN: 150, valueCrypto: 0.0045 },
+      { name: "raport_inwigilacji_policji.pdf", desc: "Tajny dokument operacyjny wydziału do walki z cyberprzestępczością.", valuePLN: 520, valueCrypto: 0.0008 },
+      { name: "schemat_chlodzenia_v2.cad", desc: "Plany przemysłowego radiatora o podwyższonej wydajności.", valuePLN: 240, valueCrypto: 0.0003 }
+    ];
+
+    // 40% chance of carving a file on used/scrap disks if not previously carved
+    if (Math.random() < 0.45) {
+      const template = secretPool[Math.floor(Math.random() * secretPool.length)];
+      const file = {
+        id: `file-${Date.now()}`,
+        name: template.name,
+        desc: template.desc,
+        valuePLN: template.valuePLN,
+        valueCrypto: template.valueCrypto,
+        sourceDisk: disk.dev,
+        sold: false
+      };
+      this.state.recoveredDataFiles.push(file);
+      this.state.notify();
+      return { success: true, found: true, file: file };
+    }
+
+    return { success: true, found: false };
+  }
+
+  sellRecoveredData(fileId) {
+    const file = this.state.recoveredDataFiles.find(f => f.id === fileId);
+    if (!file || file.sold) return { success: false, msg: "Plik nie istnieje lub został już sprzedany." };
+
+    file.sold = true;
+    this.state.money += file.valuePLN;
+    this.state.crypto += file.valueCrypto;
+    window.audioEngine?.playBeep(980, 0.15);
+    window.gameUI?.showToast(`Sprzedano na czarnym rynku: ${file.name} (+${file.valuePLN} PLN, +${file.valueCrypto} Ⓦ)!`, "success");
     this.state.notify();
     return { success: true };
   }
@@ -265,6 +491,7 @@ class DiskEngine {
     // Stop all services
     disk.partitions.forEach(p => {
       if (p.serviceId) window.servicesEngine?.stopService(p.serviceId);
+      if (p.leasedContractId) this.breakLease(p.leasedContractId);
     });
 
     disk.partitions = [];

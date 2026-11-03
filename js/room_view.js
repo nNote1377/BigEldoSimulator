@@ -22,7 +22,8 @@ class RoomView {
       { id: 'window', name: 'Okno Pokoju [Otwórz/Zamknij]', x: 730, y: 90, w: 150, h: 180 },
       { id: 'bed', name: 'Materac / Łóżko [Odpocznij i zregeneruj siły]', x: 80, y: 340, w: 220, h: 140 },
       { id: 'fridge', name: 'Minilodówka & Zapasy [Zjedz / Kofeina]', x: 230, y: 220, w: 90, h: 110 },
-      { id: 'coolant', name: 'Chłodzenie Wodne & Zbiornik [Pompa / Płyn]', x: 670, y: 380, w: 110, h: 110 }
+      { id: 'coolant', name: 'Chłodzenie Wodne & Zbiornik [Pompa / Płyn]', x: 670, y: 380, w: 110, h: 110 },
+      { id: 'ac', name: 'Klimatyzator Pokojowy [Włącz/Wyłącz]', x: 740, y: 275, w: 100, h: 42 }
     ];
 
     this.bindEvents();
@@ -124,6 +125,16 @@ class RoomView {
         break;
       case 'coolant':
         this.toggleCoolingPump();
+        break;
+      case 'ac':
+        if (!this.state.acInstalled) {
+          window.gameUI?.showToast("Brak klimatyzatora! Kup go na Giełdzie Sprzętu w dziale Chłodzenie.");
+          return;
+        }
+        this.state.acActive = !this.state.acActive;
+        window.audioEngine?.playBeep(this.state.acActive ? 850 : 350, 0.1);
+        window.gameUI?.showToast(this.state.acActive ? "Włączono klimatyzator (AC) - mocny nawiew!" : "Wyłączono klimatyzator.");
+        this.state.notify();
         break;
     }
   }
@@ -239,6 +250,11 @@ class RoomView {
       this.renderCoolantSystem(ctx);
     }
 
+    // 9.5 AC Unit on Wall (If Installed)
+    if (this.state.acInstalled) {
+      this.renderAirConditioner(ctx);
+    }
+
     // 10. Ambient Particles (Floating dust motes & Cyber data dust)
     this.renderParticles(ctx);
 
@@ -302,6 +318,19 @@ class RoomView {
       ctx.fillRect(wx + 120, wy + 55, 2, 2);
     }
 
+    // Sun and heat glare during hot hours
+    if (!isNight && this.state.outdoorTemp > 26) {
+      const sunY = isDusk ? wy + 60 : wy + 35;
+      ctx.fillStyle = 'rgba(255, 220, 60, 0.3)';
+      ctx.beginPath();
+      ctx.arc(wx + 105, sunY, 28, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = '#ffee66';
+      ctx.beginPath();
+      ctx.arc(wx + 105, sunY, 14, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
     // Window panes
     ctx.strokeStyle = '#1b2230';
     ctx.lineWidth = 4;
@@ -313,9 +342,14 @@ class RoomView {
     ctx.lineTo(wx + ww, wy + wh / 2);
     ctx.stroke();
 
-    // If window open: draw curtain flutter
+    // Temperature text on window sill
+    ctx.fillStyle = '#ffaa33';
+    ctx.font = '12px "Share Tech Mono"';
+    ctx.fillText(`DWÓR: ${this.state.outdoorTemp.toFixed(1)}°C`, wx + 10, wy + wh - 8);
+
+    // If window open: draw curtain flutter and street dust/air breeze
     if (this.state.windowOpen) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
       const wave = Math.sin(this.animFrame * 0.08) * 8;
       ctx.beginPath();
       ctx.moveTo(wx, wy);
@@ -323,6 +357,14 @@ class RoomView {
       ctx.lineTo(wx, wy + wh);
       ctx.closePath();
       ctx.fill();
+
+      // Incoming air heat/dust particles
+      ctx.fillStyle = this.state.outdoorTemp > 28 ? 'rgba(255, 170, 50, 0.6)' : 'rgba(100, 200, 255, 0.6)';
+      for (let d = 0; d < 4; d++) {
+        const dx = wx + ((this.animFrame * 3 + d * 35) % ww);
+        const dy = wy + 40 + (d * 30);
+        ctx.fillRect(dx, dy, 2, 2);
+      }
     }
     ctx.restore();
   }
@@ -624,8 +666,46 @@ class RoomView {
     ctx.stroke();
   }
 
+  renderAirConditioner(ctx) {
+    const ax = 740, ay = 275, aw = 100, ah = 36;
+    // AC body
+    ctx.fillStyle = '#e2e6eb';
+    ctx.fillRect(ax, ay, aw, ah);
+    ctx.strokeStyle = '#8fa0b5';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(ax, ay, aw, ah);
+
+    // Front vent grill
+    ctx.fillStyle = '#1c2430';
+    ctx.fillRect(ax + 10, ay + 20, aw - 20, 10);
+
+    // LED display
+    const isPowered = !this.state.fuseTripped;
+    ctx.fillStyle = '#0a1018';
+    ctx.fillRect(ax + aw - 32, ay + 6, 26, 10);
+    ctx.font = '8px monospace';
+    if (this.state.acActive && isPowered) {
+      ctx.fillStyle = '#00f0ff';
+      ctx.fillText('18°C', ax + aw - 30, ay + 14);
+
+      // Cool airflow wind lines
+      ctx.strokeStyle = 'rgba(0, 240, 255, 0.4)';
+      ctx.lineWidth = 1.5;
+      for (let w = 0; w < 3; w++) {
+        const offset = ((this.animFrame * 2 + w * 15) % 40);
+        ctx.beginPath();
+        ctx.moveTo(ax + 20 + w * 25, ay + 32);
+        ctx.lineTo(ax + 10 + w * 25 - offset * 0.4, ay + 55 + offset);
+        ctx.stroke();
+      }
+    } else {
+      ctx.fillStyle = '#ff3344';
+      ctx.fillText('OFF', ax + aw - 28, ay + 14);
+    }
+  }
+
   renderParticles(ctx) {
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    // Normal ambient particles
     for (const p of this.particles) {
       p.x += p.vx;
       p.y += p.vy;
@@ -635,6 +715,17 @@ class RoomView {
 
       ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
       ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+
+    // Street dust particles scaling with dustLevel
+    if (this.state.dustLevel > 10) {
+      const dustCount = Math.floor(this.state.dustLevel * 0.5);
+      ctx.fillStyle = 'rgba(210, 190, 140, 0.35)';
+      for (let d = 0; d < dustCount; d++) {
+        const dx = (d * 87 + this.animFrame * 0.3) % 960;
+        const dy = (d * 53 + this.animFrame * 0.4) % 540;
+        ctx.fillRect(dx, dy, 1.5, 1.5);
+      }
     }
   }
 

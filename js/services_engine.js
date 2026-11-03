@@ -1,6 +1,7 @@
 /**
- * NAVI // PARTITION.SYS - THE WIRED SERVICES & DAEMONS ENGINE
- * Manages background daemons, partition requirements, cluster efficiency, income & police suspicion.
+ * NAVI // PARTITION.SYS 2.0 - WIRED SERVICES, LEASING & SIMULATION ENGINE
+ * Handles daemons, dynamic weather, noise, dust, AC, dedicated crypto mining,
+ * long-term volume leasing lifecycle, P&L financial auditing, and bank debt collectors.
  */
 
 class ServicesEngine {
@@ -10,85 +11,85 @@ class ServicesEngine {
       {
         id: "wired_relay",
         name: "Węzeł Przekaźnikowy The Wired",
-        desc: "Podstawowy routing pakietów sieciowych w The Wired. Wymaga stabilnego systemu plików i partycji min. 15 GB.",
+        desc: "Podstawowy routing pakietów sieciowych. Wymaga stabilnego systemu plików i min. 15 GB.",
         minSizeGB: 15,
         requiredFs: ["EXT4", "NTFS", "ZFS"],
         preferredClusters: ["4KB", "16KB"],
         requiredMount: "/mnt/wired",
-        powerWatts: 35,
-        heatRate: 0.15,
-        incomePerTick: 0.90, // PLN per 10 in-game minutes
-        cryptoPerTick: 0.00008,
+        powerWatts: 30,
+        heatRate: 0.12,
+        incomePerTick: 0.40, // ~24 PLN / day (Rebalanced)
+        cryptoPerTick: 0.0, // Standard services don't generate crypto magically!
         illegal: false
       },
       {
         id: "scraper_bot",
         name: "Sieciowy Scraper Danych & Indeksator",
-        desc: "Pobiera miliony mikroskopijnych plików i logów z sieci. Wymaga małych klastrów (512B lub 1KB), inaczej slack space zapycha dysk!",
+        desc: "Pobiera tysiące mikroskopijnych plików i logów. Wymaga małych klastrów (512B lub 1KB).",
         minSizeGB: 20,
         requiredFs: ["FAT32", "EXT4", "NTFS"],
         preferredClusters: ["512B", "1KB"],
         requiredMount: "/mnt/storage",
         powerWatts: 45,
-        heatRate: 0.20,
-        incomePerTick: 1.50,
-        cryptoPerTick: 0.00015,
+        heatRate: 0.18,
+        incomePerTick: 0.65, // ~39 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       },
       {
         id: "p2p_seeder",
         name: "P2P Warez & Anime Mirror",
-        desc: "Nocny seedbox dla cyfrowego podziemia. Lekki, działa nawet na starym FAT32, generuje stały drobny dochód.",
+        desc: "Lekki seedbox podziemia. Działa nawet na FAT32, generuje stały drobny dochód.",
         minSizeGB: 10,
         requiredFs: ["FAT32", "NTFS", "EXT4"],
         preferredClusters: ["16KB", "64KB"],
         requiredMount: "/mnt/storage",
         powerWatts: 20,
-        heatRate: 0.10,
-        incomePerTick: 0.65,
-        cryptoPerTick: 0.00005,
+        heatRate: 0.08,
+        incomePerTick: 0.25, // ~15 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       },
       {
-        id: "crypto_validator",
-        name: "Węzeł Walidacyjny WiredCoin (Mining)",
-        desc: "Koparka i walidator transakcji kryptograficznych. Wysoki pobór mocy i ciepła! Wymaga klastrów 16KB lub 64KB.",
+        id: "crypto_miner",
+        name: "Węzeł Wydobywczy WiredCoin (Mining Pool)",
+        desc: "Dedykowana koparka PoW/PoS! Pożera mnóstwo prądu (160W) i potężnie grzeje pokój. Wymaga klastrów 64KB. RAID 0 podwaja zysk!",
         minSizeGB: 35,
         requiredFs: ["EXT4", "ZFS", "NTFS"],
-        preferredClusters: ["16KB", "64KB"],
+        preferredClusters: ["64KB"],
         requiredMount: "/mnt/crypto",
-        powerWatts: 110,
-        heatRate: 0.55,
-        incomePerTick: 0.30,
-        cryptoPerTick: 0.00085,
+        powerWatts: 160, // Heavy wattage!
+        heatRate: 0.70, // Heavy heat!
+        incomePerTick: 0.05,
+        cryptoPerTick: 0.0018, // Intentional source of crypto!
         illegal: false
       },
       {
         id: "darknet_mirror",
         name: "Hosting Lustrzany DarkNetu",
-        desc: "Nielegalny węzeł darknetu. Ogromne zyski, ale przyciąga policję! Wymaga szyfrowania LUKS, inaczej nalot to kwestia czasu.",
+        desc: "Nielegalny węzeł darknetu. Bardzo wysoki zysk w PLN i Krypto, lecz przyciąga policję! Wymaga szyfrowania LUKS.",
         minSizeGB: 30,
         requiredFs: ["LUKS", "EXT4", "ZFS"],
         preferredClusters: ["4KB"],
         requiredMount: "/mnt/darknet",
-        powerWatts: 60,
-        heatRate: 0.35,
-        incomePerTick: 3.80,
-        cryptoPerTick: 0.0018,
+        powerWatts: 65,
+        heatRate: 0.30,
+        incomePerTick: 2.20, // ~132 PLN / day
+        cryptoPerTick: 0.0008,
         illegal: true
       },
       {
         id: "corporate_vault",
         name: "Skarbiec Kopii Zapasowych Tachibana",
-        desc: "Płatny bezpieczny skarbiec danych korporacyjnych. Wymaga odpornego na awarie systemu ZFS lub NTFS.",
+        desc: "Przechowywanie danych korporacyjnych z sumami kontrolnymi. Wymaga odpornego systemu ZFS lub NTFS.",
         minSizeGB: 50,
         requiredFs: ["ZFS", "NTFS"],
         preferredClusters: ["4KB", "16KB"],
         requiredMount: "/mnt/vault",
         powerWatts: 50,
-        heatRate: 0.25,
-        incomePerTick: 2.80,
-        cryptoPerTick: 0.0005,
+        heatRate: 0.20,
+        incomePerTick: 1.40, // ~84 PLN / day
+        cryptoPerTick: 0.0,
         illegal: false
       }
     ];
@@ -113,6 +114,7 @@ class ServicesEngine {
     const mountOk = part.mount === serviceDef.requiredMount;
     const clusterIdeal = serviceDef.preferredClusters.includes(part.clusterSize);
     const willTripFuse = (this.state.currentWatts + serviceDef.powerWatts) > this.state.fuseMaxWatts;
+    const isLeased = part.leasedContractId != null;
 
     return {
       size: { ok: sizeOk, msg: `${part.sizeGB} GB (min. ${serviceDef.minSizeGB} GB)` },
@@ -120,12 +122,16 @@ class ServicesEngine {
       mount: { ok: mountOk, msg: `${part.mount} (wymagane: ${serviceDef.requiredMount})` },
       cluster: { ok: clusterIdeal, msg: `${part.clusterSize} ${clusterIdeal ? '(optymalne)' : '(-20% wydajności)'}` },
       power: { ok: !willTripFuse, msg: `+${serviceDef.powerWatts}W ${willTripFuse ? '⚠️ WYBIJE KORKI!' : '(w normie)'}` },
-      allValid: sizeOk && fsOk && mountOk
+      leased: { ok: !isLeased, msg: isLeased ? '🔒 Wynajęta dla klienta' : 'Wolna' },
+      allValid: sizeOk && fsOk && mountOk && !isLeased
     };
   }
 
   // Check if a partition meets service requirements
   validatePartitionForService(serviceDef, part) {
+    if (part.leasedContractId) {
+      return { valid: false, reason: "Partycja jest aktualnie wynajęta dla klienta! Nie możesz na niej uruchamiać własnych serwisów." };
+    }
     if (part.sizeGB < serviceDef.minSizeGB) {
       return { 
         valid: false, 
@@ -148,9 +154,17 @@ class ServicesEngine {
     // Cluster efficiency factor (0.5 to 1.2x)
     let clusterMultiplier = 1.0;
     if (serviceDef.preferredClusters.includes(part.clusterSize)) {
-      clusterMultiplier = 1.2; // Bonus for ideal allocation unit size
+      clusterMultiplier = 1.2;
     } else {
-      clusterMultiplier = 0.8; // Penalty for slack space or random access latency
+      clusterMultiplier = 0.8;
+    }
+
+    // RAID 0 bonus
+    if (part.inRaid && part.raidId) {
+      const raid = this.state.raidArrays.find(r => r.id === part.raidId);
+      if (raid && raid.type === 'RAID0') {
+        clusterMultiplier *= 1.8; // RAID 0 Striping speed boost!
+      }
     }
 
     return { valid: true, clusterMultiplier };
@@ -181,7 +195,7 @@ class ServicesEngine {
       diskId: entry.disk.id,
       partId: partId,
       clusterMultiplier: validation.clusterMultiplier,
-      trafficMBps: (1.5 + Math.random() * 8.0).toFixed(1)
+      trafficMBps: (1.2 + Math.random() * 5.0).toFixed(1)
     });
 
     window.audioEngine?.playHddSeek(1.2);
@@ -205,110 +219,232 @@ class ServicesEngine {
     }
   }
 
-  // Tick calculation for economy, power and heat
+  // Calculate dynamic outdoor weather temperature based on time of day
+  calculateOutdoorTemp(hour) {
+    if (hour >= 0 && hour < 6) return 16.0;
+    if (hour >= 6 && hour < 10) return 20.0 + (hour - 6) * 1.5;
+    if (hour >= 10 && hour <= 16) return 31.0 + Math.sin((hour - 10) / 6 * Math.PI) * 4.0; // Midday heatwave up to 35°C!
+    if (hour > 16 && hour < 21) return 28.0 - (hour - 16) * 2.0;
+    return 18.0;
+  }
+
+  // Main simulation tick: Power, Thermal, Leasing SLA, P&L, Debt, Malware
   tickProcess() {
-    if (this.state.fuseTripped) return; // No power, no services
+    const hour = this.state.inGameTime.hour;
+    this.state.outdoorTemp = this.calculateOutdoorTemp(hour);
 
     let totalWatts = 50; // Baseline PC idle
-    let totalHeat = 0.05; // Ambient baseline heat
-    let totalIncome = 0;
-    let totalCrypto = 0;
+    let totalHeat = 0.05; // Baseline ambient heat
+    let totalNoise = 10;
+    let incomeServices = 0;
+    let incomeMining = 0;
+    let incomeLeasing = 0;
+    let costPower = 0;
+    let costWear = 0;
 
-    // Disks idle power & heat
+    // Disks power, heat and wear
     for (const disk of this.state.disks) {
       totalWatts += disk.powerWatts;
       totalHeat += disk.heatRate;
+      totalNoise += 3;
+      costWear += 0.01; // Mechanical wear amortisation
     }
 
-    // Running services power, heat, and income
-    for (const s of this.state.services) {
-      const def = this.serviceCatalog.find(c => c.id === s.serviceId);
-      if (!def) continue;
+    // Fans & Coolers
+    if (this.state.coolingPumpActive) {
+      totalWatts += 40;
+      totalNoise += 6;
+    }
+    if (this.state.acActive && this.state.acInstalled) {
+      totalWatts += 450; // AC draws 450W!
+      totalNoise += 12;
+    }
 
-      totalWatts += def.powerWatts;
-      totalHeat += def.heatRate;
+    // Malware drain
+    for (const m of this.state.malwareActive) {
+      totalWatts += m.drainWatts || 30;
+      totalHeat += 0.15;
+    }
 
-      const earnedPLN = def.incomePerTick * s.clusterMultiplier;
-      const earnedCrypto = def.cryptoPerTick * s.clusterMultiplier;
+    // Running services calculation (Only if fuse is intact!)
+    const isPowered = !this.state.fuseTripped;
+    const isThrottled = this.state.roomTemp > 42.0;
+    const throttleMultiplier = isThrottled ? 0.5 : 1.0;
 
-      totalIncome += earnedPLN;
-      totalCrypto += earnedCrypto;
+    if (isPowered) {
+      for (const s of this.state.services) {
+        const def = this.serviceCatalog.find(c => c.id === s.serviceId);
+        if (!def) continue;
 
-      // Check illegal status and police threat
-      if (def.illegal) {
-        const all = this.getAllPartitions();
-        const entry = all.find(e => e.part.id === s.partId);
-        if (entry && !entry.part.encrypted && entry.part.fs !== "LUKS") {
-          // Unencrypted darknet data increases police suspicion!
-          this.state.policeThreat = Math.min(100, this.state.policeThreat + 1.2);
+        totalWatts += def.powerWatts;
+        totalHeat += def.heatRate;
+        totalNoise += 4;
+
+        const earnedPLN = def.incomePerTick * s.clusterMultiplier * throttleMultiplier;
+        const earnedCrypto = def.cryptoPerTick * s.clusterMultiplier * throttleMultiplier;
+
+        if (def.id === 'crypto_miner') {
+          incomeMining += earnedCrypto;
+          this.state.crypto += earnedCrypto;
         } else {
-          // Encrypted LUKS partition is safe from automated sniffer!
-          this.state.policeThreat = Math.max(0, this.state.policeThreat - 0.2);
+          incomeServices += earnedPLN;
+          this.state.money += earnedPLN;
+        }
+
+        // Darknet threat
+        if (def.illegal) {
+          const all = this.getAllPartitions();
+          const entry = all.find(e => e.part.id === s.partId);
+          if (entry && !entry.part.encrypted && entry.part.fs !== "LUKS") {
+            this.state.policeThreat = Math.min(100, this.state.policeThreat + 1.2);
+          } else {
+            this.state.policeThreat = Math.max(0, this.state.policeThreat - 0.2);
+          }
         }
       }
 
-      // Random I/O sound effect
-      if (Math.random() < 0.25) {
-        window.audioEngine?.playHddSeek(0.4);
-      }
-    }
+      // Leased Contracts processing
+      for (const lease of this.state.leasedContracts) {
+        lease.totalTicks = (lease.totalTicks || 0) + 1;
+        if (!isThrottled) {
+          lease.uptimeTicks = (lease.uptimeTicks || 0) + 1;
+        }
 
-    // Cooling pump power draw
-    if (this.state.coolingPumpActive) {
-      totalWatts += 40;
+        // Daily rent paid proportionally per tick
+        const tickRent = lease.dailyRent / 144; // 144 ticks = 1 in-game day
+        incomeLeasing += tickRent;
+        this.state.money += tickRent;
+      }
     }
 
     this.state.currentWatts = totalWatts;
-    this.state.money += totalIncome;
-    this.state.crypto += totalCrypto;
+    this.state.noiseLevel = totalNoise;
 
-    // Power bill accrual (kWh = Watts * hours / 1000; 1 tick = 1/6th hour)
+    // Power bill
     const kwhDelta = (totalWatts * (1 / 6)) / 1000;
     this.state.powerKwhAccrued += kwhDelta;
-    this.state.powerBillAmount += kwhDelta * this.state.powerKwhRate;
+    costPower = kwhDelta * this.state.powerKwhRate;
+    this.state.powerBillAmount += costPower;
 
-    // Circuit breaker overload check!
-    if (this.state.currentWatts > this.state.fuseMaxWatts) {
+    // Update P&L metrics
+    this.state.pnlMetrics.todayIncome += (incomeServices + incomeLeasing);
+    this.state.pnlMetrics.todayExpenses += (costPower + costWear);
+    this.state.pnlMetrics.incomeServices += incomeServices;
+    this.state.pnlMetrics.incomeLeasing += incomeLeasing;
+    this.state.pnlMetrics.incomeMining += incomeMining;
+    this.state.pnlMetrics.costPower += costPower;
+    this.state.pnlMetrics.costWear += costWear;
+
+    // Circuit Breaker Overload
+    if (this.state.currentWatts > this.state.fuseMaxWatts && !this.state.fuseTripped) {
       this.state.fuseTripped = true;
       window.audioEngine?.playFuseTrip();
-      window.gameUI?.showToast(`WYBIŁO BEZPIECZNIK! Pobór (${Math.round(this.state.currentWatts)}W) przekroczył limit (${this.state.fuseMaxWatts}W)!`, "error");
+      window.gameUI?.showToast(`WYBIŁO BEZPIECZNIK! Pobór ${Math.round(this.state.currentWatts)}W przekroczył limit ${this.state.fuseMaxWatts}W!`, "error");
       return;
     }
 
-    // Thermal simulation
+    // THERMAL SIMULATION OVERHAUL
     let tempDelta = (totalHeat * (1 / 6));
-    if (this.state.windowOpen) {
-      // Room cools towards ambient temp (19°C)
-      const diff = this.state.roomTemp - this.state.ambientTemp;
-      tempDelta -= diff * 0.08;
-    }
-    if (this.state.coolingPumpActive && this.state.coolingFluidLevel > 0) {
-      tempDelta -= 0.18;
-      this.state.coolingFluidLevel = Math.max(0, this.state.coolingFluidLevel - 0.05);
-    }
-    this.state.roomTemp = Math.max(16.0, this.state.roomTemp + tempDelta);
 
-    // Update dynamic fan speed sound based on load & temp
+    if (this.state.windowOpen) {
+      // Moves towards outdoor weather temp
+      const outdoorDiff = this.state.outdoorTemp - this.state.roomTemp;
+      tempDelta += outdoorDiff * 0.06;
+
+      // Dust accumulation from street
+      this.state.dustLevel = Math.min(100, this.state.dustLevel + 0.05);
+
+      // Neighbor complaints from noise
+      if (this.state.noiseLevel > 28) {
+        this.state.neighborComplaints = Math.min(100, this.state.neighborComplaints + 0.35);
+        if (this.state.neighborComplaints >= 100) {
+          this.state.neighborComplaints = 0;
+          this.state.money = Math.max(0, this.state.money - 200);
+          window.audioEngine?.playAlert();
+          window.gameUI?.showToast("MANDAT ZE SPÓŁDZIELNI: Hałas pracujących dysków przez otwarte okno oburzył sąsiadów (-200 PLN)!", "error");
+        }
+      }
+    } else {
+      // Window closed reduces neighbor complaints
+      this.state.neighborComplaints = Math.max(0, this.state.neighborComplaints - 0.2);
+    }
+
+    // Dust insulation penalty (reduces heat dissipation)
+    tempDelta *= (1 + this.state.dustLevel / 150);
+
+    // Liquid cooling pump
+    if (this.state.coolingPumpActive && this.state.coolingFluidLevel > 0) {
+      tempDelta -= 0.16;
+      this.state.coolingFluidLevel = Math.max(0, this.state.coolingFluidLevel - 0.04);
+    }
+
+    // Air Conditioner (AC)
+    if (this.state.acActive && this.state.acInstalled && isPowered) {
+      tempDelta -= 0.32; // Strong cooling!
+    }
+
+    this.state.roomTemp = Math.max(15.0, this.state.roomTemp + tempDelta);
+
+    // Audio fan speed update
     const loadFrac = Math.min(1.0, this.state.currentWatts / this.state.fuseMaxWatts);
     window.audioEngine?.updateFanSpeed(loadFrac, this.state.roomTemp);
 
-    // Thermal throttling & drive damage warning
-    if (this.state.roomTemp > 45.0 && Math.random() < 0.2) {
-      const damagedDisk = this.state.disks[Math.floor(Math.random() * this.state.disks.length)];
-      if (damagedDisk) {
-        damagedDisk.health = Math.max(5, damagedDisk.health - 2);
+    // Thermal damage & bad sectors if > 48°C
+    if (this.state.roomTemp > 48.0 && Math.random() < 0.25) {
+      const disk = this.state.disks[Math.floor(Math.random() * this.state.disks.length)];
+      if (disk) {
+        disk.health = Math.max(5, disk.health - 2);
         const badIdx = Math.floor(Math.random() * 128);
-        if (!damagedDisk.badSectors.includes(badIdx)) damagedDisk.badSectors.push(badIdx);
-        window.gameUI?.showToast(`PRZEGRZANIE (${this.state.roomTemp.toFixed(1)}°C)! Dysk ${damagedDisk.model} ulega degradacji termicznej!`, "error");
+        if (!disk.badSectors.includes(badIdx)) disk.badSectors.push(badIdx);
+        window.gameUI?.showToast(`KRYTYCZNY UPAŁ (${this.state.roomTemp.toFixed(1)}°C)! Dysk ${disk.model} łapie bad sectory!`, "error");
       }
     }
 
-    // Police Raid check if threat reaches 100%
-    if (this.state.policeThreat >= 100 && !this.state.policeRaidPending) {
-      this.state.policeRaidPending = true;
-      window.audioEngine?.playAlert();
-      window.gameUI?.showToast("ALARM: Wykryto nakaz przeszukania policji cybernetycznej! Masz 1 minutę na szyfrowanie lub czyszczenie dysków (/dev/zero)!", "error");
+    // Random Cyber Malware Attack (1% chance per tick if online in Darknet)
+    const hasDarknet = this.state.services.some(s => s.serviceId === 'darknet_mirror');
+    if (hasDarknet && Math.random() < 0.008 && this.state.malwareActive.length === 0) {
+      this.infectWithMalware();
     }
+  }
+
+  infectWithMalware() {
+    const all = this.getAllPartitions().filter(e => !e.part.isSystem);
+    if (all.length === 0) return;
+    const target = all[Math.floor(Math.random() * all.length)].part;
+
+    const malware = {
+      id: `malware-${Date.now()}`,
+      name: "Ransomware 'Crypt0Lain'",
+      type: "ransomware",
+      targetPartId: target.id,
+      targetDev: target.dev,
+      drainWatts: 45,
+      ransomAmount: 350
+    };
+
+    target.corrupted = true;
+    this.state.malwareActive.push(malware);
+    window.audioEngine?.playAlert();
+    window.gameUI?.showToast(`ALARM BEZPIECZEŃSTWA: Wykryto infekcję '${malware.name}' na partycji ${target.dev}! Użyj DEFENDER.EXE!`, "error");
+    this.state.notify();
+  }
+
+  cleanMalware(malwareId) {
+    const idx = this.state.malwareActive.findIndex(m => m.id === malwareId);
+    if (idx === -1) return { success: false, msg: "Nie znaleziono zagrożenia." };
+    const m = this.state.malwareActive[idx];
+
+    const all = this.getAllPartitions();
+    const target = all.find(e => e.part.id === m.targetPartId);
+    if (target) {
+      target.part.corrupted = false;
+    }
+
+    this.state.malwareActive.splice(idx, 1);
+    window.audioEngine?.playBeep(980, 0.2);
+    window.gameUI?.showToast(`Zneutralizowano złośliwe oprogramowanie: ${m.name}!`, "success");
+    this.state.notify();
+    return { success: true };
   }
 }
 

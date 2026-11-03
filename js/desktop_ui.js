@@ -716,6 +716,37 @@ class DesktopUI {
       this.state.notify();
     });
 
+    const btnRepayDebt = document.getElementById('btn-repay-debt');
+    if (btnRepayDebt) {
+      btnRepayDebt.addEventListener('click', () => {
+        if (this.state.debtBalance <= 0) {
+          this.showToast("Brak zadłużenia w banku.");
+          return;
+        }
+        const valInput = document.getElementById('debt-repay-amount');
+        const amount = parseFloat(valInput.value);
+        if (isNaN(amount) || amount <= 0) {
+          this.showToast("Podaj prawidłową kwotę spłaty długu!", "error");
+          return;
+        }
+        const repayAmt = Math.min(this.state.debtBalance, amount);
+        if (this.state.money < repayAmt) {
+          this.showToast(`Brak wystarczających środków! Masz tylko ${this.state.money.toFixed(2)} PLN.`, "error");
+          return;
+        }
+        this.state.money -= repayAmt;
+        this.state.debtBalance -= repayAmt;
+        if (this.state.debtBalance <= 0) {
+          this.state.debtBalance = 0;
+          this.state.debtDaysRemaining = 0;
+        }
+        window.audioEngine?.playBeep(920, 0.1);
+        this.showToast(`Spłacono ${repayAmt.toFixed(2)} PLN długu bankowego!`, "success");
+        this.renderBank();
+        this.state.notify();
+      });
+    }
+
     document.getElementById('btn-pay-rent').addEventListener('click', () => {
       if (this.state.money < this.state.rentAmount) {
         this.showToast(`Brak środków na opłacenie czynszu (${this.state.rentAmount} PLN)!`, "error");
@@ -987,6 +1018,10 @@ class DesktopUI {
     this.renderServices();
     this.renderPowerGrid();
     this.renderBank();
+    this.renderPnL();
+    this.renderRaid();
+    this.renderForensics();
+    this.renderDefender();
     this.updateTaskbar();
     this.renderTutorial();
     this.checkTutorialProgress();
@@ -997,6 +1032,8 @@ class DesktopUI {
     this.renderTopStatus();
     this.renderPowerGrid();
     this.renderBank();
+    this.renderPnL();
+    this.renderDefender();
     this.checkTutorialProgress();
   }
 
@@ -1023,6 +1060,20 @@ class DesktopUI {
       trayThreat.className = 'threat-indicator threat-warning';
     } else {
       trayThreat.className = 'threat-indicator';
+    }
+
+    const debtPill = document.getElementById('debt-pill');
+    if (debtPill) {
+      if (this.state.debtBalance > 0) {
+        debtPill.classList.remove('hidden');
+        document.getElementById('debt-display').innerText = `${this.state.debtBalance.toFixed(2)} PLN`;
+      } else {
+        debtPill.classList.add('hidden');
+      }
+    }
+    const weatherDisplay = document.getElementById('weather-display');
+    if (weatherDisplay) {
+      weatherDisplay.innerText = `${this.state.outdoorTemp.toFixed(1)}°C`;
     }
 
     // Room dock statuses
