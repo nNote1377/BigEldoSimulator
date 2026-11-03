@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAVI // PARTITION.SYS - Cyber-Partycjonowanie & Life-Sim</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="crt-enabled">
+  <!-- CRT Overlay Effects -->
+  <div class="crt-scanlines"></div>
+  <div class="crt-vignette"></div>
+  <div class="crt-flicker"></div>
+
+  <!-- Main Container -->
+  <div id="game-app">
+    
+    <!-- Top Global Notification & Status Bar -->
+    <header id="global-bar">
+      <div class="brand">
+        <span class="logo-glitch" data-text="NAVI // PARTITION.SYS">NAVI // PARTITION.SYS</span>
+        <span class="version-tag">v1.0.4 [COPLAND-OS]</span>
+      </div>
+      <div class="quick-status">
+        <div class="stat-pill"><span class="label">CZAS:</span> <span id="time-display">Dzień 1, 08:00</span></div>
+        <div class="stat-pill"><span class="label">ŚRODKI:</span> <span id="money-display" class="cash-value">450.00 PLN</span></div>
+        <div class="stat-pill"><span class="label">KRYPTO:</span> <span id="crypto-display" class="crypto-value">0.0000 Ⓦ</span></div>
+        <div class="stat-pill alert-pill"><span class="label">CZYNSZ:</span> <span id="rent-timer">Za 6 dni (500 PLN)</span></div>
+        <div class="stat-pill" id="power-pill"><span class="label">MOC:</span> <span id="power-display">120W / 400W</span></div>
+        <div class="stat-pill" id="temp-pill"><span class="label">TEMP:</span> <span id="temp-display">21.5°C</span></div>
+      </div>
+      <div class="top-controls">
+        <button id="btn-toggle-view" class="cyber-btn highlight-btn">🖥️ PULPIT NAVI</button>
+        <button id="btn-speed-pause" class="cyber-btn icon-btn" title="Pauza">⏸</button>
+        <button id="btn-speed-1x" class="cyber-btn icon-btn active-btn" title="1x">1x</button>
+        <button id="btn-speed-2x" class="cyber-btn icon-btn" title="2x">2x</button>
+        <button id="btn-speed-5x" class="cyber-btn icon-btn" title="5x">5x</button>
+        <button id="btn-audio-toggle" class="cyber-btn icon-btn" title="Dźwięk ON/OFF">🔊</button>
+        <button id="btn-crt-toggle" class="cyber-btn icon-btn" title="Filtr CRT">📺</button>
+        <button id="btn-help" class="cyber-btn icon-btn" title="Pomoc / Poradnik">❓</button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: 2D PIXEL-ART ROOM (LAIN'S SANCTUARY) -->
+    <section id="view-room" class="view-panel active">
+      <div class="room-canvas-wrapper">
+        <canvas id="room-canvas" width="960" height="540"></canvas>
+        <div id="room-tooltip" class="pixel-tooltip hidden"></div>
+      </div>
+      
+      <!-- Room Action Dock -->
+      <div class="room-dock">
+        <button class="dock-btn" data-action="pc"><span class="icon">🖥️</span><strong>Stanowisko NAVI</strong><small>[Spacja / Klik]</small></button>
+        <button class="dock-btn" data-action="fusebox"><span class="icon">⚡</span><strong>Skrzynka Bezpieczników</strong><small id="dock-fuse-status">Sprawna</small></button>
+        <button class="dock-btn" data-action="window"><span class="icon">🪟</span><strong>Okno Pokoju</strong><small id="dock-window-status">Zamknięte</small></button>
+        <button class="dock-btn" data-action="fridge"><span class="icon">🥫</span><strong>Lodówka & Zapasy</strong><small id="dock-food-status">Głód: 15%</small></button>
+        <button class="dock-btn" data-action="bed"><span class="icon">🛏️</span><strong>Łóżko (Sen)</strong><small id="dock-energy-status">Energia: 90%</small></button>
+        <button class="dock-btn" data-action="coolant"><span class="icon">🧪</span><strong>Chłodzenie Wodne</strong><small id="dock-coolant-status">Zbiornik: 100%</small></button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: RETRO NAVI COPLAND OS DESKTOP -->
+    <section id="view-desktop" class="view-panel">
+      <!-- Desktop Icons Grid -->
+      <div id="desktop-icons">
+        <div class="desktop-icon" data-app="app-disk-mgr">
+          <div class="icon-img icon-disk"></div>
+          <span>Menedżer Dysków</span>
+        </div>
+        <div class="desktop-icon" data-app="app-services">
+          <div class="icon-img icon-wired"></div>
+          <span>Węzły The Wired</span>
+        </div>
+        <div class="desktop-icon" data-app="app-bazaar">
+          <div class="icon-img icon-shop"></div>
+          <span>Giełda Sprzętu</span>
+        </div>
+        <div class="desktop-icon" data-app="app-contracts">
+          <div class="icon-img icon-mail"></div>
+          <span>Zlecenia DarkNetu</span>
+        </div>
+        <div class="desktop-icon" data-app="app-power">
+          <div class="icon-img icon-power"></div>
+          <span>Instalacja & Klimat</span>
+        </div>
+        <div class="desktop-icon" data-app="app-bank">
+          <div class="icon-img icon-bank"></div>
+          <span>Bank & Czynsz</span>
+        </div>
+        <div class="desktop-icon" data-app="app-terminal">
+          <div class="icon-img icon-term"></div>
+          <span>Terminal CLI</span>
+        </div>
+        <div class="desktop-icon" data-app="app-guide">
+          <div class="icon-img icon-doc"></div>
+          <span>Instrukcja.txt</span>
+        </div>
+      </div>
+
+      <!-- Windows Workspace (Draggable & Resizable) -->
+      <div id="windows-container">
+
+        <!-- WINDOW: DISK MANAGER (FDISK / GPARTED) -->
+        <div id="app-disk-mgr" class="cyber-window focused" style="top: 30px; left: 110px; width: 780px; height: 500px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">💾</span> <span id="disk-mgr-title">DISK_MGR 1.0 - Tablica Partycji & Klastry</span></div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body disk-mgr-layout">
+            <!-- Sidebar: Installed Disks List -->
+            <div class="disk-sidebar">
+              <div class="sidebar-header">Fizyczne Dyski (Zainstalowane)</div>
+              <div id="disk-device-list" class="device-list">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="disk-hardware-specs" id="active-disk-specs">
+                <!-- Disk specs details -->
+              </div>
+            </div>
+
+            <!-- Main Panel: Visual Partition Map & Operations -->
+            <div class="disk-main-area">
+              <div class="disk-toolbar">
+                <button id="btn-new-partition" class="tool-btn">➕ Nowa Partycja</button>
+                <button id="btn-delete-partition" class="tool-btn">❌ Usuń</button>
+                <button id="btn-format-partition" class="tool-btn">⚡ Formatuj / System Plików</button>
+                <button id="btn-change-table" class="tool-btn">🔄 Zmień Tablicę (MBR/GPT)</button>
+                <button id="btn-scan-badsectors" class="tool-btn">🔍 Skan S.M.A.R.T.</button>
+                <button id="btn-wipe-zero" class="tool-btn alert-tool-btn">☢️ dd wipe (/dev/zero)</button>
+              </div>
+
+              <!-- Visual Disk Strip Bar -->
+              <div class="disk-visual-section">
+                <div class="disk-label-bar">
+                  <span id="disk-bar-name">/dev/sda [80 GB HDD]</span>
+                  <span id="disk-bar-free">Wolne: 80 GB</span>
+                </div>
+                <div id="disk-visual-strip" class="disk-visual-strip">
+                  <!-- Dynamic visual blocks -->
+                </div>
+                <div class="disk-legend">
+                  <span class="legend-item"><span class="color-box col-fat32"></span> FAT16/32</span>
+                  <span class="legend-item"><span class="color-box col-ntfs"></span> NTFS</span>
+                  <span class="legend-item"><span class="color-box col-ext4"></span> EXT4</span>
+                  <span class="legend-item"><span class="color-box col-zfs"></span> ZFS</span>
+                  <span class="legend-item"><span class="color-box col-luks"></span> LUKS Szyfrowana</span>
+                  <span class="legend-item"><span class="color-box col-swap"></span> SWAP</span>
+                  <span class="legend-item"><span class="color-box col-unalloc"></span> Nieprzydzielone</span>
+                </div>
+              </div>
+
+              <!-- Partition Details & S.M.A.R.T. Sector Grid -->
+              <div class="partition-info-panel">
+                <div class="info-table-container">
+                  <table class="cyber-table" id="partitions-table">
+                    <thead>
+                      <tr>
+                        <th>Partycja</th>
+                        <th>Rozmiar</th>
+                        <th>System Plików</th>
+                        <th>Klastry</th>
+                        <th>Punkt Montowania</th>
+                        <th>Usługa</th>
+                        <th>Stan</th>
+                      </tr>
+                    </thead>
+                    <tbody id="partitions-tbody">
+                      <!-- Dynamic rows -->
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- Sector Map View / S.M.A.R.T. -->
+                <div class="sector-map-wrapper">
+                  <div class="sector-header">
+                    <span>Mapa Sektorów S.M.A.R.T. (<span id="bad-sectors-count">0 bad sectorów</span>)</span>
+                    <button id="btn-remap-bad" class="small-btn">Remapuj Uszkodzone</button>
+                  </div>
+                  <div id="sector-grid" class="sector-grid">
+                    <!-- 128 tiny block indicators -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: THE WIRED SERVICES & DAEMONS -->
+        <div id="app-services" class="cyber-window minimized" style="top: 50px; left: 140px; width: 720px; height: 460px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🌐</span> WIRED_SERVICES.EXE - Monetyzacja Partycji & Demony</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body services-layout">
+            <div class="services-header-info">
+              <p>Przypisuj usługi do sformatowanych partycji, aby generować transfer danych i przychody. Każda usługa ma specyficzne wymagania co do systemu plików i klastrów!</p>
+            </div>
+            <div class="services-grid" id="services-grid-list">
+              <!-- Dynamically generated services cards -->
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: HARDWARE BAZAAR (MARKETPLACE) -->
+        <div id="app-bazaar" class="cyber-window minimized" style="top: 70px; left: 170px; width: 680px; height: 480px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🛒</span> GIEŁDA ELEKTRONIKI // GIEŁDA WOLUMEN</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body bazaar-layout">
+            <div class="bazaar-tabs">
+              <button class="tab-btn active" data-tab="disks">Nośniki Danych (HDD/SSD/SCSI)</button>
+              <button class="tab-btn" data-tab="cooling">Chłodzenie & Wiatraki</button>
+              <button class="tab-btn" data-tab="power">Zasilacze & Bezpieczniki</button>
+              <button class="tab-btn" data-tab="software">Narzędzia & Licencje</button>
+            </div>
+            <div class="bazaar-content" id="bazaar-catalog">
+              <!-- Dynamically injected store items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: CONTRACTS & DARKNET BOARD -->
+        <div id="app-contracts" class="cyber-window minimized" style="top: 90px; left: 200px; width: 660px; height: 440px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">✉️</span> DARKNET_BOARD // Szyfrowana Tablica Zleceń</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body contracts-layout">
+            <div class="contracts-list" id="contracts-list">
+              <!-- Dynamically injected contracts -->
+            </div>
+            <div class="contract-details" id="contract-active-view">
+              <div class="empty-state">Wybierz zlecenie z listy po lewej, aby zapoznać się ze specyfikacją klienta.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: POWER & CLIMATE -->
+        <div id="app-power" class="cyber-window minimized" style="top: 110px; left: 230px; width: 600px; height: 420px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">⚡</span> POWER_GRID & CLIMATE MONITOR</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body power-layout">
+            <div class="gauge-box">
+              <h3>Pobór Mocy Pokoju</h3>
+              <div class="gauge-meter">
+                <div id="power-bar-fill" class="gauge-fill" style="width: 30%;"></div>
+              </div>
+              <div class="gauge-labels">
+                <span id="power-val-detail">120W</span> / <span id="power-max-detail">400W (Limit bezpiecznika B16)</span>
+              </div>
+              <p class="gauge-hint">Przekroczenie limitu natychmiast wywali bezpiecznik w pokoju!</p>
+            </div>
+
+            <div class="gauge-box">
+              <h3>Termika & Chłodzenie Pokoju</h3>
+              <div class="gauge-meter">
+                <div id="temp-bar-fill" class="gauge-fill temp-fill" style="width: 25%;"></div>
+              </div>
+              <div class="gauge-labels">
+                <span id="temp-val-detail">21.5°C</span> (Optymalna: poniżej 35°C)
+              </div>
+              <p class="gauge-hint">Powyżej 42°C dyski tracą stabilność. Otwórz okno lub włącz chłodzenie wodne.</p>
+            </div>
+
+            <div class="power-controls-grid">
+              <button id="btn-toggle-window-os" class="tool-btn">🪟 Otwórz/Zamknij Okno</button>
+              <button id="btn-toggle-pump-os" class="tool-btn">🧪 Pompa Chłodzenia Cieczą (Włącz)</button>
+              <button id="btn-reset-fuse-os" class="tool-btn">⚡ Zresetuj Bezpiecznik</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: BANK & RENT -->
+        <div id="app-bank" class="cyber-window minimized" style="top: 130px; left: 260px; width: 560px; height: 400px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🏦</span> E-BANK POLSKI & WIRED-EXCHANGE</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body bank-layout">
+            <div class="account-card">
+              <div class="acc-row"><span>Rachunek Główny:</span> <strong id="bank-pln-val">450.00 PLN</strong></div>
+              <div class="acc-row"><span>Portfel The Wired:</span> <strong id="bank-crypto-val">0.0000 Ⓦ</strong></div>
+              <div class="crypto-exchange-row">
+                <input type="number" id="crypto-exchange-amount" value="0.001" step="0.001" min="0.001">
+                <button id="btn-exchange-crypto" class="tool-btn">Wymień Ⓦ na PLN (Kurs: 1Ⓦ = 2400 PLN)</button>
+              </div>
+            </div>
+
+            <div class="bills-card">
+              <h3>Nadchodzące Zobowiązania</h3>
+              <div class="bill-row">
+                <div>
+                  <strong>Czynsz za kawalerkę:</strong> 500.00 PLN
+                  <br><small id="bill-rent-days">Płatne za: 6 dni</small>
+                </div>
+                <button id="btn-pay-rent" class="tool-btn">Opłać Czynsz</button>
+              </div>
+              <div class="bill-row">
+                <div>
+                  <strong>Bieżący rachunek za prąd:</strong> <span id="bill-power-amount">18.40 PLN</span>
+                  <br><small>Stawka: 0.95 PLN / kWh</small>
+                </div>
+                <button id="btn-pay-power" class="tool-btn">Ureguluj Prąd</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: TERMINAL CLI -->
+        <div id="app-terminal" class="cyber-window minimized" style="top: 150px; left: 100px; width: 700px; height: 420px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">💻</span> BASH / TERMINAL [NAVI-SHELL]</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body terminal-layout">
+            <div id="term-output" class="terminal-screen">
+              <div class="term-line">Copland OS NAVI Shell Kernel 4.19-lain</div>
+              <div class="term-line">Wpisz 'help', aby zobaczyć dostępne polecenia (/dev/sda, lsblk, fdisk, mkfs, mount, smartctl).</div>
+            </div>
+            <div class="terminal-input-bar">
+              <span class="prompt">root@lain-navi:~#</span>
+              <input type="text" id="term-input" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: GUIDE -->
+        <div id="app-guide" class="cyber-window minimized" style="top: 60px; left: 180px; width: 640px; height: 460px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">📖</span> INSTRUKCJA_HAKERA.TXT</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body guide-layout">
+            <h2>Przewodnik Architekta Danych NAVI</h2>
+            <p><strong>1. Cel gry:</strong> Przetrwaj w swoim mieszkaniu, opłacaj czynsz i rozbuduj swoje stanowisko komputerowe z pojedynczego starego PC do potężnego cybernetycznego sanktuarium (jak w <em>Serial Experiments Lain</em>).</p>
+            <h3>2. Zasady Partycjonowania:</h3>
+            <ul>
+              <li><strong>MBR vs GPT:</strong> MBR pozwala na maks. 4 partycje (do 2 TB). GPT pozwala na dowolną liczbę i ogromne dyski.</li>
+              <li><strong>FAT16/FAT32:</strong> Bardzo stary, minimalny narzut, ale brak ochrony i mały rozmiar pliku. Dobre dla tanich węzłów P2P.</li>
+              <li><strong>NTFS:</strong> Stabilny system plików z obsługą uprawnień i kompresji. Wymagany przez komercyjne archiwa.</li>
+              <li><strong>EXT4:</strong> Bardzo szybki system uniksowy, idealny do baz danych i węzłów The Wired.</li>
+              <li><strong>ZFS:</strong> Zaawansowany system z redundancją i ochroną przed uszkodzeniami. Wymaga dużej ilości RAMu i mocy.</li>
+              <li><strong>LUKS:</strong> Szyfrowana partycja. Obowiązkowa dla nielegalnych zleceń Darknetu – chroni przed nalotem policji!</li>
+              <li><strong>SWAP:</strong> Przestrzeń wymiany – odciąża pamięć operacyjną serwerów.</li>
+            </ul>
+            <h3>3. Rozmiar Klastra (Cluster Size):</h3>
+            <ul>
+              <li><strong>512B – 1KB (Małe klastry):</strong> Idealne dla scraperów i botów (miliony malutkich plików bez marnowania przestrzeni).</li>
+              <li><strong>4KB (Standard):</strong> Zrównoważona wydajność dla większości serwisów internetowych.</li>
+              <li><strong>16KB – 64KB (Duże klastry):</strong> Piekielnie szybki transfer dla baz danych wideo, kryptowalut i wielkich archiwów, lecz marnuje miejsce przy małych plikach.</li>
+            </ul>
+            <h3>4. Dom, Bezpieczniki i Temperatura:</h3>
+            <p>Im więcej dysków i procesów, tym wyższy pobór mocy (W) i temperatura (°C). Pilnuj watomierza! Gdy wywali korki, wyłącz zbyteczne procesy i zresetuj bezpiecznik w pokoju. Chłodź pokój oknem lub instalacją cieczy.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Desktop Bottom Taskbar -->
+      <footer id="desktop-taskbar">
+        <button id="start-btn" class="taskbar-btn"><span class="os-logo">👁️</span> <strong>NAVI</strong></button>
+        <div id="taskbar-tasks" class="taskbar-running-apps">
+          <!-- Active minimized/open window buttons -->
+        </div>
+        <div class="taskbar-tray">
+          <span id="tray-police-threat" class="threat-indicator" title="Zagrożenie Nalotem Policji">POLICJA: 0%</span>
+          <span id="tray-net-speed">I/O: 0.0 MB/s</span>
+          <span id="tray-clock">13:37</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- MODAL: PARTITION CREATE / FORMAT DIALOG -->
+    <div id="modal-partition" class="cyber-modal hidden">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <span id="modal-partition-title">Utwórz Nową Partycję</span>
+          <button class="win-btn modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Etykieta Woluminu:</label>
+            <input type="text" id="modal-part-label" value="WIRED_VOL" maxlength="16">
+          </div>
+          <div class="form-group">
+            <label>Rozmiar Partycji (GB):</label>
+            <div class="range-row">
+              <input type="range" id="modal-part-size-slider" min="1" max="80" value="40">
+              <input type="number" id="modal-part-size-val" min="1" max="80" value="40"> <span>GB</span>
+            </div>
+            <small id="modal-part-max-hint">Maksymalnie wolne: 80 GB</small>
+          </div>
+          <div class="form-group">
+            <label>System Plików:</label>
+            <select id="modal-part-fs">
+              <option value="FAT32">FAT32 (Uniwersalny, mały narzut)</option>
+              <option value="NTFS">NTFS (Dobra kompresja, archiwa)</option>
+              <option value="EXT4" selected>EXT4 (Szybki, zalecany dla The Wired)</option>
+              <option value="ZFS">ZFS (Odporny na błędy, wymaga mocy)</option>
+              <option value="LUKS">LUKS Encrypted (Szyfrowanie wojskowe, ochrona policji)</option>
+              <option value="SWAP">SWAP (Pamięć wymiany)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Rozmiar Klastra (Allocation Unit Size):</label>
+            <select id="modal-part-cluster">
+              <option value="512B">512 Bajtów (Mikro-pliki, boty scrapingowe)</option>
+              <option value="1KB">1 KB (Małe pakiety sieciowe)</option>
+              <option value="4KB" selected>4 KB (Standard uniwersalny)</option>
+              <option value="16KB">16 KB (Szybkie bazy danych)</option>
+              <option value="64KB">64 KB (Maksymalny transfer sekwencyjny)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Punkt Montowania:</label>
+            <select id="modal-part-mount">
+              <option value="/mnt/wired">/mnt/wired (Główny Węzeł The Wired)</option>
+              <option value="/mnt/darknet">/mnt/darknet (Hosting Nielegalny / Dark)</option>
+              <option value="/mnt/storage">/mnt/storage (Magazyn Danych / P2P)</option>
+              <option value="/mnt/crypto">/mnt/crypto (Węzeł Walidacyjny Krypto)</option>
+              <option value="/mnt/vault">/mnt/vault (Skarbiec Korporacyjny)</option>
+              <option value="/swap">/swap (Przestrzeń Wymiany)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-modal-cancel" class="cyber-btn">Anuluj</button>
+          <button id="btn-modal-confirm" class="cyber-btn highlight-btn">Utwórz i Formatuj</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION POPUPS CONTAINER -->
+    <div id="toast-container"></div>
+
+  </div>
+
+  <!-- Audio and Game Logic Scripts -->
+  <script src="js/audio.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/disk_engine.js"></script>
+  <script src="js/services_engine.js"></script>
+  <script src="js/room_view.js"></script>
+  <script src="js/desktop_ui.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

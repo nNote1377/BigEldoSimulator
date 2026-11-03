@@ -1,0 +1,4655 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NAVI // PARTITION.SYS - Cyber-Partycjonowanie & Life-Sim</title>
+  <style>
+/* ==========================================================================
+   NAVI // PARTITION.SYS - RETRO CYBERPUNK STYLESHEET
+   Aesthetics: Serial Experiments Lain, Copland OS, Windows 95 / BeOS / NeXT
+   ========================================================================== */
+
+:root {
+  --bg-color: #0c0d12;
+  --crt-green: #33ff66;
+  --crt-amber: #ffb833;
+  --crt-cyan: #00f0ff;
+  --crt-red: #ff3344;
+  --crt-purple: #bb55ff;
+  --win-bg: #141824;
+  --win-border-light: #445069;
+  --win-border-dark: #080a10;
+  --win-header-bg: linear-gradient(90deg, #1b2838 0%, #0d1520 100%);
+  --win-header-active: linear-gradient(90deg, #005577 0%, #001f33 100%);
+  --text-main: #d0d8e8;
+  --text-dim: #74829c;
+  --text-bright: #ffffff;
+  --pixel-font: 'Press Start 2P', monospace;
+  --mono-font: 'Share Tech Mono', 'VT323', monospace;
+  --code-font: 'VT323', monospace;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--mono-font);
+  font-size: 15px;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+  image-rendering: pixelated;
+}
+
+/* --- CRT SCANLINES & OVERLAYS --- */
+.crt-scanlines {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.35) 50%
+  );
+  background-size: 100% 4px;
+  z-index: 9999;
+  opacity: 0.85;
+}
+
+.crt-vignette {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9), inset 0 0 30px rgba(0, 240, 255, 0.05);
+  z-index: 9998;
+}
+
+.crt-flicker {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none;
+  background: rgba(18, 16, 16, 0.015);
+  opacity: 0;
+  z-index: 9997;
+  animation: crtFlicker 0.15s infinite;
+}
+
+@keyframes crtFlicker {
+  0% { opacity: 0.01; }
+  50% { opacity: 0.04; }
+  100% { opacity: 0.015; }
+}
+
+body:not(.crt-enabled) .crt-scanlines,
+body:not(.crt-enabled) .crt-vignette,
+body:not(.crt-enabled) .crt-flicker {
+  display: none;
+}
+
+/* --- MAIN CONTAINER --- */
+#game-app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+}
+
+/* --- GLOBAL TOP BAR --- */
+#global-bar {
+  height: 38px;
+  background: #0f131c;
+  border-bottom: 2px solid #28324a;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  z-index: 500;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logo-glitch {
+  font-family: var(--pixel-font);
+  font-size: 11px;
+  color: var(--crt-cyan);
+  text-shadow: 0 0 8px rgba(0, 240, 255, 0.6);
+  letter-spacing: 1px;
+}
+
+.version-tag {
+  font-size: 11px;
+  color: var(--text-dim);
+  background: #182030;
+  padding: 1px 6px;
+  border: 1px solid #2d3b55;
+  border-radius: 2px;
+}
+
+.quick-status {
+  display: flex;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.stat-pill {
+  background: #131a26;
+  border: 1px solid #2c3a52;
+  padding: 2px 8px;
+  border-radius: 3px;
+  display: flex;
+  gap: 5px;
+}
+
+.stat-pill .label {
+  color: var(--text-dim);
+}
+
+.cash-value { color: var(--crt-green); font-weight: bold; }
+.crypto-value { color: var(--crt-amber); font-weight: bold; }
+.alert-pill { border-color: var(--crt-red); }
+.alert-pill #rent-timer { color: var(--crt-red); font-weight: bold; }
+
+.top-controls {
+  display: flex;
+  gap: 6px;
+}
+
+.cyber-btn {
+  background: #1e283c;
+  border-top: 2px solid #3c4f73;
+  border-left: 2px solid #3c4f73;
+  border-right: 2px solid #0d121c;
+  border-bottom: 2px solid #0d121c;
+  color: var(--text-main);
+  font-family: var(--mono-font);
+  font-size: 13px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+
+.cyber-btn:hover {
+  background: #2b3956;
+  color: #fff;
+}
+
+.cyber-btn:active {
+  border-top: 2px solid #0d121c;
+  border-left: 2px solid #0d121c;
+  border-right: 2px solid #3c4f73;
+  border-bottom: 2px solid #3c4f73;
+}
+
+.highlight-btn {
+  background: #006680;
+  border-color: #00a4cc #003340 #003340 #00a4cc;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.highlight-btn:hover {
+  background: #0088aa;
+}
+
+.icon-btn {
+  padding: 3px 7px;
+  min-width: 28px;
+}
+
+.active-btn {
+  background: #00aa66 !important;
+  color: #000 !important;
+  font-weight: bold;
+}
+
+/* --- VIEW PANELS --- */
+.view-panel {
+  display: none;
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.view-panel.active {
+  display: flex;
+}
+
+/* --- VIEW 1: ROOM VIEW --- */
+#view-room {
+  flex-direction: column;
+  background: #0a0b10;
+  align-items: center;
+  justify-content: center;
+}
+
+.room-canvas-wrapper {
+  position: relative;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 240, 255, 0.1);
+  border: 3px solid #202a3a;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#room-canvas {
+  width: 960px;
+  height: 540px;
+  cursor: crosshair;
+}
+
+.pixel-tooltip {
+  position: absolute;
+  background: rgba(10, 14, 22, 0.95);
+  border: 2px solid var(--crt-cyan);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #fff;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.7);
+  white-space: nowrap;
+}
+
+.pixel-tooltip.hidden {
+  display: none;
+}
+
+.room-dock {
+  width: 960px;
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.dock-btn {
+  flex: 1;
+  background: #141b26;
+  border: 2px solid #26334a;
+  color: var(--text-main);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  font-family: var(--mono-font);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.dock-btn:hover {
+  background: #1f2b3e;
+  border-color: var(--crt-cyan);
+  transform: translateY(-2px);
+}
+
+.dock-btn .icon {
+  font-size: 20px;
+}
+
+.dock-btn strong {
+  font-size: 13px;
+  color: #fff;
+}
+
+.dock-btn small {
+  font-size: 11px;
+  color: var(--text-dim);
+}
+
+/* --- VIEW 2: NAVI COPLAND OS DESKTOP --- */
+#view-desktop {
+  background: #07090e radial-gradient(circle at 50% 50%, #111a28 0%, #06080d 100%);
+  flex-direction: column;
+}
+
+#desktop-icons {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  display: grid;
+  grid-template-columns: repeat(1, 90px);
+  gap: 20px;
+  z-index: 10;
+}
+
+.desktop-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  width: 86px;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid transparent;
+}
+
+.desktop-icon:hover {
+  background: rgba(0, 240, 255, 0.1);
+  border-color: rgba(0, 240, 255, 0.3);
+}
+
+.icon-img {
+  width: 44px;
+  height: 44px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-bottom: 4px;
+  position: relative;
+}
+
+/* Pixel art icons via CSS shapes */
+.icon-disk { background: #1c2838; border: 2px solid var(--crt-cyan); box-shadow: inset 0 0 8px rgba(0, 240, 255, 0.4); border-radius: 4px; }
+.icon-disk::after { content: "HDD"; font-family: var(--pixel-font); font-size: 8px; color: var(--crt-cyan); position: absolute; bottom: 4px; left: 6px; }
+
+.icon-wired { background: #251630; border: 2px solid var(--crt-purple); box-shadow: inset 0 0 8px rgba(187, 85, 255, 0.4); border-radius: 4px; }
+.icon-wired::after { content: "WEB"; font-family: var(--pixel-font); font-size: 8px; color: var(--crt-purple); position: absolute; bottom: 4px; left: 6px; }
+
+.icon-shop { background: #332712; border: 2px solid var(--crt-amber); box-shadow: inset 0 0 8px rgba(255, 184, 51, 0.4); border-radius: 4px; }
+.icon-shop::after { content: "$$"; font-family: var(--pixel-font); font-size: 8px; color: var(--crt-amber); position: absolute; bottom: 4px; left: 8px; }
+
+.icon-mail { background: #122822; border: 2px solid var(--crt-green); box-shadow: inset 0 0 8px rgba(51, 255, 102, 0.4); border-radius: 4px; }
+.icon-mail::after { content: "MSG"; font-family: var(--pixel-font); font-size: 8px; color: var(--crt-green); position: absolute; bottom: 4px; left: 6px; }
+
+.icon-power { background: #331518; border: 2px solid var(--crt-red); box-shadow: inset 0 0 8px rgba(255, 51, 68, 0.4); border-radius: 4px; }
+.icon-power::after { content: "PWR"; font-family: var(--pixel-font); font-size: 8px; color: var(--crt-red); position: absolute; bottom: 4px; left: 6px; }
+
+.icon-bank { background: #152733; border: 2px solid #55aaff; border-radius: 4px; }
+.icon-bank::after { content: "NBP"; font-family: var(--pixel-font); font-size: 8px; color: #55aaff; position: absolute; bottom: 4px; left: 6px; }
+
+.icon-term { background: #000; border: 2px solid #fff; border-radius: 4px; }
+.icon-term::after { content: ">_"; font-family: var(--pixel-font); font-size: 10px; color: #fff; position: absolute; bottom: 8px; left: 8px; }
+
+.icon-doc { background: #222; border: 2px solid #aaa; border-radius: 4px; }
+.icon-doc::after { content: "TXT"; font-family: var(--pixel-font); font-size: 8px; color: #aaa; position: absolute; bottom: 4px; left: 6px; }
+
+.desktop-icon span {
+  font-size: 12px;
+  color: #fff;
+  text-shadow: 1px 1px 2px #000;
+  line-height: 1.2;
+}
+
+#windows-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+/* --- CYBER RETRO WINDOWS --- */
+.cyber-window {
+  position: absolute;
+  background: var(--win-bg);
+  border-top: 2px solid var(--win-border-light);
+  border-left: 2px solid var(--win-border-light);
+  border-right: 2px solid var(--win-border-dark);
+  border-bottom: 2px solid var(--win-border-dark);
+  box-shadow: 4px 6px 20px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  z-index: 20;
+}
+
+.cyber-window.focused {
+  z-index: 50;
+  box-shadow: 4px 8px 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 240, 255, 0.2);
+}
+
+.cyber-window.focused .window-header {
+  background: var(--win-header-active);
+}
+
+.cyber-window.minimized {
+  display: none !important;
+}
+
+.window-header {
+  height: 28px;
+  background: var(--win-header-bg);
+  border-bottom: 2px solid #000;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 6px;
+  cursor: move;
+}
+
+.window-title {
+  font-size: 13px;
+  font-weight: bold;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.window-controls {
+  display: flex;
+  gap: 3px;
+}
+
+.win-btn {
+  background: #25334a;
+  border-top: 1px solid #455d85;
+  border-left: 1px solid #455d85;
+  border-right: 1px solid #0b1018;
+  border-bottom: 1px solid #0b1018;
+  color: #fff;
+  font-family: var(--mono-font);
+  font-size: 11px;
+  width: 20px;
+  height: 18px;
+  line-height: 14px;
+  text-align: center;
+  cursor: pointer;
+}
+
+.win-btn:active {
+  border-top: 1px solid #0b1018;
+  border-left: 1px solid #0b1018;
+  border-right: 1px solid #455d85;
+  border-bottom: 1px solid #455d85;
+}
+
+.window-body {
+  flex: 1;
+  padding: 10px;
+  overflow: auto;
+  font-size: 13px;
+  background: #0d111a;
+}
+
+/* --- DISK MANAGER LAYOUT --- */
+.disk-mgr-layout {
+  display: flex;
+  gap: 10px;
+  height: calc(100% - 28px);
+}
+
+.disk-sidebar {
+  width: 220px;
+  background: #090c14;
+  border: 1px solid #1c2638;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-header {
+  background: #141c2a;
+  padding: 6px;
+  font-weight: bold;
+  font-size: 12px;
+  border-bottom: 1px solid #1c2638;
+  color: var(--crt-cyan);
+}
+
+.device-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.device-item {
+  padding: 6px;
+  margin-bottom: 4px;
+  background: #101724;
+  border: 1px solid #1c283d;
+  cursor: pointer;
+}
+
+.device-item:hover {
+  background: #182336;
+}
+
+.device-item.active {
+  background: #00334d;
+  border-color: var(--crt-cyan);
+  color: #fff;
+}
+
+.device-item .dev-name { font-weight: bold; }
+.device-item .dev-meta { font-size: 11px; color: var(--text-dim); }
+
+.disk-hardware-specs {
+  border-top: 1px solid #1c2638;
+  padding: 8px;
+  font-size: 11px;
+  line-height: 1.4;
+  background: #060910;
+  color: #8da0be;
+}
+
+.disk-main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.disk-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  background: #101622;
+  padding: 4px;
+  border: 1px solid #1f2a3e;
+}
+
+.tool-btn {
+  background: #182233;
+  border: 1px solid #2f4060;
+  color: var(--text-main);
+  padding: 4px 8px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tool-btn:hover {
+  background: #23334d;
+  color: #fff;
+}
+
+.tool-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.alert-tool-btn {
+  background: #3b1419;
+  border-color: #6a242c;
+  color: #ff9999;
+}
+
+.alert-tool-btn:hover {
+  background: #5c1e26;
+  color: #fff;
+}
+
+/* --- DISK VISUAL STRIP --- */
+.disk-visual-section {
+  background: #080c14;
+  border: 1px solid #1c283d;
+  padding: 8px;
+}
+
+.disk-label-bar {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-bottom: 4px;
+  color: var(--crt-cyan);
+}
+
+.disk-visual-strip {
+  height: 38px;
+  background: #020305;
+  border: 2px solid #28374f;
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
+}
+
+.part-block {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: 2px solid #000;
+  cursor: pointer;
+  position: relative;
+  transition: opacity 0.15s;
+  overflow: hidden;
+  padding: 2px;
+  text-align: center;
+}
+
+.part-block:hover {
+  filter: brightness(1.2);
+}
+
+.part-block.selected {
+  outline: 2px solid #fff;
+  z-index: 5;
+}
+
+.part-block .block-label {
+  font-size: 11px;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+}
+
+.part-block .block-fs {
+  font-size: 9px;
+  color: rgba(255,255,255,0.8);
+}
+
+/* File System Color Palette */
+.col-fat32 { background: #3b6e8c; }
+.col-ntfs { background: #265985; }
+.col-ext4 { background: #2e7d32; }
+.col-zfs { background: #6a1b9a; }
+.col-luks { background: #c2185b; }
+.col-swap { background: #d84315; }
+.col-unalloc { background: #1a202c; color: #556277; }
+
+.disk-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 6px;
+  font-size: 11px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-box {
+  width: 12px;
+  height: 12px;
+  display: inline-block;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* --- PARTITION INFO & SECTOR GRID --- */
+.partition-info-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 8px;
+  overflow: hidden;
+}
+
+.info-table-container {
+  flex: 1;
+  overflow-y: auto;
+  border: 1px solid #1a2538;
+}
+
+.cyber-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+
+.cyber-table th {
+  background: #121a28;
+  border-bottom: 2px solid #23324d;
+  padding: 6px;
+  text-align: left;
+  color: var(--text-dim);
+}
+
+.cyber-table td {
+  padding: 5px 6px;
+  border-bottom: 1px solid #162030;
+  color: var(--text-main);
+}
+
+.cyber-table tr:hover td {
+  background: #182336;
+}
+
+.cyber-table tr.selected td {
+  background: #003c5c;
+  color: #fff;
+}
+
+.sector-map-wrapper {
+  background: #06080e;
+  border: 1px solid #1a2538;
+  padding: 6px;
+  height: 90px;
+}
+
+.sector-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  margin-bottom: 4px;
+  color: var(--crt-cyan);
+}
+
+.small-btn {
+  background: #1c2738;
+  border: 1px solid #334460;
+  color: #fff;
+  font-size: 10px;
+  padding: 1px 6px;
+  cursor: pointer;
+}
+
+.sector-grid {
+  display: grid;
+  grid-template-columns: repeat(32, 1fr);
+  gap: 2px;
+  height: 52px;
+}
+
+.sector-block {
+  background: #0f1c14;
+  border: 1px solid #1a3824;
+}
+
+.sector-block.allocated {
+  background: #15452b;
+  border-color: #298553;
+}
+
+.sector-block.bad {
+  background: #7a1515 !important;
+  border-color: #ff3333 !important;
+  animation: pulseBad 1s infinite alternate;
+}
+
+.sector-block.remapped {
+  background: #806015 !important;
+  border-color: #ffcc00 !important;
+}
+
+@keyframes pulseBad {
+  0% { opacity: 0.6; }
+  100% { opacity: 1; }
+}
+
+/* --- SERVICES GRID --- */
+.services-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.services-header-info {
+  background: #101826;
+  border-left: 3px solid var(--crt-purple);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  overflow-y: auto;
+}
+
+.service-card {
+  background: #0d121c;
+  border: 1px solid #1f2a3e;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.service-card.running {
+  border-color: var(--crt-green);
+  box-shadow: inset 0 0 10px rgba(51, 255, 102, 0.1);
+}
+
+.service-card.error {
+  border-color: var(--crt-red);
+}
+
+.service-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.service-name {
+  font-weight: bold;
+  color: #fff;
+  font-size: 13px;
+}
+
+.service-status-tag {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 2px;
+  font-family: var(--pixel-font);
+}
+
+.status-stopped { background: #262c38; color: #889; }
+.status-active { background: #144023; color: var(--crt-green); }
+
+.service-desc {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.3;
+}
+
+.service-requirements {
+  background: #080a10;
+  padding: 4px 6px;
+  font-size: 11px;
+  border: 1px solid #161e2c;
+  color: #9ab;
+}
+
+.service-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: auto;
+}
+
+.service-actions select {
+  flex: 1;
+  background: #162030;
+  border: 1px solid #2d3e5a;
+  color: #fff;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  padding: 4px;
+}
+
+/* --- HARDWARE BAZAAR --- */
+.bazaar-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bazaar-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #222f46;
+  padding-bottom: 4px;
+}
+
+.tab-btn {
+  background: #121926;
+  border: 1px solid #233149;
+  color: var(--text-dim);
+  padding: 5px 10px;
+  font-family: var(--mono-font);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tab-btn.active {
+  background: #1d2c44;
+  border-color: var(--crt-amber);
+  color: #fff;
+  font-weight: bold;
+}
+
+.bazaar-content {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.store-card {
+  background: #0a0e16;
+  border: 1px solid #1a2538;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.store-card:hover {
+  border-color: #3b5075;
+}
+
+.store-title {
+  font-weight: bold;
+  color: var(--crt-amber);
+  font-size: 13px;
+}
+
+.store-meta {
+  font-size: 11px;
+  color: var(--text-dim);
+  line-height: 1.4;
+}
+
+.store-price-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 6px;
+  border-top: 1px solid #161f2f;
+}
+
+.store-price {
+  font-weight: bold;
+  color: var(--crt-green);
+  font-size: 14px;
+}
+
+/* --- CONTRACTS & DARKNET BOARD --- */
+.contracts-layout {
+  display: flex;
+  gap: 10px;
+  height: 100%;
+}
+
+.contracts-list {
+  width: 250px;
+  background: #090c14;
+  border: 1px solid #1b2638;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.contract-item {
+  padding: 6px;
+  background: #101624;
+  border: 1px solid #1b2638;
+  margin-bottom: 4px;
+  cursor: pointer;
+}
+
+.contract-item:hover {
+  background: #162033;
+}
+
+.contract-item.active {
+  border-color: var(--crt-green);
+  background: #0f2c1c;
+}
+
+.contract-item .c-title { font-weight: bold; font-size: 12px; color: #fff; }
+.contract-item .c-reward { font-size: 11px; color: var(--crt-green); }
+
+.contract-details {
+  flex: 1;
+  background: #090c14;
+  border: 1px solid #1b2638;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.contract-spec-box {
+  background: #030406;
+  border: 1px solid #23334d;
+  padding: 8px;
+  font-family: var(--code-font);
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--crt-cyan);
+}
+
+/* --- POWER & CLIMATE WINDOW --- */
+.power-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.gauge-box {
+  background: #0b0f17;
+  border: 1px solid #1c2738;
+  padding: 10px;
+}
+
+.gauge-box h3 {
+  font-size: 13px;
+  margin-bottom: 6px;
+  color: #fff;
+}
+
+.gauge-meter {
+  height: 18px;
+  background: #030406;
+  border: 1px solid #29384f;
+  position: relative;
+  overflow: hidden;
+}
+
+.gauge-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #00aa66 0%, #ffbb00 70%, #ff3333 100%);
+  transition: width 0.3s;
+}
+
+.temp-fill {
+  background: linear-gradient(90deg, #00bbff 0%, #ffaa00 60%, #ff2222 100%);
+}
+
+.gauge-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  margin-top: 4px;
+  font-weight: bold;
+}
+
+.gauge-hint {
+  font-size: 11px;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.power-controls-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* --- BANK & BILLS --- */
+.bank-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.account-card, .bills-card {
+  background: #0a0e16;
+  border: 1px solid #1a2638;
+  padding: 10px;
+}
+
+.acc-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.crypto-exchange-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #182233;
+}
+
+.crypto-exchange-row input {
+  width: 90px;
+  background: #141c2a;
+  border: 1px solid #28374d;
+  color: #fff;
+  padding: 4px;
+  font-family: var(--mono-font);
+}
+
+.bill-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 8px;
+  padding: 6px;
+  background: #101622;
+  border: 1px solid #1b2638;
+}
+
+/* --- TERMINAL CLI --- */
+.terminal-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: #020305 !important;
+  padding: 6px;
+}
+
+.terminal-screen {
+  flex: 1;
+  overflow-y: auto;
+  font-family: var(--code-font);
+  font-size: 16px;
+  color: #33ff66;
+  line-height: 1.25;
+}
+
+.terminal-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-top: 1px solid #183322;
+  padding-top: 4px;
+}
+
+.prompt {
+  color: #00f0ff;
+  font-family: var(--code-font);
+  font-size: 16px;
+}
+
+#term-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #33ff66;
+  font-family: var(--code-font);
+  font-size: 16px;
+}
+
+/* --- GUIDE --- */
+.guide-layout {
+  line-height: 1.5;
+  color: #c0cde0;
+}
+
+.guide-layout h2, .guide-layout h3 {
+  color: var(--crt-cyan);
+  margin: 10px 0 4px 0;
+}
+
+.guide-layout ul {
+  padding-left: 20px;
+  margin-bottom: 8px;
+}
+
+/* --- DESKTOP TASKBAR --- */
+#desktop-taskbar {
+  height: 34px;
+  background: #101624;
+  border-top: 2px solid #2a374e;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  z-index: 100;
+}
+
+.taskbar-btn {
+  background: #182336;
+  border-top: 2px solid #3d4f6d;
+  border-left: 2px solid #3d4f6d;
+  border-right: 2px solid #090d14;
+  border-bottom: 2px solid #090d14;
+  color: #fff;
+  font-family: var(--mono-font);
+  font-size: 13px;
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  height: 26px;
+}
+
+.taskbar-btn:active {
+  border-top: 2px solid #090d14;
+  border-left: 2px solid #090d14;
+  border-right: 2px solid #3d4f6d;
+  border-bottom: 2px solid #3d4f6d;
+}
+
+.taskbar-running-apps {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+  margin: 0 10px;
+  overflow-x: auto;
+}
+
+.task-item {
+  background: #131a26;
+  border: 1px solid #243249;
+  color: var(--text-main);
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.task-item.active {
+  background: #003d5c;
+  border-color: var(--crt-cyan);
+  color: #fff;
+}
+
+.taskbar-tray {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  background: #090d14;
+  border: 1px solid #1b2638;
+  padding: 2px 8px;
+  height: 24px;
+}
+
+.threat-indicator {
+  color: var(--crt-green);
+  font-weight: bold;
+}
+
+.threat-warning {
+  color: var(--crt-red) !important;
+  animation: pulseThreat 0.5s infinite alternate;
+}
+
+@keyframes pulseThreat {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* --- MODAL DIALOGS --- */
+.cyber-modal {
+  position: fixed;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+}
+
+.cyber-modal.hidden {
+  display: none;
+}
+
+.modal-dialog {
+  width: 480px;
+  background: #111724;
+  border-top: 2px solid #4a5c7d;
+  border-left: 2px solid #4a5c7d;
+  border-right: 2px solid #070a10;
+  border-bottom: 2px solid #070a10;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+}
+
+.modal-header {
+  height: 28px;
+  background: linear-gradient(90deg, #005577 0%, #001f33 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: #fff;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.modal-body {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-group label {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.form-group input[type="text"],
+.form-group select {
+  background: #090d14;
+  border: 1px solid #233149;
+  color: #fff;
+  font-family: var(--mono-font);
+  font-size: 13px;
+  padding: 6px;
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.range-row input[type="range"] {
+  flex: 1;
+}
+
+.range-row input[type="number"] {
+  width: 70px;
+  background: #090d14;
+  border: 1px solid #233149;
+  color: #fff;
+  padding: 4px;
+  font-family: var(--mono-font);
+}
+
+.modal-footer {
+  padding: 10px 14px;
+  background: #0c101a;
+  border-top: 1px solid #1a2538;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+/* --- TOAST NOTIFICATIONS --- */
+#toast-container {
+  position: fixed;
+  bottom: 45px;
+  right: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  z-index: 9000;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(10, 14, 22, 0.95);
+  border: 1px solid var(--crt-cyan);
+  border-left: 4px solid var(--crt-cyan);
+  padding: 8px 12px;
+  color: #fff;
+  font-size: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.8);
+  animation: slideToast 0.25s ease-out;
+}
+
+.toast.toast-error {
+  border-color: var(--crt-red);
+  border-left-color: var(--crt-red);
+  color: #ff9999;
+}
+
+.toast.toast-success {
+  border-color: var(--crt-green);
+  border-left-color: var(--crt-green);
+  color: #aaffbb;
+}
+
+@keyframes slideToast {
+  from { transform: translateX(50px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+</style>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=VT323&family=Share+Tech+Mono&family=Press+Start+2P&display=swap" rel="stylesheet">
+</head>
+<body class="crt-enabled">
+  <!-- CRT Overlay Effects -->
+  <div class="crt-scanlines"></div>
+  <div class="crt-vignette"></div>
+  <div class="crt-flicker"></div>
+
+  <!-- Main Container -->
+  <div id="game-app">
+    
+    <!-- Top Global Notification & Status Bar -->
+    <header id="global-bar">
+      <div class="brand">
+        <span class="logo-glitch" data-text="NAVI // PARTITION.SYS">NAVI // PARTITION.SYS</span>
+        <span class="version-tag">v1.0.4 [COPLAND-OS]</span>
+      </div>
+      <div class="quick-status">
+        <div class="stat-pill"><span class="label">CZAS:</span> <span id="time-display">Dzień 1, 08:00</span></div>
+        <div class="stat-pill"><span class="label">ŚRODKI:</span> <span id="money-display" class="cash-value">450.00 PLN</span></div>
+        <div class="stat-pill"><span class="label">KRYPTO:</span> <span id="crypto-display" class="crypto-value">0.0000 Ⓦ</span></div>
+        <div class="stat-pill alert-pill"><span class="label">CZYNSZ:</span> <span id="rent-timer">Za 6 dni (500 PLN)</span></div>
+        <div class="stat-pill" id="power-pill"><span class="label">MOC:</span> <span id="power-display">120W / 400W</span></div>
+        <div class="stat-pill" id="temp-pill"><span class="label">TEMP:</span> <span id="temp-display">21.5°C</span></div>
+      </div>
+      <div class="top-controls">
+        <button id="btn-toggle-view" class="cyber-btn highlight-btn">🖥️ PULPIT NAVI</button>
+        <button id="btn-speed-pause" class="cyber-btn icon-btn" title="Pauza">⏸</button>
+        <button id="btn-speed-1x" class="cyber-btn icon-btn active-btn" title="1x">1x</button>
+        <button id="btn-speed-2x" class="cyber-btn icon-btn" title="2x">2x</button>
+        <button id="btn-speed-5x" class="cyber-btn icon-btn" title="5x">5x</button>
+        <button id="btn-audio-toggle" class="cyber-btn icon-btn" title="Dźwięk ON/OFF">🔊</button>
+        <button id="btn-crt-toggle" class="cyber-btn icon-btn" title="Filtr CRT">📺</button>
+        <button id="btn-help" class="cyber-btn icon-btn" title="Pomoc / Poradnik">❓</button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: 2D PIXEL-ART ROOM (LAIN'S SANCTUARY) -->
+    <section id="view-room" class="view-panel active">
+      <div class="room-canvas-wrapper">
+        <canvas id="room-canvas" width="960" height="540"></canvas>
+        <div id="room-tooltip" class="pixel-tooltip hidden"></div>
+      </div>
+      
+      <!-- Room Action Dock -->
+      <div class="room-dock">
+        <button class="dock-btn" data-action="pc"><span class="icon">🖥️</span><strong>Stanowisko NAVI</strong><small>[Spacja / Klik]</small></button>
+        <button class="dock-btn" data-action="fusebox"><span class="icon">⚡</span><strong>Skrzynka Bezpieczników</strong><small id="dock-fuse-status">Sprawna</small></button>
+        <button class="dock-btn" data-action="window"><span class="icon">🪟</span><strong>Okno Pokoju</strong><small id="dock-window-status">Zamknięte</small></button>
+        <button class="dock-btn" data-action="fridge"><span class="icon">🥫</span><strong>Lodówka & Zapasy</strong><small id="dock-food-status">Głód: 15%</small></button>
+        <button class="dock-btn" data-action="bed"><span class="icon">🛏️</span><strong>Łóżko (Sen)</strong><small id="dock-energy-status">Energia: 90%</small></button>
+        <button class="dock-btn" data-action="coolant"><span class="icon">🧪</span><strong>Chłodzenie Wodne</strong><small id="dock-coolant-status">Zbiornik: 100%</small></button>
+      </div>
+    </section>
+
+    <!-- VIEW 2: RETRO NAVI COPLAND OS DESKTOP -->
+    <section id="view-desktop" class="view-panel">
+      <!-- Desktop Icons Grid -->
+      <div id="desktop-icons">
+        <div class="desktop-icon" data-app="app-disk-mgr">
+          <div class="icon-img icon-disk"></div>
+          <span>Menedżer Dysków</span>
+        </div>
+        <div class="desktop-icon" data-app="app-services">
+          <div class="icon-img icon-wired"></div>
+          <span>Węzły The Wired</span>
+        </div>
+        <div class="desktop-icon" data-app="app-bazaar">
+          <div class="icon-img icon-shop"></div>
+          <span>Giełda Sprzętu</span>
+        </div>
+        <div class="desktop-icon" data-app="app-contracts">
+          <div class="icon-img icon-mail"></div>
+          <span>Zlecenia DarkNetu</span>
+        </div>
+        <div class="desktop-icon" data-app="app-power">
+          <div class="icon-img icon-power"></div>
+          <span>Instalacja & Klimat</span>
+        </div>
+        <div class="desktop-icon" data-app="app-bank">
+          <div class="icon-img icon-bank"></div>
+          <span>Bank & Czynsz</span>
+        </div>
+        <div class="desktop-icon" data-app="app-terminal">
+          <div class="icon-img icon-term"></div>
+          <span>Terminal CLI</span>
+        </div>
+        <div class="desktop-icon" data-app="app-guide">
+          <div class="icon-img icon-doc"></div>
+          <span>Instrukcja.txt</span>
+        </div>
+      </div>
+
+      <!-- Windows Workspace (Draggable & Resizable) -->
+      <div id="windows-container">
+
+        <!-- WINDOW: DISK MANAGER (FDISK / GPARTED) -->
+        <div id="app-disk-mgr" class="cyber-window focused" style="top: 30px; left: 110px; width: 780px; height: 500px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">💾</span> <span id="disk-mgr-title">DISK_MGR 1.0 - Tablica Partycji & Klastry</span></div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body disk-mgr-layout">
+            <!-- Sidebar: Installed Disks List -->
+            <div class="disk-sidebar">
+              <div class="sidebar-header">Fizyczne Dyski (Zainstalowane)</div>
+              <div id="disk-device-list" class="device-list">
+                <!-- Dynamically populated -->
+              </div>
+              <div class="disk-hardware-specs" id="active-disk-specs">
+                <!-- Disk specs details -->
+              </div>
+            </div>
+
+            <!-- Main Panel: Visual Partition Map & Operations -->
+            <div class="disk-main-area">
+              <div class="disk-toolbar">
+                <button id="btn-new-partition" class="tool-btn">➕ Nowa Partycja</button>
+                <button id="btn-delete-partition" class="tool-btn">❌ Usuń</button>
+                <button id="btn-format-partition" class="tool-btn">⚡ Formatuj / System Plików</button>
+                <button id="btn-change-table" class="tool-btn">🔄 Zmień Tablicę (MBR/GPT)</button>
+                <button id="btn-scan-badsectors" class="tool-btn">🔍 Skan S.M.A.R.T.</button>
+                <button id="btn-wipe-zero" class="tool-btn alert-tool-btn">☢️ dd wipe (/dev/zero)</button>
+              </div>
+
+              <!-- Visual Disk Strip Bar -->
+              <div class="disk-visual-section">
+                <div class="disk-label-bar">
+                  <span id="disk-bar-name">/dev/sda [80 GB HDD]</span>
+                  <span id="disk-bar-free">Wolne: 80 GB</span>
+                </div>
+                <div id="disk-visual-strip" class="disk-visual-strip">
+                  <!-- Dynamic visual blocks -->
+                </div>
+                <div class="disk-legend">
+                  <span class="legend-item"><span class="color-box col-fat32"></span> FAT16/32</span>
+                  <span class="legend-item"><span class="color-box col-ntfs"></span> NTFS</span>
+                  <span class="legend-item"><span class="color-box col-ext4"></span> EXT4</span>
+                  <span class="legend-item"><span class="color-box col-zfs"></span> ZFS</span>
+                  <span class="legend-item"><span class="color-box col-luks"></span> LUKS Szyfrowana</span>
+                  <span class="legend-item"><span class="color-box col-swap"></span> SWAP</span>
+                  <span class="legend-item"><span class="color-box col-unalloc"></span> Nieprzydzielone</span>
+                </div>
+              </div>
+
+              <!-- Partition Details & S.M.A.R.T. Sector Grid -->
+              <div class="partition-info-panel">
+                <div class="info-table-container">
+                  <table class="cyber-table" id="partitions-table">
+                    <thead>
+                      <tr>
+                        <th>Partycja</th>
+                        <th>Rozmiar</th>
+                        <th>System Plików</th>
+                        <th>Klastry</th>
+                        <th>Punkt Montowania</th>
+                        <th>Usługa</th>
+                        <th>Stan</th>
+                      </tr>
+                    </thead>
+                    <tbody id="partitions-tbody">
+                      <!-- Dynamic rows -->
+                    </tbody>
+                  </table>
+                </div>
+                
+                <!-- Sector Map View / S.M.A.R.T. -->
+                <div class="sector-map-wrapper">
+                  <div class="sector-header">
+                    <span>Mapa Sektorów S.M.A.R.T. (<span id="bad-sectors-count">0 bad sectorów</span>)</span>
+                    <button id="btn-remap-bad" class="small-btn">Remapuj Uszkodzone</button>
+                  </div>
+                  <div id="sector-grid" class="sector-grid">
+                    <!-- 128 tiny block indicators -->
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: THE WIRED SERVICES & DAEMONS -->
+        <div id="app-services" class="cyber-window minimized" style="top: 50px; left: 140px; width: 720px; height: 460px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🌐</span> WIRED_SERVICES.EXE - Monetyzacja Partycji & Demony</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body services-layout">
+            <div class="services-header-info">
+              <p>Przypisuj usługi do sformatowanych partycji, aby generować transfer danych i przychody. Każda usługa ma specyficzne wymagania co do systemu plików i klastrów!</p>
+            </div>
+            <div class="services-grid" id="services-grid-list">
+              <!-- Dynamically generated services cards -->
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: HARDWARE BAZAAR (MARKETPLACE) -->
+        <div id="app-bazaar" class="cyber-window minimized" style="top: 70px; left: 170px; width: 680px; height: 480px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🛒</span> GIEŁDA ELEKTRONIKI // GIEŁDA WOLUMEN</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body bazaar-layout">
+            <div class="bazaar-tabs">
+              <button class="tab-btn active" data-tab="disks">Nośniki Danych (HDD/SSD/SCSI)</button>
+              <button class="tab-btn" data-tab="cooling">Chłodzenie & Wiatraki</button>
+              <button class="tab-btn" data-tab="power">Zasilacze & Bezpieczniki</button>
+              <button class="tab-btn" data-tab="software">Narzędzia & Licencje</button>
+            </div>
+            <div class="bazaar-content" id="bazaar-catalog">
+              <!-- Dynamically injected store items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: CONTRACTS & DARKNET BOARD -->
+        <div id="app-contracts" class="cyber-window minimized" style="top: 90px; left: 200px; width: 660px; height: 440px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">✉️</span> DARKNET_BOARD // Szyfrowana Tablica Zleceń</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body contracts-layout">
+            <div class="contracts-list" id="contracts-list">
+              <!-- Dynamically injected contracts -->
+            </div>
+            <div class="contract-details" id="contract-active-view">
+              <div class="empty-state">Wybierz zlecenie z listy po lewej, aby zapoznać się ze specyfikacją klienta.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: POWER & CLIMATE -->
+        <div id="app-power" class="cyber-window minimized" style="top: 110px; left: 230px; width: 600px; height: 420px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">⚡</span> POWER_GRID & CLIMATE MONITOR</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body power-layout">
+            <div class="gauge-box">
+              <h3>Pobór Mocy Pokoju</h3>
+              <div class="gauge-meter">
+                <div id="power-bar-fill" class="gauge-fill" style="width: 30%;"></div>
+              </div>
+              <div class="gauge-labels">
+                <span id="power-val-detail">120W</span> / <span id="power-max-detail">400W (Limit bezpiecznika B16)</span>
+              </div>
+              <p class="gauge-hint">Przekroczenie limitu natychmiast wywali bezpiecznik w pokoju!</p>
+            </div>
+
+            <div class="gauge-box">
+              <h3>Termika & Chłodzenie Pokoju</h3>
+              <div class="gauge-meter">
+                <div id="temp-bar-fill" class="gauge-fill temp-fill" style="width: 25%;"></div>
+              </div>
+              <div class="gauge-labels">
+                <span id="temp-val-detail">21.5°C</span> (Optymalna: poniżej 35°C)
+              </div>
+              <p class="gauge-hint">Powyżej 42°C dyski tracą stabilność. Otwórz okno lub włącz chłodzenie wodne.</p>
+            </div>
+
+            <div class="power-controls-grid">
+              <button id="btn-toggle-window-os" class="tool-btn">🪟 Otwórz/Zamknij Okno</button>
+              <button id="btn-toggle-pump-os" class="tool-btn">🧪 Pompa Chłodzenia Cieczą (Włącz)</button>
+              <button id="btn-reset-fuse-os" class="tool-btn">⚡ Zresetuj Bezpiecznik</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: BANK & RENT -->
+        <div id="app-bank" class="cyber-window minimized" style="top: 130px; left: 260px; width: 560px; height: 400px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">🏦</span> E-BANK POLSKI & WIRED-EXCHANGE</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body bank-layout">
+            <div class="account-card">
+              <div class="acc-row"><span>Rachunek Główny:</span> <strong id="bank-pln-val">450.00 PLN</strong></div>
+              <div class="acc-row"><span>Portfel The Wired:</span> <strong id="bank-crypto-val">0.0000 Ⓦ</strong></div>
+              <div class="crypto-exchange-row">
+                <input type="number" id="crypto-exchange-amount" value="0.001" step="0.001" min="0.001">
+                <button id="btn-exchange-crypto" class="tool-btn">Wymień Ⓦ na PLN (Kurs: 1Ⓦ = 2400 PLN)</button>
+              </div>
+            </div>
+
+            <div class="bills-card">
+              <h3>Nadchodzące Zobowiązania</h3>
+              <div class="bill-row">
+                <div>
+                  <strong>Czynsz za kawalerkę:</strong> 500.00 PLN
+                  <br><small id="bill-rent-days">Płatne za: 6 dni</small>
+                </div>
+                <button id="btn-pay-rent" class="tool-btn">Opłać Czynsz</button>
+              </div>
+              <div class="bill-row">
+                <div>
+                  <strong>Bieżący rachunek za prąd:</strong> <span id="bill-power-amount">18.40 PLN</span>
+                  <br><small>Stawka: 0.95 PLN / kWh</small>
+                </div>
+                <button id="btn-pay-power" class="tool-btn">Ureguluj Prąd</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: TERMINAL CLI -->
+        <div id="app-terminal" class="cyber-window minimized" style="top: 150px; left: 100px; width: 700px; height: 420px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">💻</span> BASH / TERMINAL [NAVI-SHELL]</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body terminal-layout">
+            <div id="term-output" class="terminal-screen">
+              <div class="term-line">Copland OS NAVI Shell Kernel 4.19-lain</div>
+              <div class="term-line">Wpisz 'help', aby zobaczyć dostępne polecenia (/dev/sda, lsblk, fdisk, mkfs, mount, smartctl).</div>
+            </div>
+            <div class="terminal-input-bar">
+              <span class="prompt">root@lain-navi:~#</span>
+              <input type="text" id="term-input" autocomplete="off" spellcheck="false">
+            </div>
+          </div>
+        </div>
+
+        <!-- WINDOW: GUIDE -->
+        <div id="app-guide" class="cyber-window minimized" style="top: 60px; left: 180px; width: 640px; height: 460px;">
+          <div class="window-header">
+            <div class="window-title"><span class="win-icon">📖</span> INSTRUKCJA_HAKERA.TXT</div>
+            <div class="window-controls">
+              <button class="win-btn win-minimize">_</button>
+              <button class="win-btn win-close">✕</button>
+            </div>
+          </div>
+          <div class="window-body guide-layout">
+            <h2>Przewodnik Architekta Danych NAVI</h2>
+            <p><strong>1. Cel gry:</strong> Przetrwaj w swoim mieszkaniu, opłacaj czynsz i rozbuduj swoje stanowisko komputerowe z pojedynczego starego PC do potężnego cybernetycznego sanktuarium (jak w <em>Serial Experiments Lain</em>).</p>
+            <h3>2. Zasady Partycjonowania:</h3>
+            <ul>
+              <li><strong>MBR vs GPT:</strong> MBR pozwala na maks. 4 partycje (do 2 TB). GPT pozwala na dowolną liczbę i ogromne dyski.</li>
+              <li><strong>FAT16/FAT32:</strong> Bardzo stary, minimalny narzut, ale brak ochrony i mały rozmiar pliku. Dobre dla tanich węzłów P2P.</li>
+              <li><strong>NTFS:</strong> Stabilny system plików z obsługą uprawnień i kompresji. Wymagany przez komercyjne archiwa.</li>
+              <li><strong>EXT4:</strong> Bardzo szybki system uniksowy, idealny do baz danych i węzłów The Wired.</li>
+              <li><strong>ZFS:</strong> Zaawansowany system z redundancją i ochroną przed uszkodzeniami. Wymaga dużej ilości RAMu i mocy.</li>
+              <li><strong>LUKS:</strong> Szyfrowana partycja. Obowiązkowa dla nielegalnych zleceń Darknetu – chroni przed nalotem policji!</li>
+              <li><strong>SWAP:</strong> Przestrzeń wymiany – odciąża pamięć operacyjną serwerów.</li>
+            </ul>
+            <h3>3. Rozmiar Klastra (Cluster Size):</h3>
+            <ul>
+              <li><strong>512B – 1KB (Małe klastry):</strong> Idealne dla scraperów i botów (miliony malutkich plików bez marnowania przestrzeni).</li>
+              <li><strong>4KB (Standard):</strong> Zrównoważona wydajność dla większości serwisów internetowych.</li>
+              <li><strong>16KB – 64KB (Duże klastry):</strong> Piekielnie szybki transfer dla baz danych wideo, kryptowalut i wielkich archiwów, lecz marnuje miejsce przy małych plikach.</li>
+            </ul>
+            <h3>4. Dom, Bezpieczniki i Temperatura:</h3>
+            <p>Im więcej dysków i procesów, tym wyższy pobór mocy (W) i temperatura (°C). Pilnuj watomierza! Gdy wywali korki, wyłącz zbyteczne procesy i zresetuj bezpiecznik w pokoju. Chłodź pokój oknem lub instalacją cieczy.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Desktop Bottom Taskbar -->
+      <footer id="desktop-taskbar">
+        <button id="start-btn" class="taskbar-btn"><span class="os-logo">👁️</span> <strong>NAVI</strong></button>
+        <div id="taskbar-tasks" class="taskbar-running-apps">
+          <!-- Active minimized/open window buttons -->
+        </div>
+        <div class="taskbar-tray">
+          <span id="tray-police-threat" class="threat-indicator" title="Zagrożenie Nalotem Policji">POLICJA: 0%</span>
+          <span id="tray-net-speed">I/O: 0.0 MB/s</span>
+          <span id="tray-clock">13:37</span>
+        </div>
+      </footer>
+    </section>
+
+    <!-- MODAL: PARTITION CREATE / FORMAT DIALOG -->
+    <div id="modal-partition" class="cyber-modal hidden">
+      <div class="modal-dialog">
+        <div class="modal-header">
+          <span id="modal-partition-title">Utwórz Nową Partycję</span>
+          <button class="win-btn modal-close">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Etykieta Woluminu:</label>
+            <input type="text" id="modal-part-label" value="WIRED_VOL" maxlength="16">
+          </div>
+          <div class="form-group">
+            <label>Rozmiar Partycji (GB):</label>
+            <div class="range-row">
+              <input type="range" id="modal-part-size-slider" min="1" max="80" value="40">
+              <input type="number" id="modal-part-size-val" min="1" max="80" value="40"> <span>GB</span>
+            </div>
+            <small id="modal-part-max-hint">Maksymalnie wolne: 80 GB</small>
+          </div>
+          <div class="form-group">
+            <label>System Plików:</label>
+            <select id="modal-part-fs">
+              <option value="FAT32">FAT32 (Uniwersalny, mały narzut)</option>
+              <option value="NTFS">NTFS (Dobra kompresja, archiwa)</option>
+              <option value="EXT4" selected>EXT4 (Szybki, zalecany dla The Wired)</option>
+              <option value="ZFS">ZFS (Odporny na błędy, wymaga mocy)</option>
+              <option value="LUKS">LUKS Encrypted (Szyfrowanie wojskowe, ochrona policji)</option>
+              <option value="SWAP">SWAP (Pamięć wymiany)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Rozmiar Klastra (Allocation Unit Size):</label>
+            <select id="modal-part-cluster">
+              <option value="512B">512 Bajtów (Mikro-pliki, boty scrapingowe)</option>
+              <option value="1KB">1 KB (Małe pakiety sieciowe)</option>
+              <option value="4KB" selected>4 KB (Standard uniwersalny)</option>
+              <option value="16KB">16 KB (Szybkie bazy danych)</option>
+              <option value="64KB">64 KB (Maksymalny transfer sekwencyjny)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Punkt Montowania:</label>
+            <select id="modal-part-mount">
+              <option value="/mnt/wired">/mnt/wired (Główny Węzeł The Wired)</option>
+              <option value="/mnt/darknet">/mnt/darknet (Hosting Nielegalny / Dark)</option>
+              <option value="/mnt/storage">/mnt/storage (Magazyn Danych / P2P)</option>
+              <option value="/mnt/crypto">/mnt/crypto (Węzeł Walidacyjny Krypto)</option>
+              <option value="/mnt/vault">/mnt/vault (Skarbiec Korporacyjny)</option>
+              <option value="/swap">/swap (Przestrzeń Wymiany)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btn-modal-cancel" class="cyber-btn">Anuluj</button>
+          <button id="btn-modal-confirm" class="cyber-btn highlight-btn">Utwórz i Formatuj</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATION POPUPS CONTAINER -->
+    <div id="toast-container"></div>
+
+  </div>
+
+  <!-- Audio and Game Logic Scripts -->
+  <script>
+/**
+ * NAVI // PARTITION.SYS - PROCEDURAL WEB AUDIO SYNTHESIZER
+ * Synthesizes mechanical HDD seeks, fan hum, circuit breaker trips, PC beeps & cyber ambient.
+ */
+
+class RetroAudioEngine {
+  constructor() {
+    this.ctx = null;
+    this.isMuted = false;
+    this.isInitialized = false;
+
+    // Persistent audio nodes
+    this.fanGain = null;
+    this.fanFilter = null;
+    this.ambientGain = null;
+  }
+
+  init() {
+    if (this.isInitialized) return;
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      this.ctx = new AudioCtx();
+      this.isInitialized = true;
+      this.setupContinuousSounds();
+    } catch (e) {
+      console.warn("Web Audio API niedostępne:", e);
+    }
+  }
+
+  ensureContext() {
+    if (!this.isInitialized) {
+      this.init();
+    }
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume();
+    }
+  }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+    if (this.fanGain && this.ctx) {
+      this.fanGain.gain.setValueAtTime(this.isMuted ? 0 : 0.04, this.ctx.currentTime);
+    }
+    if (this.ambientGain && this.ctx) {
+      this.ambientGain.gain.setValueAtTime(this.isMuted ? 0 : 0.03, this.ctx.currentTime);
+    }
+    return !this.isMuted;
+  }
+
+  setupContinuousSounds() {
+    if (!this.ctx) return;
+
+    // 1. Fan noise generator (Pink-ish filtered noise buffer)
+    const bufferSize = this.ctx.sampleRate * 2;
+    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const output = noiseBuffer.getChannelData(0);
+    let b0 = 0, b1 = 0, b2 = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      output[i] = (b0 + b1 + b2) * 0.15;
+    }
+
+    const whiteNoise = this.ctx.createBufferSource();
+    whiteNoise.buffer = noiseBuffer;
+    whiteNoise.loop = true;
+
+    this.fanFilter = this.ctx.createBiquadFilter();
+    this.fanFilter.type = 'lowpass';
+    this.fanFilter.frequency.setValueAtTime(450, this.ctx.currentTime);
+
+    this.fanGain = this.ctx.createGain();
+    this.fanGain.gain.setValueAtTime(this.isMuted ? 0 : 0.03, this.ctx.currentTime);
+
+    whiteNoise.connect(this.fanFilter);
+    this.fanFilter.connect(this.fanGain);
+    this.fanGain.connect(this.ctx.destination);
+    whiteNoise.start();
+
+    // 2. Ambient Cyber Drone (Sub-bass layered sines)
+    const osc1 = this.ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(55, this.ctx.currentTime); // A1 note
+
+    const osc2 = this.ctx.createOscillator();
+    osc2.type = 'triangle';
+    osc2.frequency.setValueAtTime(110, this.ctx.currentTime); // A2 harmonic
+
+    this.ambientGain = this.ctx.createGain();
+    this.ambientGain.gain.setValueAtTime(this.isMuted ? 0 : 0.02, this.ctx.currentTime);
+
+    const ambientFilter = this.ctx.createBiquadFilter();
+    ambientFilter.type = 'lowpass';
+    ambientFilter.frequency.setValueAtTime(180, this.ctx.currentTime);
+
+    osc1.connect(ambientFilter);
+    osc2.connect(ambientFilter);
+    ambientFilter.connect(this.ambientGain);
+    this.ambientGain.connect(this.ctx.destination);
+
+    osc1.start();
+    osc2.start();
+  }
+
+  updateFanSpeed(loadFraction, temp) {
+    if (!this.ctx || this.isMuted || !this.fanFilter || !this.fanGain) return;
+    const targetFreq = 300 + (loadFraction * 400) + (temp > 35 ? (temp - 35) * 40 : 0);
+    const targetGain = 0.02 + (loadFraction * 0.05);
+    this.fanFilter.frequency.setTargetAtTime(targetFreq, this.ctx.currentTime, 0.5);
+    this.fanGain.gain.setTargetAtTime(targetGain, this.ctx.currentTime, 0.5);
+  }
+
+  // Mechanical HDD head seek / chatter effect
+  playHddSeek(intensity = 1.0) {
+    if (!this.ctx || this.isMuted) return;
+    this.ensureContext();
+
+    const count = 3 + Math.floor(Math.random() * 4);
+    for (let i = 0; i < count; i++) {
+      const delay = i * 0.035 + (Math.random() * 0.015);
+      setTimeout(() => {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        const filter = this.ctx.createBiquadFilter();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(800 + Math.random() * 1200, now);
+        osc.frequency.exponentialRampToValueAtTime(80, now + 0.02);
+
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1600, now);
+        filter.Q.setValueAtTime(3, now);
+
+        gain.gain.setValueAtTime(0.06 * intensity, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+
+        osc.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.03);
+      }, delay * 1000);
+    }
+  }
+
+  // Circuit breaker fuse trip (Heavy relay CLACK-POP)
+  playFuseTrip() {
+    if (!this.ctx || this.isMuted) return;
+    this.ensureContext();
+    const now = this.ctx.currentTime;
+
+    // Low thump
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(120, now);
+    osc.frequency.exponentialRampToValueAtTime(30, now + 0.15);
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.16);
+
+    // Spark pop
+    const bufferSize = this.ctx.sampleRate * 0.05;
+    const noiseBuffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+    const data = noiseBuffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.2));
+    }
+    const noise = this.ctx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    const noiseGain = this.ctx.createGain();
+    noiseGain.gain.setValueAtTime(0.25, now);
+    noise.connect(noiseGain);
+    noiseGain.connect(this.ctx.destination);
+    noise.start(now);
+  }
+
+  // PC Speaker Beep
+  playBeep(freq = 880, duration = 0.1, type = 'sine') {
+    if (!this.ctx || this.isMuted) return;
+    this.ensureContext();
+    const now = this.ctx.currentTime;
+
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, now);
+
+    gain.gain.setValueAtTime(0.08, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + duration);
+  }
+
+  // UI Key Clack
+  playClick() {
+    this.playBeep(1200 + Math.random() * 400, 0.02, 'triangle');
+  }
+
+  // Alert alarm beep
+  playAlert() {
+    this.playBeep(440, 0.1, 'square');
+    setTimeout(() => this.playBeep(880, 0.15, 'square'), 120);
+  }
+}
+
+// Global audio singleton
+window.audioEngine = new RetroAudioEngine();
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - CENTRAL REACTIVE STATE STORE
+ * Manages player finances, room environment, electrical grid, disk hardware, progression & saves.
+ */
+
+class GameState {
+  constructor() {
+    this.subscribers = [];
+    this.resetToDefaults();
+  }
+
+  resetToDefaults() {
+    this.timeSpeed = 1; // 0=pause, 1=1x, 2=2x, 5=5x
+    this.inGameTime = {
+      day: 1,
+      hour: 8,
+      minute: 0
+    };
+
+    // Economy & Player stats
+    this.money = 450.00; // PLN
+    this.crypto = 0.0000; // Ⓦ WiredCoin
+    this.cryptoRate = 2400.00; // PLN per 1 Ⓦ
+    this.hunger = 15; // 0-100%
+    this.energy = 95; // 0-100%
+    this.rentDueDays = 6;
+    this.rentAmount = 500.00;
+    this.powerKwhRate = 0.95; // PLN per kWh
+    this.powerKwhAccrued = 0.0;
+    this.powerBillAmount = 0.0;
+
+    // Room Environment & Electrical Grid
+    this.roomTier = 1; // 1 to 4 (Lain's NAVI shrine at 4)
+    this.roomTemp = 21.5; // °C
+    this.ambientTemp = 19.0; // Outdoor °C
+    this.windowOpen = false;
+    this.coolingPumpActive = false;
+    this.coolingFluidLevel = 100; // %
+    this.fuseTripped = false;
+    this.fuseMaxWatts = 400; // Tier 1 standard apartment circuit
+    this.currentWatts = 80; // Baseline PC idle power
+
+    // Law Enforcement & Security
+    this.policeThreat = 0; // 0-100%
+    this.policeRaidPending = false;
+
+    // Tooling Progression (1=fdisk CLI, 2=GUI Partition Wizard, 3=LVM/GPT Pro, 4=NAVI Hyper-Storage)
+    this.toolTier = 1;
+    this.reputation = 0;
+
+    // Disks (Populated with initial starter drive)
+    this.disks = [
+      {
+        id: "disk-0",
+        dev: "/dev/sda",
+        model: "Quantum Fireball ST 80GB",
+        type: "HDD",
+        interface: "IDE",
+        sizeGB: 80,
+        tableType: "MBR", // "MBR" or "GPT"
+        powerWatts: 25,
+        heatRate: 0.12, // °C per in-game hour
+        rpm: 5400,
+        health: 96, // 0-100%
+        badSectors: [14, 42, 89], // specific sector indices
+        remappedSectors: [],
+        partitions: [
+          {
+            id: "part-0-1",
+            dev: "/dev/sda1",
+            label: "SYSTEM_OS",
+            sizeGB: 20,
+            fs: "EXT4",
+            clusterSize: "4KB",
+            mount: "/",
+            encrypted: false,
+            serviceId: null,
+            corrupted: false
+          }
+        ]
+      }
+    ];
+
+    // Selected disk in UI
+    this.selectedDiskId = "disk-0";
+    this.selectedPartId = null;
+
+    // Active & Registered Services
+    this.services = [];
+
+    // Contracts Board
+    this.contracts = [];
+    this.activeContract = null;
+
+    // View state
+    this.activeView = "room"; // "room" or "desktop"
+  }
+
+  // Subscribe to state changes
+  subscribe(callback) {
+    this.subscribers.push(callback);
+  }
+
+  notify() {
+    for (const cb of this.subscribers) {
+      cb(this);
+    }
+  }
+
+  // Save / Load via LocalStorage
+  saveGame() {
+    try {
+      const data = {
+        time: this.inGameTime,
+        money: this.money,
+        crypto: this.crypto,
+        hunger: this.hunger,
+        energy: this.energy,
+        rentDueDays: this.rentDueDays,
+        powerBillAmount: this.powerBillAmount,
+        roomTier: this.roomTier,
+        roomTemp: this.roomTemp,
+        windowOpen: this.windowOpen,
+        coolingPumpActive: this.coolingPumpActive,
+        coolingFluidLevel: this.coolingFluidLevel,
+        fuseTripped: this.fuseTripped,
+        fuseMaxWatts: this.fuseMaxWatts,
+        toolTier: this.toolTier,
+        reputation: this.reputation,
+        disks: this.disks,
+        services: this.services,
+        contracts: this.contracts,
+        policeThreat: this.policeThreat
+      };
+      localStorage.setItem("NAVI_PARTITION_SAVE", JSON.stringify(data));
+      window.gameUI?.showToast("Stan gry został pomyślnie zapisany.", "success");
+    } catch (e) {
+      console.error("Save error:", e);
+    }
+  }
+
+  loadGame() {
+    try {
+      const raw = localStorage.getItem("NAVI_PARTITION_SAVE");
+      if (!raw) return false;
+      const data = JSON.parse(raw);
+      this.inGameTime = data.time || this.inGameTime;
+      this.money = data.money ?? this.money;
+      this.crypto = data.crypto ?? this.crypto;
+      this.hunger = data.hunger ?? this.hunger;
+      this.energy = data.energy ?? this.energy;
+      this.rentDueDays = data.rentDueDays ?? this.rentDueDays;
+      this.powerBillAmount = data.powerBillAmount ?? this.powerBillAmount;
+      this.roomTier = data.roomTier ?? this.roomTier;
+      this.roomTemp = data.roomTemp ?? this.roomTemp;
+      this.windowOpen = data.windowOpen ?? this.windowOpen;
+      this.coolingPumpActive = data.coolingPumpActive ?? this.coolingPumpActive;
+      this.coolingFluidLevel = data.coolingFluidLevel ?? this.coolingFluidLevel;
+      this.fuseTripped = data.fuseTripped ?? this.fuseTripped;
+      this.fuseMaxWatts = data.fuseMaxWatts ?? this.fuseMaxWatts;
+      this.toolTier = data.toolTier ?? this.toolTier;
+      this.reputation = data.reputation ?? this.reputation;
+      this.disks = data.disks || this.disks;
+      this.services = data.services || this.services;
+      this.contracts = data.contracts || this.contracts;
+      this.policeThreat = data.policeThreat ?? this.policeThreat;
+      this.notify();
+      window.gameUI?.showToast("Wczytano zapis gry.", "success");
+      return true;
+    } catch (e) {
+      console.error("Load error:", e);
+      return false;
+    }
+  }
+}
+
+// Global state singleton
+window.gameState = new GameState();
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - DISK & PARTITION ENGINE
+ * Manages partition tables (MBR/GPT), cluster sizes, file systems, S.M.A.R.T. bad sectors & dd wipes.
+ */
+
+class DiskEngine {
+  constructor(state) {
+    this.state = state;
+  }
+
+  // Get active selected disk object
+  getActiveDisk() {
+    return this.state.disks.find(d => d.id === this.state.selectedDiskId) || this.state.disks[0];
+  }
+
+  // Calculate allocated and unallocated space in GB
+  getDiskSpaceUsage(disk) {
+    const allocated = disk.partitions.reduce((acc, p) => acc + p.sizeGB, 0);
+    const unallocated = Math.max(0, disk.sizeGB - allocated);
+    return { allocated, unallocated };
+  }
+
+  // Check if partition creation is valid under MBR / GPT constraints
+  canCreatePartition(disk, sizeGB, requestedFs) {
+    const { unallocated } = this.getDiskSpaceUsage(disk);
+    if (sizeGB <= 0 || sizeGB > unallocated) {
+      return { allowed: false, reason: `Brak wystarczającej ilości miejsca! Dostępne: ${unallocated} GB.` };
+    }
+
+    if (disk.tableType === "MBR") {
+      if (disk.partitions.length >= 4) {
+        return { allowed: false, reason: "Limit tablicy MBR: maksymalnie 4 partycje podstawowe! Przekonwertuj dysk na GPT." };
+      }
+      if (disk.sizeGB > 2048) {
+        return { allowed: false, reason: "Tablica MBR nie obsługuje dysków powyżej 2 TB (2048 GB). Wymagane GPT!" };
+      }
+    }
+
+    // Progression tier validation
+    if (requestedFs === "NTFS" || requestedFs === "EXT4" || requestedFs === "SWAP") {
+      if (this.state.toolTier < 2) {
+        return { allowed: false, reason: "Twój system (fdisk 1.0) nie obsługuje jeszcze NTFS/EXT4. Wymagany Partition Wizard (Tier 2)!" };
+      }
+    } else if (requestedFs === "ZFS") {
+      if (this.state.toolTier < 3) {
+        return { allowed: false, reason: "System plików ZFS wymaga pakietu GParted Pro / LVM (Tier 3)!" };
+      }
+    } else if (requestedFs === "LUKS") {
+      if (this.state.toolTier < 4) {
+        return { allowed: false, reason: "Szyfrowanie wojskowe LUKS wymaga modułu NAVI Hyper-Storage (Tier 4)!" };
+      }
+    }
+
+    return { allowed: true };
+  }
+
+  // Create a new partition on a disk
+  createPartition(diskId, label, sizeGB, fs, clusterSize, mount, encrypted = false) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    const check = this.canCreatePartition(disk, sizeGB, fs);
+    if (!check.allowed) {
+      return { success: false, msg: check.reason };
+    }
+
+    const nextIndex = disk.partitions.length + 1;
+    const devName = `${disk.dev}${nextIndex}`;
+    const newPart = {
+      id: `part-${disk.id}-${Date.now()}`,
+      dev: devName,
+      label: label.trim() || `PART_${nextIndex}`,
+      sizeGB: parseFloat(sizeGB),
+      fs: fs,
+      clusterSize: clusterSize,
+      mount: mount,
+      encrypted: encrypted || (fs === "LUKS"),
+      serviceId: null,
+      corrupted: false
+    };
+
+    disk.partitions.push(newPart);
+    this.state.selectedPartId = newPart.id;
+
+    // Mechanical HDD sound
+    window.audioEngine?.playHddSeek(1.2);
+    this.state.notify();
+    return { success: true, part: newPart };
+  }
+
+  // Delete partition
+  deletePartition(diskId, partId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    const index = disk.partitions.findIndex(p => p.id === partId);
+    if (index === -1) return { success: false, msg: "Nie znaleziono partycji." };
+
+    const part = disk.partitions[index];
+
+    // Check if system root partition
+    if (part.mount === "/") {
+      return { success: false, msg: "Ostrzeżenie jądra: nie możesz usunąć partycji głównej systemu montowania (/)!" };
+    }
+
+    // Stop associated service if any
+    if (part.serviceId) {
+      window.servicesEngine?.stopService(part.serviceId);
+    }
+
+    disk.partitions.splice(index, 1);
+    this.state.selectedPartId = null;
+
+    window.audioEngine?.playHddSeek(0.8);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // Format existing partition
+  formatPartition(diskId, partId, fs, clusterSize, mount, encrypted = false) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    const part = disk.partitions.find(p => p.id === partId);
+    if (!part) return { success: false, msg: "Nie znaleziono partycji." };
+
+    // Stop service if running
+    if (part.serviceId) {
+      window.servicesEngine?.stopService(part.serviceId);
+    }
+
+    part.fs = fs;
+    part.clusterSize = clusterSize;
+    part.mount = mount;
+    part.encrypted = encrypted || (fs === "LUKS");
+    part.corrupted = false;
+
+    window.audioEngine?.playHddSeek(1.5);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // Convert partition table MBR <-> GPT
+  changeTableType(diskId, newType) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    if (newType === "GPT" && this.state.toolTier < 3) {
+      return { success: false, msg: "Tablica GPT wymaga narzędzi GParted LVM Pro (Tier 3)!" };
+    }
+
+    // Stop all running services on this disk
+    disk.partitions.forEach(p => {
+      if (p.serviceId) window.servicesEngine?.stopService(p.serviceId);
+    });
+
+    disk.tableType = newType;
+    disk.partitions = []; // Partition table conversion wipes table entries
+    this.state.selectedPartId = null;
+
+    window.audioEngine?.playHddSeek(2.0);
+    this.state.notify();
+    return { success: true };
+  }
+
+  // Perform S.M.A.R.T. Surface Scan for bad sectors
+  scanBadSectors(diskId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    window.audioEngine?.playHddSeek(2.5);
+
+    // Random chance of discovering new bad sector if health is low
+    if (disk.health < 90 && Math.random() < 0.4) {
+      const newBad = Math.floor(Math.random() * 128);
+      if (!disk.badSectors.includes(newBad)) {
+        disk.badSectors.push(newBad);
+      }
+    }
+
+    this.state.notify();
+    return { 
+      success: true, 
+      count: disk.badSectors.length,
+      health: disk.health 
+    };
+  }
+
+  // Remap bad sectors from spare sector reserve
+  remapBadSectors(diskId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    if (this.state.toolTier < 2) {
+      return { success: false, msg: "Remapowanie S.M.A.R.T. wymaga co najmniej Partition Wizard (Tier 2)!" };
+    }
+
+    if (disk.badSectors.length === 0) {
+      return { success: false, msg: "Brak uszkodzonych sektorów do remapowania." };
+    }
+
+    const remapped = [...disk.badSectors];
+    disk.remappedSectors.push(...remapped);
+    disk.badSectors = [];
+    disk.health = Math.max(10, disk.health - (remapped.length * 2));
+
+    window.audioEngine?.playHddSeek(1.8);
+    this.state.notify();
+    return { success: true, count: remapped.length };
+  }
+
+  // Panic Zero Wipe (/dev/zero) - Instant wipe to erase illegal data during police scan
+  panicZeroWipe(diskId) {
+    const disk = this.state.disks.find(d => d.id === diskId);
+    if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    // Stop all services
+    disk.partitions.forEach(p => {
+      if (p.serviceId) window.servicesEngine?.stopService(p.serviceId);
+    });
+
+    disk.partitions = [];
+    this.state.selectedPartId = null;
+
+    // Reset police threat for wiped data
+    this.state.policeThreat = Math.max(0, this.state.policeThreat - 40);
+
+    window.audioEngine?.playAlert();
+    window.audioEngine?.playHddSeek(3.0);
+    this.state.notify();
+    return { success: true };
+  }
+}
+
+// Global disk engine singleton
+window.diskEngine = new DiskEngine(window.gameState);
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - THE WIRED SERVICES & DAEMONS ENGINE
+ * Manages background daemons, partition requirements, cluster efficiency, income & police suspicion.
+ */
+
+class ServicesEngine {
+  constructor(state) {
+    this.state = state;
+    this.serviceCatalog = [
+      {
+        id: "wired_relay",
+        name: "Węzeł Przekaźnikowy The Wired",
+        desc: "Podstawowy routing pakietów sieciowych w The Wired. Wymaga stabilnego systemu plików i partycji min. 15 GB.",
+        minSizeGB: 15,
+        requiredFs: ["EXT4", "NTFS", "ZFS"],
+        preferredClusters: ["4KB", "16KB"],
+        requiredMount: "/mnt/wired",
+        powerWatts: 35,
+        heatRate: 0.15,
+        incomePerTick: 0.90, // PLN per 10 in-game minutes
+        cryptoPerTick: 0.00008,
+        illegal: false
+      },
+      {
+        id: "scraper_bot",
+        name: "Sieciowy Scraper Danych & Indeksator",
+        desc: "Pobiera miliony mikroskopijnych plików i logów z sieci. Wymaga małych klastrów (512B lub 1KB), inaczej slack space zapycha dysk!",
+        minSizeGB: 20,
+        requiredFs: ["FAT32", "EXT4", "NTFS"],
+        preferredClusters: ["512B", "1KB"],
+        requiredMount: "/mnt/storage",
+        powerWatts: 45,
+        heatRate: 0.20,
+        incomePerTick: 1.50,
+        cryptoPerTick: 0.00015,
+        illegal: false
+      },
+      {
+        id: "p2p_seeder",
+        name: "P2P Warez & Anime Mirror",
+        desc: "Nocny seedbox dla cyfrowego podziemia. Lekki, działa nawet na starym FAT32, generuje stały drobny dochód.",
+        minSizeGB: 10,
+        requiredFs: ["FAT32", "NTFS", "EXT4"],
+        preferredClusters: ["16KB", "64KB"],
+        requiredMount: "/mnt/storage",
+        powerWatts: 20,
+        heatRate: 0.10,
+        incomePerTick: 0.65,
+        cryptoPerTick: 0.00005,
+        illegal: false
+      },
+      {
+        id: "crypto_validator",
+        name: "Węzeł Walidacyjny WiredCoin (Mining)",
+        desc: "Koparka i walidator transakcji kryptograficznych. Wysoki pobór mocy i ciepła! Wymaga klastrów 16KB lub 64KB.",
+        minSizeGB: 35,
+        requiredFs: ["EXT4", "ZFS", "NTFS"],
+        preferredClusters: ["16KB", "64KB"],
+        requiredMount: "/mnt/crypto",
+        powerWatts: 110,
+        heatRate: 0.55,
+        incomePerTick: 0.30,
+        cryptoPerTick: 0.00085,
+        illegal: false
+      },
+      {
+        id: "darknet_mirror",
+        name: "Hosting Lustrzany DarkNetu",
+        desc: "Nielegalny węzeł darknetu. Ogromne zyski, ale przyciąga policję! Wymaga szyfrowania LUKS, inaczej nalot to kwestia czasu.",
+        minSizeGB: 30,
+        requiredFs: ["LUKS", "EXT4", "ZFS"],
+        preferredClusters: ["4KB"],
+        requiredMount: "/mnt/darknet",
+        powerWatts: 60,
+        heatRate: 0.35,
+        incomePerTick: 3.80,
+        cryptoPerTick: 0.0018,
+        illegal: true
+      },
+      {
+        id: "corporate_vault",
+        name: "Skarbiec Kopii Zapasowych Tachibana",
+        desc: "Płatny bezpieczny skarbiec danych korporacyjnych. Wymaga odpornego na awarie systemu ZFS lub NTFS.",
+        minSizeGB: 50,
+        requiredFs: ["ZFS", "NTFS"],
+        preferredClusters: ["4KB", "16KB"],
+        requiredMount: "/mnt/vault",
+        powerWatts: 50,
+        heatRate: 0.25,
+        incomePerTick: 2.80,
+        cryptoPerTick: 0.0005,
+        illegal: false
+      }
+    ];
+  }
+
+  // Find all partitions available in all disks
+  getAllPartitions() {
+    const list = [];
+    for (const disk of this.state.disks) {
+      for (const part of disk.partitions) {
+        list.push({ disk, part });
+      }
+    }
+    return list;
+  }
+
+  // Check if a partition meets service requirements
+  validatePartitionForService(serviceDef, part) {
+    if (part.sizeGB < serviceDef.minSizeGB) {
+      return { valid: false, reason: `Zbyt mały rozmiar partycji (${part.sizeGB} GB < ${serviceDef.minSizeGB} GB).` };
+    }
+    if (!serviceDef.requiredFs.includes(part.fs)) {
+      return { valid: false, reason: `Nieobsługiwany system plików: ${part.fs}. Wymagany jeden z: ${serviceDef.requiredFs.join(", ")}.` };
+    }
+    if (part.mount !== serviceDef.requiredMount) {
+      return { valid: false, reason: `Nieprawidłowy punkt montowania (${part.mount}). Wymagany: ${serviceDef.requiredMount}.` };
+    }
+
+    // Cluster efficiency factor (0.5 to 1.2x)
+    let clusterMultiplier = 1.0;
+    if (serviceDef.preferredClusters.includes(part.clusterSize)) {
+      clusterMultiplier = 1.2; // Bonus for ideal allocation unit size
+    } else {
+      clusterMultiplier = 0.8; // Penalty for slack space or random access latency
+    }
+
+    return { valid: true, clusterMultiplier };
+  }
+
+  // Start a service on a partition
+  startService(serviceId, partId) {
+    const def = this.serviceCatalog.find(s => s.id === serviceId);
+    if (!def) return { success: false, msg: "Nie znaleziono usługi." };
+
+    const all = this.getAllPartitions();
+    const entry = all.find(e => e.part.id === partId);
+    if (!entry) return { success: false, msg: "Nie znaleziono wybranej partycji." };
+
+    const validation = this.validatePartitionForService(def, entry.part);
+    if (!validation.valid) {
+      return { success: false, msg: validation.reason };
+    }
+
+    // Detach from previous partition if running
+    this.stopService(serviceId);
+
+    // Attach to partition
+    entry.part.serviceId = serviceId;
+
+    this.state.services.push({
+      serviceId: serviceId,
+      diskId: entry.disk.id,
+      partId: partId,
+      clusterMultiplier: validation.clusterMultiplier,
+      trafficMBps: (1.5 + Math.random() * 8.0).toFixed(1)
+    });
+
+    window.audioEngine?.playHddSeek(1.2);
+    window.gameUI?.showToast(`Uruchomiono usługę: ${def.name}`, "success");
+    this.state.notify();
+    return { success: true };
+  }
+
+  // Stop running service
+  stopService(serviceId) {
+    const index = this.state.services.findIndex(s => s.serviceId === serviceId);
+    if (index !== -1) {
+      const running = this.state.services[index];
+      const all = this.getAllPartitions();
+      const entry = all.find(e => e.part.id === running.partId);
+      if (entry) {
+        entry.part.serviceId = null;
+      }
+      this.state.services.splice(index, 1);
+      this.state.notify();
+    }
+  }
+
+  // Tick calculation for economy, power and heat
+  tickProcess() {
+    if (this.state.fuseTripped) return; // No power, no services
+
+    let totalWatts = 50; // Baseline PC idle
+    let totalHeat = 0.05; // Ambient baseline heat
+    let totalIncome = 0;
+    let totalCrypto = 0;
+
+    // Disks idle power & heat
+    for (const disk of this.state.disks) {
+      totalWatts += disk.powerWatts;
+      totalHeat += disk.heatRate;
+    }
+
+    // Running services power, heat, and income
+    for (const s of this.state.services) {
+      const def = this.serviceCatalog.find(c => c.id === s.serviceId);
+      if (!def) continue;
+
+      totalWatts += def.powerWatts;
+      totalHeat += def.heatRate;
+
+      const earnedPLN = def.incomePerTick * s.clusterMultiplier;
+      const earnedCrypto = def.cryptoPerTick * s.clusterMultiplier;
+
+      totalIncome += earnedPLN;
+      totalCrypto += earnedCrypto;
+
+      // Check illegal status and police threat
+      if (def.illegal) {
+        const all = this.getAllPartitions();
+        const entry = all.find(e => e.part.id === s.partId);
+        if (entry && !entry.part.encrypted && entry.part.fs !== "LUKS") {
+          // Unencrypted darknet data increases police suspicion!
+          this.state.policeThreat = Math.min(100, this.state.policeThreat + 1.2);
+        } else {
+          // Encrypted LUKS partition is safe from automated sniffer!
+          this.state.policeThreat = Math.max(0, this.state.policeThreat - 0.2);
+        }
+      }
+
+      // Random I/O sound effect
+      if (Math.random() < 0.25) {
+        window.audioEngine?.playHddSeek(0.4);
+      }
+    }
+
+    // Cooling pump power draw
+    if (this.state.coolingPumpActive) {
+      totalWatts += 40;
+    }
+
+    this.state.currentWatts = totalWatts;
+    this.state.money += totalIncome;
+    this.state.crypto += totalCrypto;
+
+    // Power bill accrual (kWh = Watts * hours / 1000; 1 tick = 1/6th hour)
+    const kwhDelta = (totalWatts * (1 / 6)) / 1000;
+    this.state.powerKwhAccrued += kwhDelta;
+    this.state.powerBillAmount += kwhDelta * this.state.powerKwhRate;
+
+    // Circuit breaker overload check!
+    if (this.state.currentWatts > this.state.fuseMaxWatts) {
+      this.state.fuseTripped = true;
+      window.audioEngine?.playFuseTrip();
+      window.gameUI?.showToast(`WYBIŁO BEZPIECZNIK! Pobór (${Math.round(this.state.currentWatts)}W) przekroczył limit (${this.state.fuseMaxWatts}W)!`, "error");
+      return;
+    }
+
+    // Thermal simulation
+    let tempDelta = (totalHeat * (1 / 6));
+    if (this.state.windowOpen) {
+      // Room cools towards ambient temp (19°C)
+      const diff = this.state.roomTemp - this.state.ambientTemp;
+      tempDelta -= diff * 0.08;
+    }
+    if (this.state.coolingPumpActive && this.state.coolingFluidLevel > 0) {
+      tempDelta -= 0.18;
+      this.state.coolingFluidLevel = Math.max(0, this.state.coolingFluidLevel - 0.05);
+    }
+    this.state.roomTemp = Math.max(16.0, this.state.roomTemp + tempDelta);
+
+    // Update dynamic fan speed sound based on load & temp
+    const loadFrac = Math.min(1.0, this.state.currentWatts / this.state.fuseMaxWatts);
+    window.audioEngine?.updateFanSpeed(loadFrac, this.state.roomTemp);
+
+    // Thermal throttling & drive damage warning
+    if (this.state.roomTemp > 45.0 && Math.random() < 0.2) {
+      const damagedDisk = this.state.disks[Math.floor(Math.random() * this.state.disks.length)];
+      if (damagedDisk) {
+        damagedDisk.health = Math.max(5, damagedDisk.health - 2);
+        const badIdx = Math.floor(Math.random() * 128);
+        if (!damagedDisk.badSectors.includes(badIdx)) damagedDisk.badSectors.push(badIdx);
+        window.gameUI?.showToast(`PRZEGRZANIE (${this.state.roomTemp.toFixed(1)}°C)! Dysk ${damagedDisk.model} ulega degradacji termicznej!`, "error");
+      }
+    }
+
+    // Police Raid check if threat reaches 100%
+    if (this.state.policeThreat >= 100 && !this.state.policeRaidPending) {
+      this.state.policeRaidPending = true;
+      window.audioEngine?.playAlert();
+      window.gameUI?.showToast("ALARM: Wykryto nakaz przeszukania policji cybernetycznej! Masz 1 minutę na szyfrowanie lub czyszczenie dysków (/dev/zero)!", "error");
+    }
+  }
+}
+
+// Global services engine singleton
+window.servicesEngine = new ServicesEngine(window.gameState);
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - 2D PIXEL-ART ROOM VIEW (LAIN'S SANCTUARY)
+ * Renders the protagonist's room, evolving from a sparse bedroom to a sprawling NAVI cyber-shrine.
+ */
+
+class RoomView {
+  constructor(canvasId, state) {
+    this.canvas = document.getElementById(canvasId);
+    this.ctx = this.canvas.getContext('2d');
+    this.state = state;
+    this.tooltip = document.getElementById('room-tooltip');
+
+    // Animation & rendering state
+    this.animFrame = 0;
+    this.particles = [];
+    this.initParticles();
+
+    // Hotspot bounding boxes for mouse interaction
+    this.hotspots = [
+      { id: 'pc', name: 'Stanowisko NAVI [Kliknij, by zasiąść]', x: 380, y: 180, w: 280, h: 260 },
+      { id: 'fusebox', name: 'Skrzynka Bezpieczników [Reset / Stan]', x: 60, y: 120, w: 70, h: 90 },
+      { id: 'window', name: 'Okno Pokoju [Otwórz/Zamknij]', x: 730, y: 90, w: 150, h: 180 },
+      { id: 'bed', name: 'Materac / Łóżko [Odpocznij i zregeneruj siły]', x: 80, y: 340, w: 220, h: 140 },
+      { id: 'fridge', name: 'Minilodówka & Zapasy [Zjedz / Kofeina]', x: 230, y: 220, w: 90, h: 110 },
+      { id: 'coolant', name: 'Chłodzenie Wodne & Zbiornik [Pompa / Płyn]', x: 670, y: 380, w: 110, h: 110 }
+    ];
+
+    this.bindEvents();
+    this.startLoop();
+  }
+
+  initParticles() {
+    for (let i = 0; i < 40; i++) {
+      this.particles.push({
+        x: Math.random() * 960,
+        y: Math.random() * 540,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: -0.2 - Math.random() * 0.5,
+        size: 1 + Math.random() * 2,
+        alpha: 0.1 + Math.random() * 0.4
+      });
+    }
+  }
+
+  bindEvents() {
+    this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+    this.canvas.addEventListener('click', (e) => this.handleClick(e));
+    this.canvas.addEventListener('mouseleave', () => {
+      this.tooltip.classList.add('hidden');
+    });
+  }
+
+  getCanvasCoords(e) {
+    const rect = this.canvas.getBoundingClientRect();
+    const scaleX = this.canvas.width / rect.width;
+    const scaleY = this.canvas.height / rect.height;
+    return {
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
+      screenX: e.clientX,
+      screenY: e.clientY
+    };
+  }
+
+  handleMouseMove(e) {
+    const { x, y, screenX, screenY } = this.getCanvasCoords(e);
+    let hovered = null;
+    for (const h of this.hotspots) {
+      if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) {
+        hovered = h;
+        break;
+      }
+    }
+
+    if (hovered) {
+      this.canvas.style.cursor = 'pointer';
+      this.tooltip.innerText = hovered.name;
+      this.tooltip.style.left = `${screenX + 15}px`;
+      this.tooltip.style.top = `${screenY - 10}px`;
+      this.tooltip.classList.remove('hidden');
+    } else {
+      this.canvas.style.cursor = 'crosshair';
+      this.tooltip.classList.add('hidden');
+    }
+  }
+
+  handleClick(e) {
+    const { x, y } = this.getCanvasCoords(e);
+    for (const h of this.hotspots) {
+      if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) {
+        this.triggerAction(h.id);
+        break;
+      }
+    }
+  }
+
+  triggerAction(actionId) {
+    window.audioEngine?.playClick();
+    switch (actionId) {
+      case 'pc':
+        window.gameUI?.switchView('desktop');
+        break;
+      case 'fusebox':
+        if (this.state.fuseTripped) {
+          this.state.fuseTripped = false;
+          window.audioEngine?.playBeep(600, 0.1);
+          window.gameUI?.showToast("Załączono bezpiecznik. Zasilanie przywrócone!", "success");
+        } else {
+          window.gameUI?.showToast(`Bezpiecznik sprawny. Aktualne obciążenie: ${Math.round(this.state.currentWatts)}W / ${this.state.fuseMaxWatts}W.`);
+        }
+        this.state.notify();
+        break;
+      case 'window':
+        this.state.windowOpen = !this.state.windowOpen;
+        window.audioEngine?.playBeep(this.state.windowOpen ? 700 : 400, 0.08);
+        window.gameUI?.showToast(this.state.windowOpen ? "Otwarto okno. Chłodne powietrze napływa do pokoju." : "Zamknięto okno.");
+        this.state.notify();
+        break;
+      case 'bed':
+        this.sleepAndRecover();
+        break;
+      case 'fridge':
+        this.eatAndDrink();
+        break;
+      case 'coolant':
+        this.toggleCoolingPump();
+        break;
+    }
+  }
+
+  sleepAndRecover() {
+    if (this.state.energy >= 95) {
+      window.gameUI?.showToast("Nie jesteś zmęczony. Czas pracować nad partycjami!");
+      return;
+    }
+    // Fast forward 6 hours
+    for (let i = 0; i < 36; i++) {
+      window.gameEngine?.tick();
+    }
+    this.state.energy = 100;
+    this.state.hunger = Math.min(100, this.state.hunger + 25);
+    window.audioEngine?.playBeep(520, 0.2);
+    window.gameUI?.showToast("Przespałeś kilka godzin. Energia odzyskana!", "success");
+    this.state.notify();
+  }
+
+  eatAndDrink() {
+    if (this.state.money < 25) {
+      window.gameUI?.showToast("Brak środków na jedzenie i napoje energetyczne (wymagane 25 PLN)!", "error");
+      return;
+    }
+    this.state.money -= 25;
+    this.state.hunger = Math.max(0, this.state.hunger - 40);
+    this.state.energy = Math.min(100, this.state.energy + 20);
+    window.audioEngine?.playBeep(880, 0.08);
+    window.gameUI?.showToast("Zamówiono pizzę i Cyber-Colę (-25 PLN). Głód zaspokojony!", "success");
+    this.state.notify();
+  }
+
+  toggleCoolingPump() {
+    if (this.state.roomTier < 3) {
+      window.gameUI?.showToast("Instalacja chłodzenia cieczą wymaga rozbudowy stanowiska do poziomu 3!");
+      return;
+    }
+    this.state.coolingPumpActive = !this.state.coolingPumpActive;
+    window.audioEngine?.playBeep(this.state.coolingPumpActive ? 900 : 350, 0.1);
+    window.gameUI?.showToast(this.state.coolingPumpActive ? "Włączono pompę chłodzenia cieczą." : "Wyłączono pompę chłodzenia cieczą.");
+    this.state.notify();
+  }
+
+  startLoop() {
+    const loop = () => {
+      this.render();
+      this.animFrame++;
+      requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+  }
+
+  render() {
+    const ctx = this.ctx;
+    const w = this.canvas.width;
+    const h = this.canvas.height;
+    const hour = this.state.inGameTime.hour;
+    const isNight = hour < 6 || hour >= 21;
+    const isDusk = (hour >= 18 && hour < 21) || (hour >= 5 && hour < 7);
+
+    // 1. Room Background Walls
+    ctx.fillStyle = isNight ? '#070910' : (isDusk ? '#161320' : '#1c2230');
+    ctx.fillRect(0, 0, w, 320);
+
+    // Wallpaper subtle vertical stripes
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+    for (let x = 0; x < w; x += 16) {
+      ctx.fillRect(x, 0, 2, 320);
+    }
+
+    // Baseboard moulding
+    ctx.fillStyle = '#0f131a';
+    ctx.fillRect(0, 310, w, 12);
+
+    // 2. Wooden Floorboards (Isometric perspective feel)
+    const floorGrad = ctx.createLinearGradient(0, 320, 0, h);
+    floorGrad.addColorStop(0, '#121622');
+    floorGrad.addColorStop(1, '#080a10');
+    ctx.fillStyle = floorGrad;
+    ctx.fillRect(0, 322, w, h - 322);
+
+    // Floorboard lines
+    ctx.strokeStyle = '#1b2333';
+    ctx.lineWidth = 1;
+    for (let y = 322; y < h; y += 18) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
+      ctx.stroke();
+    }
+
+    // 3. Window (Sky & City Skyline)
+    this.renderWindow(ctx, isNight, isDusk);
+
+    // 4. Fuse Box (Left Wall)
+    this.renderFusebox(ctx);
+
+    // 5. Bed / Sleeping Futon (Bottom Left)
+    this.renderBed(ctx);
+
+    // 6. Mini Fridge & Food (Center Left)
+    this.renderFridge(ctx);
+
+    // 7. Cables on the floor (Density scales with room tier!)
+    this.renderFloorCables(ctx);
+
+    // 8. Workstation Desk & Hardware Towers
+    this.renderWorkstation(ctx);
+
+    // 9. Coolant Tank & Tubing (Tier 3 & 4)
+    if (this.state.roomTier >= 3) {
+      this.renderCoolantSystem(ctx);
+    }
+
+    // 10. Ambient Particles (Floating dust motes & Cyber data dust)
+    this.renderParticles(ctx);
+
+    // 11. Phosphor screen glow overlays
+    this.renderScreenGlow(ctx);
+
+    // 12. Power Outage darkness filter if fuse tripped
+    if (this.state.fuseTripped) {
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = '#ff3344';
+      ctx.font = '16px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.fillText('BRAK ZASILANIA // WYBIŁO BEZPIECZNIK!', w / 2, 60);
+      ctx.font = '13px "Share Tech Mono"';
+      ctx.fillStyle = '#aaa';
+      ctx.fillText('Kliknij skrzynkę bezpieczników po lewej stronie, aby zresetować.', w / 2, 85);
+      ctx.textAlign = 'left';
+    }
+  }
+
+  renderWindow(ctx, isNight, isDusk) {
+    const wx = 730, wy = 80, ww = 150, wh = 180;
+    // Window frame
+    ctx.fillStyle = '#0d111a';
+    ctx.fillRect(wx - 6, wy - 6, ww + 12, wh + 12);
+
+    // Sky
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(wx, wy, ww, wh);
+    ctx.clip();
+
+    let skyColor = '#3a5a78';
+    if (isNight) skyColor = '#060a14';
+    else if (isDusk) skyColor = '#4a2542';
+    ctx.fillStyle = skyColor;
+    ctx.fillRect(wx, wy, ww, wh);
+
+    // Stars at night
+    if (isNight) {
+      ctx.fillStyle = '#ffffff';
+      for (let i = 0; i < 15; i++) {
+        const sx = wx + ((i * 37) % ww);
+        const sy = wy + ((i * 19) % (wh / 2));
+        ctx.fillRect(sx, sy, 1.5, 1.5);
+      }
+    }
+
+    // Distant city silhouette
+    ctx.fillStyle = '#05070a';
+    ctx.fillRect(wx + 10, wy + 90, 25, 90);
+    ctx.fillRect(wx + 30, wy + 70, 35, 110);
+    ctx.fillRect(wx + 75, wy + 85, 20, 95);
+    ctx.fillRect(wx + 100, wy + 60, 40, 120);
+
+    // Blinking city antennae red lights
+    if (Math.floor(this.animFrame / 30) % 2 === 0) {
+      ctx.fillStyle = '#ff2233';
+      ctx.fillRect(wx + 47, wy + 65, 2, 2);
+      ctx.fillRect(wx + 120, wy + 55, 2, 2);
+    }
+
+    // Window panes
+    ctx.strokeStyle = '#1b2230';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(wx, wy, ww, wh);
+    ctx.beginPath();
+    ctx.moveTo(wx + ww / 2, wy);
+    ctx.lineTo(wx + ww / 2, wy + wh);
+    ctx.moveTo(wx, wy + wh / 2);
+    ctx.lineTo(wx + ww, wy + wh / 2);
+    ctx.stroke();
+
+    // If window open: draw curtain flutter
+    if (this.state.windowOpen) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      const wave = Math.sin(this.animFrame * 0.08) * 8;
+      ctx.beginPath();
+      ctx.moveTo(wx, wy);
+      ctx.quadraticCurveTo(wx + 15 + wave, wy + wh / 2, wx + 5, wy + wh);
+      ctx.lineTo(wx, wy + wh);
+      ctx.closePath();
+      ctx.fill();
+    }
+    ctx.restore();
+  }
+
+  renderFusebox(ctx) {
+    const fx = 60, fy = 120, fw = 70, fh = 90;
+    // Metal casing
+    ctx.fillStyle = '#222938';
+    ctx.fillRect(fx, fy, fw, fh);
+    ctx.strokeStyle = '#38465e';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(fx, fy, fw, fh);
+
+    // Warning lightning bolt
+    ctx.fillStyle = '#ffaa00';
+    ctx.font = '16px monospace';
+    ctx.fillText('⚡', fx + 10, fy + 25);
+
+    // Circuit breakers
+    for (let i = 0; i < 4; i++) {
+      const bx = fx + 35;
+      const by = fy + 15 + i * 16;
+      ctx.fillStyle = '#111620';
+      ctx.fillRect(bx, by, 22, 10);
+      // Switch handle
+      const tripped = this.state.fuseTripped;
+      ctx.fillStyle = tripped ? '#ff3344' : '#00ff88';
+      ctx.fillRect(tripped ? bx + 2 : bx + 12, by + 1, 8, 8);
+    }
+  }
+
+  renderBed(ctx) {
+    const bx = 80, by = 350, bw = 200, bh = 110;
+    // Mattress
+    ctx.fillStyle = '#1c2233';
+    ctx.fillRect(bx, by, bw, bh);
+    // Blanket
+    ctx.fillStyle = '#2a354d';
+    ctx.fillRect(bx + 40, by, bw - 40, bh);
+    // Pillow
+    ctx.fillStyle = '#d0d8e8';
+    ctx.fillRect(bx + 8, by + 15, 30, 45);
+    // Headboard shadow
+    ctx.fillStyle = '#101420';
+    ctx.fillRect(bx, by + bh - 6, bw, 6);
+  }
+
+  renderFridge(ctx) {
+    const rx = 230, ry = 220, rw = 80, rh = 100;
+    // Mini fridge
+    ctx.fillStyle = '#3a4457';
+    ctx.fillRect(rx, ry, rw, rh);
+    ctx.strokeStyle = '#556480';
+    ctx.strokeRect(rx, ry, rw, rh);
+    // Handle
+    ctx.fillStyle = '#0d1118';
+    ctx.fillRect(rx + 68, ry + 30, 4, 25);
+
+    // Pizza box & energy drink cans on top
+    ctx.fillStyle = '#9e7344';
+    ctx.fillRect(rx + 8, ry - 12, 45, 12);
+    // Soda cans
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(rx + 60, ry - 14, 8, 14);
+    ctx.fillStyle = '#ff2255';
+    ctx.fillRect(rx + 70, ry - 14, 8, 14);
+  }
+
+  renderFloorCables(ctx) {
+    const tier = this.state.roomTier;
+    ctx.lineWidth = 3;
+
+    // Cable cluster 1: From desk to wall/fusebox
+    ctx.strokeStyle = '#05070a';
+    ctx.beginPath();
+    ctx.moveTo(380, 400);
+    ctx.bezierCurveTo(280, 430, 180, 410, 100, 210);
+    ctx.stroke();
+
+    ctx.strokeStyle = '#0a0d14';
+    ctx.beginPath();
+    ctx.moveTo(400, 415);
+    ctx.bezierCurveTo(320, 450, 200, 440, 110, 210);
+    ctx.stroke();
+
+    if (tier >= 2) {
+      // More snake cables
+      ctx.strokeStyle = '#141c29';
+      ctx.beginPath();
+      ctx.moveTo(450, 440);
+      ctx.bezierCurveTo(550, 480, 680, 470, 720, 420);
+      ctx.stroke();
+    }
+
+    if (tier >= 3) {
+      // Thick power conduit
+      ctx.strokeStyle = '#1f2d42';
+      ctx.lineWidth = 5;
+      ctx.beginPath();
+      ctx.moveTo(370, 450);
+      ctx.bezierCurveTo(500, 510, 650, 500, 780, 460);
+      ctx.stroke();
+    }
+
+    if (tier >= 4) {
+      // Lain finale: Floor completely covered in web of cables!
+      ctx.lineWidth = 3;
+      for (let i = 0; i < 8; i++) {
+        ctx.strokeStyle = i % 2 === 0 ? '#0b101a' : '#141c2c';
+        ctx.beginPath();
+        ctx.moveTo(320 + i * 40, 380);
+        ctx.bezierCurveTo(250 + i * 30, 480 + (i % 3) * 15, 600 - i * 20, 520, 750, 440);
+        ctx.stroke();
+      }
+    }
+  }
+
+  renderWorkstation(ctx) {
+    const tier = this.state.roomTier;
+    const dx = 420, dy = 260, dw = 240, dh = 150;
+
+    // Wooden / Metal Desk
+    ctx.fillStyle = '#1c1b18';
+    ctx.fillRect(dx, dy, dw, 18);
+    // Desk legs
+    ctx.fillStyle = '#101010';
+    ctx.fillRect(dx + 10, dy + 18, 12, dh);
+    ctx.fillRect(dx + dw - 22, dy + 18, 12, dh);
+
+    // Computer Case on the floor (Beige retro tower)
+    const pcx = dx + 160, pcy = dy + 30;
+    ctx.fillStyle = tier >= 3 ? '#151b26' : '#c2baaa';
+    ctx.fillRect(pcx, pcy, 55, 95);
+    // 5.25" and 3.5" drive bays
+    ctx.fillStyle = '#222';
+    ctx.fillRect(pcx + 8, pcy + 10, 39, 8);
+    ctx.fillRect(pcx + 8, pcy + 22, 39, 8);
+    // Power button & blinking activity LED
+    ctx.fillStyle = '#555';
+    ctx.fillRect(pcx + 12, pcy + 40, 6, 6);
+    // HDD LED
+    const hddLedBlink = Math.random() < 0.35 && !this.state.fuseTripped;
+    ctx.fillStyle = hddLedBlink ? '#ffaa00' : '#442200';
+    ctx.fillRect(pcx + 24, pcy + 42, 4, 4);
+
+    // Primary CRT Monitor
+    const mx = dx + 60, my = dy - 95, mw = 100, mh = 90;
+    ctx.fillStyle = '#c5bea8';
+    ctx.fillRect(mx, my, mw, mh);
+    // Screen bezel
+    ctx.fillStyle = '#22262d';
+    ctx.fillRect(mx + 8, my + 8, mw - 16, mh - 24);
+    // CRT screen content
+    ctx.fillStyle = this.state.fuseTripped ? '#05070a' : '#0a331c';
+    ctx.fillRect(mx + 11, my + 11, mw - 22, mh - 30);
+    // Phosphor scan lines on monitor
+    if (!this.state.fuseTripped) {
+      ctx.fillStyle = '#33ff66';
+      for (let l = 0; l < 4; l++) {
+        const lw = 15 + ((this.animFrame + l * 12) % 35);
+        ctx.fillRect(mx + 15, my + 16 + l * 8, lw, 3);
+      }
+    }
+    // Monitor stand
+    ctx.fillStyle = '#9e9784';
+    ctx.fillRect(mx + 35, my + mh - 8, 30, 10);
+    ctx.fillRect(mx + 25, my + mh + 2, 50, 4);
+
+    // Keyboard & Mouse
+    ctx.fillStyle = '#b8b09a';
+    ctx.fillRect(dx + 55, dy + 4, 75, 10);
+    ctx.fillRect(dx + 140, dy + 6, 12, 7);
+
+    // Protagonist (Pixel avatar sitting in chair, facing screens, Lain style)
+    this.renderProtagonist(ctx, dx + 70, dy + 2);
+
+    // TIER EVOLUTIONS:
+    if (tier >= 2) {
+      // Secondary CRT Monitor on the left
+      const m2x = dx - 30, m2y = dy - 80, m2w = 80, m2h = 75;
+      ctx.fillStyle = '#2b3445';
+      ctx.fillRect(m2x, m2y, m2w, m2h);
+      ctx.fillStyle = this.state.fuseTripped ? '#05070a' : '#0d2238';
+      ctx.fillRect(m2x + 6, m2y + 6, m2w - 12, m2h - 18);
+      // Amber phosphor
+      if (!this.state.fuseTripped) {
+        ctx.fillStyle = '#ffaa22';
+        ctx.fillRect(m2x + 10, m2y + 12, 40, 3);
+        ctx.fillRect(m2x + 10, m2y + 20, 25, 3);
+      }
+      // Desk Fan spinning
+      const fx = dx + 180, fy = dy - 40;
+      ctx.fillStyle = '#111';
+      ctx.fillRect(fx + 10, fy + 25, 10, 15);
+      ctx.beginPath();
+      ctx.arc(fx + 15, fy + 15, 18, 0, Math.PI * 2);
+      ctx.strokeStyle = '#445566';
+      ctx.stroke();
+    }
+
+    if (tier >= 3) {
+      // Server Rack Tower stacked on the right
+      const rx = dx + dw - 15, ry = dy - 130, rw = 75, rh = 145;
+      ctx.fillStyle = '#10141e';
+      ctx.fillRect(rx, ry, rw, rh);
+      ctx.strokeStyle = '#28364f';
+      ctx.strokeRect(rx, ry, rw, rh);
+      // Hard Drive Caddies
+      for (let i = 0; i < 6; i++) {
+        ctx.fillStyle = '#1c2436';
+        ctx.fillRect(rx + 5, ry + 8 + i * 22, rw - 10, 16);
+        // Green / Red activity LEDs
+        const ledOn = Math.random() < 0.6 && !this.state.fuseTripped;
+        ctx.fillStyle = ledOn ? '#00f0ff' : '#003344';
+        ctx.fillRect(rx + rw - 14, ry + 12 + i * 22, 4, 4);
+      }
+    }
+
+    if (tier >= 4) {
+      // TIER 4: Serial Experiments Lain FINALE SHRINE!
+      // High hanging monitors suspended by metal arms
+      const hmx = dx + 30, hmy = dy - 185;
+      ctx.fillStyle = '#0a0e17';
+      ctx.fillRect(hmx, hmy, 95, 75);
+      ctx.fillStyle = this.state.fuseTripped ? '#000' : '#1a0528';
+      ctx.fillRect(hmx + 6, hmy + 6, 83, 63);
+      if (!this.state.fuseTripped) {
+        ctx.fillStyle = '#bb55ff';
+        ctx.fillText('THE WIRED', hmx + 12, hmy + 35);
+      }
+
+      // Overhead industrial cabling bundle
+      ctx.strokeStyle = '#05070c';
+      ctx.lineWidth = 12;
+      ctx.beginPath();
+      ctx.moveTo(350, 0);
+      ctx.bezierCurveTo(450, 80, 600, 70, 700, 0);
+      ctx.stroke();
+    }
+  }
+
+  renderProtagonist(ctx, px, py) {
+    // Office chair backrest
+    ctx.fillStyle = '#1a1f2c';
+    ctx.fillRect(px + 10, py - 40, 45, 60);
+
+    // Protagonist (Hair, headphones, silhouette viewed from slightly behind)
+    // Dark brown/purple bob hair with side tuft (Lain motif)
+    ctx.fillStyle = '#3d2b45';
+    ctx.beginPath();
+    ctx.arc(px + 32, py - 35, 14, 0, Math.PI * 2);
+    ctx.fill();
+    // Signature hair strand on left
+    ctx.fillRect(px + 18, py - 35, 4, 18);
+
+    // Headphones headband & earcups
+    ctx.fillStyle = '#00f0ff';
+    ctx.fillRect(px + 16, py - 38, 5, 8);
+    ctx.fillRect(px + 43, py - 38, 5, 8);
+
+    // Shoulders & hoodie
+    ctx.fillStyle = '#222938';
+    ctx.fillRect(px + 14, py - 20, 36, 40);
+  }
+
+  renderCoolantSystem(ctx) {
+    const cx = 680, cy = 390, cw = 90, ch = 90;
+    // Transparent reservoir tank
+    ctx.fillStyle = '#101726';
+    ctx.fillRect(cx, cy, cw, ch);
+    ctx.strokeStyle = '#2d4263';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(cx, cy, cw, ch);
+
+    // Coolant Fluid (Glowing Cyan)
+    const fluidHeight = (ch - 10) * (this.state.coolingFluidLevel / 100);
+    const fluidGrad = ctx.createLinearGradient(cx, cy + ch - fluidHeight, cx, cy + ch);
+    fluidGrad.addColorStop(0, '#00d4ff');
+    fluidGrad.addColorStop(1, '#005577');
+    ctx.fillStyle = fluidGrad;
+    ctx.fillRect(cx + 4, cy + ch - fluidHeight, cw - 8, fluidHeight);
+
+    // Bubbles if active
+    if (this.state.coolingPumpActive && !this.state.fuseTripped) {
+      ctx.fillStyle = '#ffffff';
+      for (let b = 0; b < 5; b++) {
+        const bx = cx + 15 + ((b * 23) % (cw - 30));
+        const by = cy + ch - ((this.animFrame * 2 + b * 20) % Math.max(10, fluidHeight));
+        ctx.fillRect(bx, by, 3, 3);
+      }
+    }
+
+    // Clear tubes snaking to PC
+    ctx.strokeStyle = 'rgba(0, 240, 255, 0.6)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(cx + 20, cy);
+    ctx.bezierCurveTo(cx, cy - 40, cx - 100, cy - 60, 620, 340);
+    ctx.stroke();
+  }
+
+  renderParticles(ctx) {
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    for (const p of this.particles) {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < 0) p.y = 540;
+      if (p.x < 0) p.x = 960;
+      if (p.x > 960) p.x = 0;
+
+      ctx.fillStyle = `rgba(0, 240, 255, ${p.alpha})`;
+      ctx.fillRect(p.x, p.y, p.size, p.size);
+    }
+  }
+
+  renderScreenGlow(ctx) {
+    if (this.state.fuseTripped) return;
+    // Subtle radial light cast from CRT monitors into the dark room
+    const glow = ctx.createRadialGradient(530, 210, 30, 530, 210, 220);
+    glow.addColorStop(0, 'rgba(51, 255, 102, 0.12)');
+    glow.addColorStop(0.5, 'rgba(0, 240, 255, 0.05)');
+    glow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = glow;
+    ctx.fillRect(350, 80, 400, 300);
+  }
+}
+
+// Global room view instance
+window.RoomView = RoomView;
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - RETRO DESKTOP UI & WINDOW MANAGER
+ * Controls draggable windows, partition strips, services cards, bazaar store, contracts, terminal & HUD.
+ */
+
+class DesktopUI {
+  constructor(state) {
+    this.state = state;
+    this.topZIndex = 100;
+    this.activeWindow = null;
+    this.initElements();
+    this.bindWindowDragging();
+    this.bindGlobalControls();
+    this.bindDiskManagerActions();
+    this.bindServicesActions();
+    this.bindBazaarActions();
+    this.bindContractsActions();
+    this.bindPowerActions();
+    this.bindBankActions();
+    this.bindTerminal();
+    this.renderAll();
+
+    // Subscribe to state changes
+    this.state.subscribe(() => this.renderAll());
+  }
+
+  initElements() {
+    this.viewRoom = document.getElementById('view-room');
+    this.viewDesktop = document.getElementById('view-desktop');
+    this.btnToggleView = document.getElementById('btn-toggle-view');
+    this.toastContainer = document.getElementById('toast-container');
+    this.modalPartition = document.getElementById('modal-partition');
+  }
+
+  showToast(message, type = 'normal') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type === 'error' ? 'toast-error' : (type === 'success' ? 'toast-success' : '')}`;
+    toast.innerText = message;
+    this.toastContainer.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = '0';
+      setTimeout(() => toast.remove(), 300);
+    }, 4500);
+  }
+
+  switchView(targetView) {
+    this.state.activeView = targetView;
+    if (targetView === 'desktop') {
+      this.viewRoom.classList.remove('active');
+      this.viewDesktop.classList.add('active');
+      this.btnToggleView.innerText = '🛏️ POKÓJ';
+      this.btnToggleView.classList.remove('highlight-btn');
+    } else {
+      this.viewDesktop.classList.remove('active');
+      this.viewRoom.classList.add('active');
+      this.btnToggleView.innerText = '🖥️ PULPIT NAVI';
+      this.btnToggleView.classList.add('highlight-btn');
+    }
+    window.audioEngine?.playClick();
+  }
+
+  bindGlobalControls() {
+    this.btnToggleView.addEventListener('click', () => {
+      this.switchView(this.state.activeView === 'room' ? 'desktop' : 'room');
+    });
+
+    // Time speed buttons
+    const btnPause = document.getElementById('btn-speed-pause');
+    const btn1x = document.getElementById('btn-speed-1x');
+    const btn2x = document.getElementById('btn-speed-2x');
+    const btn5x = document.getElementById('btn-speed-5x');
+    const speedBtns = [btnPause, btn1x, btn2x, btn5x];
+
+    const setSpeed = (spd, activeBtn) => {
+      this.state.timeSpeed = spd;
+      speedBtns.forEach(b => b.classList.remove('active-btn'));
+      activeBtn.classList.add('active-btn');
+      window.audioEngine?.playClick();
+    };
+
+    btnPause.addEventListener('click', () => setSpeed(0, btnPause));
+    btn1x.addEventListener('click', () => setSpeed(1, btn1x));
+    btn2x.addEventListener('click', () => setSpeed(2, btn2x));
+    btn5x.addEventListener('click', () => setSpeed(5, btn5x));
+
+    // Audio toggle
+    const btnAudio = document.getElementById('btn-audio-toggle');
+    btnAudio.addEventListener('click', () => {
+      const unmuted = window.audioEngine?.toggleMute();
+      btnAudio.innerText = unmuted ? '🔊' : '🔇';
+      this.showToast(unmuted ? "Dźwięk włączony." : "Dźwięk wyciszony.");
+    });
+
+    // CRT toggle
+    const btnCrt = document.getElementById('btn-crt-toggle');
+    btnCrt.addEventListener('click', () => {
+      document.body.classList.toggle('crt-enabled');
+      this.showToast(document.body.classList.contains('crt-enabled') ? "Filtr CRT aktywny." : "Filtr CRT wyłączony.");
+      window.audioEngine?.playClick();
+    });
+
+    // Help
+    document.getElementById('btn-help').addEventListener('click', () => {
+      this.openWindow('app-guide');
+    });
+
+    // Room dock buttons
+    document.querySelectorAll('.dock-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const action = btn.dataset.action;
+        window.roomView?.triggerAction(action);
+      });
+    });
+
+    // Desktop icons click
+    document.querySelectorAll('.desktop-icon').forEach(icon => {
+      icon.addEventListener('click', () => {
+        const appId = icon.dataset.app;
+        this.openWindow(appId);
+      });
+    });
+
+    // Start button
+    document.getElementById('start-btn').addEventListener('click', () => {
+      this.openWindow('app-guide');
+    });
+
+    // Keyboard shortcut: Space toggles between Room and Desktop
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+      if (e.code === 'Space') {
+        e.preventDefault();
+        this.switchView(this.state.activeView === 'room' ? 'desktop' : 'room');
+      }
+    });
+  }
+
+  // --- WINDOW MANAGEMENT ---
+  bindWindowDragging() {
+    const windows = document.querySelectorAll('.cyber-window');
+    windows.forEach(win => {
+      const header = win.querySelector('.window-header');
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+
+      header.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('win-btn')) return;
+        this.focusWindow(win);
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        initialLeft = win.offsetLeft;
+        initialTop = win.offsetTop;
+        window.audioEngine?.playClick();
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        win.style.left = `${Math.max(10, Math.min(window.innerWidth - win.offsetWidth - 10, initialLeft + dx))}px`;
+        win.style.top = `${Math.max(45, Math.min(window.innerHeight - win.offsetHeight - 40, initialTop + dy))}px`;
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
+      });
+
+      win.addEventListener('mousedown', () => {
+        this.focusWindow(win);
+      });
+
+      // Close and minimize buttons
+      const btnClose = win.querySelector('.win-close');
+      if (btnClose) {
+        btnClose.addEventListener('click', () => {
+          win.classList.add('minimized');
+          this.updateTaskbar();
+          window.audioEngine?.playClick();
+        });
+      }
+      const btnMin = win.querySelector('.win-minimize');
+      if (btnMin) {
+        btnMin.addEventListener('click', () => {
+          win.classList.add('minimized');
+          this.updateTaskbar();
+          window.audioEngine?.playClick();
+        });
+      }
+    });
+  }
+
+  focusWindow(win) {
+    if (this.activeWindow === win) return;
+    this.topZIndex++;
+    win.style.zIndex = this.topZIndex;
+    document.querySelectorAll('.cyber-window').forEach(w => w.classList.remove('focused'));
+    win.classList.remove('minimized');
+    win.classList.add('focused');
+    this.activeWindow = win;
+    this.updateTaskbar();
+  }
+
+  openWindow(appId) {
+    const win = document.getElementById(appId);
+    if (!win) return;
+    win.classList.remove('minimized');
+    this.focusWindow(win);
+    window.audioEngine?.playClick();
+  }
+
+  updateTaskbar() {
+    const container = document.getElementById('taskbar-tasks');
+    container.innerHTML = '';
+    const windows = document.querySelectorAll('.cyber-window');
+    windows.forEach(win => {
+      const isMinimized = win.classList.contains('minimized');
+      const isFocused = win.classList.contains('focused') && !isMinimized;
+      const title = win.querySelector('.window-title').innerText.trim();
+
+      const item = document.createElement('div');
+      item.className = `task-item ${isFocused ? 'active' : ''}`;
+      item.innerText = title;
+      item.addEventListener('click', () => {
+        if (isMinimized) {
+          win.classList.remove('minimized');
+          this.focusWindow(win);
+        } else if (isFocused) {
+          win.classList.add('minimized');
+          this.updateTaskbar();
+        } else {
+          this.focusWindow(win);
+        }
+        window.audioEngine?.playClick();
+      });
+      container.appendChild(item);
+    });
+  }
+
+  // --- DISK MANAGER UI & LOGIC ---
+  bindDiskManagerActions() {
+    const btnNewPart = document.getElementById('btn-new-partition');
+    const btnDelPart = document.getElementById('btn-delete-partition');
+    const btnFormatPart = document.getElementById('btn-format-partition');
+    const btnChangeTable = document.getElementById('btn-change-table');
+    const btnScanBad = document.getElementById('btn-scan-badsectors');
+    const btnRemapBad = document.getElementById('btn-remap-bad');
+    const btnWipeZero = document.getElementById('btn-wipe-zero');
+
+    // New partition dialog open
+    btnNewPart.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      const { unallocated } = window.diskEngine.getDiskSpaceUsage(disk);
+      if (unallocated <= 0) {
+        this.showToast("Brak nieprzydzielonego miejsca na tym dysku!", "error");
+        return;
+      }
+      this.openPartitionModal('create', unallocated);
+    });
+
+    // Format partition dialog open
+    btnFormatPart.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      const part = disk.partitions.find(p => p.id === this.state.selectedPartId);
+      if (!part) {
+        this.showToast("Wybierz najpierw partycję do sformatowania!", "error");
+        return;
+      }
+      this.openPartitionModal('format', part.sizeGB, part);
+    });
+
+    // Delete partition
+    btnDelPart.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      if (!this.state.selectedPartId) {
+        this.showToast("Zaznacz partycję do usunięcia!", "error");
+        return;
+      }
+      const res = window.diskEngine.deletePartition(disk.id, this.state.selectedPartId);
+      if (!res.success) {
+        this.showToast(res.msg, "error");
+      } else {
+        this.showToast("Partycja została usunięta.", "success");
+      }
+    });
+
+    // Change table type (MBR <-> GPT)
+    btnChangeTable.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      const targetType = disk.tableType === 'MBR' ? 'GPT' : 'MBR';
+      if (!confirm(`UWAGA: Zmiana tablicy na ${targetType} skasuje WSZYSTKIE partycje i dane na dysku ${disk.dev}! Kontynuować?`)) {
+        return;
+      }
+      const res = window.diskEngine.changeTableType(disk.id, targetType);
+      if (!res.success) {
+        this.showToast(res.msg, "error");
+      } else {
+        this.showToast(`Zmieniono tablicę partycji na ${targetType}.`, "success");
+      }
+    });
+
+    // Scan bad sectors
+    btnScanBad.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      this.showToast(`Rozpoczęto skanowanie powierzchni ${disk.dev}...`);
+      setTimeout(() => {
+        const res = window.diskEngine.scanBadSectors(disk.id);
+        this.showToast(`Skan zakończony: wykryto ${res.count} uszkodzonych sektorów. Stan S.M.A.R.T.: ${res.health}%.`);
+      }, 1000);
+    });
+
+    // Remap bad sectors
+    btnRemapBad.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      const res = window.diskEngine.remapBadSectors(disk.id);
+      if (!res.success) {
+        this.showToast(res.msg, "error");
+      } else {
+        this.showToast(`Zremapowano ${res.count} uszkodzonych sektorów do puli rezerwowej!`, "success");
+      }
+    });
+
+    // Panic Zero Wipe
+    btnWipeZero.addEventListener('click', () => {
+      const disk = window.diskEngine.getActiveDisk();
+      if (!confirm(`CZY NA PEWNO chcesz wykonać natychmiastowe zerowanie /dev/zero dysku ${disk.dev}? Zniszczy to wszystkie dane, lecz usunie dowody przed policją!`)) {
+        return;
+      }
+      window.diskEngine.panicZeroWipe(disk.id);
+      this.showToast(`Wyzerowano nośnik ${disk.dev} (dd if=/dev/zero).`, "success");
+    });
+
+    // Modal partition controls
+    const slider = document.getElementById('modal-part-size-slider');
+    const valInput = document.getElementById('modal-part-size-val');
+    slider.addEventListener('input', () => { valInput.value = slider.value; });
+    valInput.addEventListener('input', () => { slider.value = valInput.value; });
+
+    document.querySelectorAll('.modal-close, #btn-modal-cancel').forEach(btn => {
+      btn.addEventListener('click', () => {
+        this.modalPartition.classList.add('hidden');
+      });
+    });
+
+    document.getElementById('btn-modal-confirm').addEventListener('click', () => {
+      this.handleModalConfirm();
+    });
+  }
+
+  openPartitionModal(mode, maxSize, existingPart = null) {
+    this.modalMode = mode;
+    this.modalTargetPart = existingPart;
+    const title = document.getElementById('modal-partition-title');
+    const slider = document.getElementById('modal-part-size-slider');
+    const valInput = document.getElementById('modal-part-size-val');
+    const maxHint = document.getElementById('modal-part-max-hint');
+    const labelInput = document.getElementById('modal-part-label');
+    const fsSelect = document.getElementById('modal-part-fs');
+    const clusterSelect = document.getElementById('modal-part-cluster');
+    const mountSelect = document.getElementById('modal-part-mount');
+
+    slider.max = maxSize;
+    valInput.max = maxSize;
+    maxHint.innerText = `Maksymalnie dostępne: ${maxSize} GB`;
+
+    if (mode === 'create') {
+      title.innerText = 'Utwórz Nową Partycję';
+      slider.disabled = false;
+      valInput.disabled = false;
+      const initialSize = Math.max(1, Math.min(40, maxSize));
+      slider.value = initialSize;
+      valInput.value = initialSize;
+      labelInput.value = 'WIRED_VOL';
+    } else {
+      title.innerText = `Formatuj Partycję [${existingPart.dev}]`;
+      slider.disabled = true;
+      valInput.disabled = true;
+      slider.value = existingPart.sizeGB;
+      valInput.value = existingPart.sizeGB;
+      labelInput.value = existingPart.label;
+      fsSelect.value = existingPart.fs;
+      clusterSelect.value = existingPart.clusterSize;
+      mountSelect.value = existingPart.mount;
+    }
+
+    this.modalPartition.classList.remove('hidden');
+    window.audioEngine?.playClick();
+  }
+
+  handleModalConfirm() {
+    const disk = window.diskEngine.getActiveDisk();
+    const label = document.getElementById('modal-part-label').value;
+    const size = parseFloat(document.getElementById('modal-part-size-val').value);
+    const fs = document.getElementById('modal-part-fs').value;
+    const cluster = document.getElementById('modal-part-cluster').value;
+    const mount = document.getElementById('modal-part-mount').value;
+
+    let res;
+    if (this.modalMode === 'create') {
+      res = window.diskEngine.createPartition(disk.id, label, size, fs, cluster, mount);
+    } else {
+      res = window.diskEngine.formatPartition(disk.id, this.modalTargetPart.id, fs, cluster, mount);
+    }
+
+    if (!res.success) {
+      this.showToast(res.msg, "error");
+    } else {
+      this.modalPartition.classList.add('hidden');
+      this.showToast(this.modalMode === 'create' ? "Utworzono nową partycję!" : "Partycja została sformatowana.", "success");
+    }
+  }
+
+  // --- SERVICES UI BINDING ---
+  bindServicesActions() {
+    // Dynamic binding handled in renderServices
+  }
+
+  // --- HARDWARE BAZAAR ---
+  bindBazaarActions() {
+    const tabs = document.querySelectorAll('.bazaar-tabs .tab-btn');
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        this.renderBazaarContent(tab.dataset.tab);
+        window.audioEngine?.playClick();
+      });
+    });
+    this.renderBazaarContent('disks');
+  }
+
+  renderBazaarContent(category) {
+    const container = document.getElementById('bazaar-catalog');
+    container.innerHTML = '';
+
+    const catalog = {
+      disks: [
+        { id: 'wd_160', name: 'Western Digital Caviar 160GB', type: 'HDD', size: 160, iface: 'SATA', watts: 20, price: 120, tier: 1 },
+        { id: 'seagate_500', name: 'Seagate Barracuda 500GB 7200RPM', type: 'HDD', size: 500, iface: 'SATA', watts: 25, price: 280, tier: 1 },
+        { id: 'maxtor_scsi', name: 'Maxtor Atlas 300GB Ultra320 SCSI', type: 'SCSI', size: 300, iface: 'SCSI', watts: 38, price: 420, tier: 2 },
+        { id: 'intel_ssd', name: 'Intel X25-M 80GB SATA-II SSD', type: 'SSD', size: 80, iface: 'SATA', watts: 6, price: 350, tier: 2 },
+        { id: 'wd_red_2tb', name: 'WD Red Pro 2TB NAS Storage', type: 'HDD', size: 2048, iface: 'SATA', watts: 30, price: 890, tier: 3 },
+        { id: 'tachibana_quantum', name: 'Tachibana Cyber-Drive 10TB Hyper-Array', type: 'QUANTUM', size: 10240, iface: 'NVME', watts: 45, price: 3400, tier: 4 }
+      ],
+      cooling: [
+        { id: 'fan_silent', name: 'Wentylator Biurkowy Silent 120mm', desc: 'Obniża temperaturę pokoju o ~0.08°C/h.', watts: 8, price: 45 },
+        { id: 'fan_exhaust', name: 'Przemysłowy Wentylator Wyciągowy', desc: 'Potężny wyciąg ciepła z obudowy i okna.', watts: 25, price: 180 },
+        { id: 'liquid_kit', name: 'Zestaw Chłodzenia Cieczą Lain-V1', desc: 'Instaluje pompę i rurki chłodzenia na podłodze.', watts: 40, price: 650, unlockTier: 3 },
+        { id: 'coolant_refill', name: 'Kanister Płynu Chłodzącego (5L)', desc: 'Uzupełnia zbiornik chłodzenia do 100%.', price: 90 }
+      ],
+      power: [
+        { id: 'fuse_b20', name: 'Wymiana Bezpiecznika na B20 (800W)', desc: 'Podwaja maksymalną moc instalacji w pokoju.', price: 150, maxWatts: 800 },
+        { id: 'fuse_c25', name: 'Wzmocniona Linia Miedziana C25 (1600W)', desc: 'Pozwala zasilić ciężkie macierze dyskowe.', price: 480, maxWatts: 1600 },
+        { id: 'fuse_3phase', name: 'Przyłącze Przemysłowe 3-Fazowe (3200W)', desc: 'Prawdziwe zasilanie serwerowni w mieszkaniu.', price: 1200, maxWatts: 3200 }
+      ],
+      software: [
+        { id: 'license_wizard', name: 'Licencja: Partition Wizard 98 (Tier 2)', desc: 'Odblokowuje systemy plików NTFS, EXT4, SWAP i remapowanie S.M.A.R.T.', price: 200, tier: 2 },
+        { id: 'license_gparted', name: 'Pakiet: GParted LVM & ZFS Pro (Tier 3)', desc: 'Odblokowuje tablice GPT, ZFS oraz zaawansowaną kontrolę klastrów.', price: 550, tier: 3 },
+        { id: 'license_hyper', name: 'Kod Źródłowy: NAVI Hyper-Storage (Tier 4)', desc: 'Wojskowe szyfrowanie LUKS i zacieranie śladów przed policją.', price: 1500, tier: 4 },
+        { id: 'room_upgrade_lain', name: 'Transformacja Pokoju: Sanktuarium NAVI', desc: 'Przekształca pokój w cybernetyczną świątynię z finału Lain!', price: 2500, roomTier: 4 }
+      ]
+    };
+
+    const items = catalog[category] || [];
+    items.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'store-card';
+      card.innerHTML = `
+        <div class="store-title">${item.name}</div>
+        <div class="store-meta">${item.desc || `Pojemność: ${item.size} GB | Interfejs: ${item.iface} | Pobór: ${item.watts}W`}</div>
+        <div class="store-price-row">
+          <span class="store-price">${item.price.toFixed(2)} PLN</span>
+          <button class="cyber-btn store-buy-btn">Kup</button>
+        </div>
+      `;
+
+      card.querySelector('.store-buy-btn').addEventListener('click', () => {
+        this.buyStoreItem(item, category);
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  buyStoreItem(item, category) {
+    if (this.state.money < item.price) {
+      this.showToast(`Niewystarczające środki! Potrzebujesz ${item.price} PLN.`, "error");
+      return;
+    }
+
+    this.state.money -= item.price;
+    window.audioEngine?.playBeep(980, 0.1);
+
+    if (category === 'disks') {
+      const nextLetter = String.fromCharCode(98 + this.state.disks.length); // sdb, sdc, sdd...
+      const newDisk = {
+        id: `disk-${Date.now()}`,
+        dev: `/dev/sd${nextLetter}`,
+        model: item.name,
+        type: item.type,
+        interface: item.iface,
+        sizeGB: item.size,
+        tableType: item.size > 2048 ? 'GPT' : 'MBR',
+        powerWatts: item.watts,
+        heatRate: item.watts * 0.005,
+        health: 100,
+        badSectors: [],
+        remappedSectors: [],
+        partitions: []
+      };
+      this.state.disks.push(newDisk);
+      this.showToast(`Zamontowano nowy nośnik: ${newDisk.dev} (${newDisk.model})!`, "success");
+    } else if (category === 'cooling') {
+      if (item.id === 'liquid_kit') {
+        this.state.roomTier = Math.max(3, this.state.roomTier);
+        this.state.coolingFluidLevel = 100;
+        this.showToast("Zainstalowano zestaw chłodzenia cieczą!", "success");
+      } else if (item.id === 'coolant_refill') {
+        this.state.coolingFluidLevel = 100;
+        this.showToast("Napełniono zbiornik płynu chłodzącego do 100%.", "success");
+      } else {
+        this.showToast(`Kupiono i zainstalowano: ${item.name}!`, "success");
+      }
+    } else if (category === 'power') {
+      this.state.fuseMaxWatts = item.maxWatts;
+      this.showToast(`Zmodernizowano sieć elektryczną! Nowy limit: ${item.maxWatts}W.`, "success");
+    } else if (category === 'software') {
+      if (item.tier) {
+        this.state.toolTier = Math.max(this.state.toolTier, item.tier);
+        this.showToast(`Odblokowano poziom narzędzi ${item.tier}: ${item.name}!`, "success");
+      } else if (item.roomTier) {
+        this.state.roomTier = item.roomTier;
+        this.showToast("POKÓJ PRZEKSZTAŁCONY W SANKTUARIUM NAVI! Witamy w The Wired.", "success");
+      }
+    }
+
+    this.state.notify();
+  }
+
+  // --- CONTRACTS BOARD ---
+  bindContractsActions() {
+    this.initDefaultContracts();
+    this.renderContracts();
+  }
+
+  initDefaultContracts() {
+    if (this.state.contracts.length === 0) {
+      this.state.contracts = [
+        {
+          id: 'c-1',
+          client: 'Anonim z forum Warez.pl',
+          title: 'Magazyn na archiwa multimediów',
+          desc: 'Potrzebuję czystej partycji EXT4 lub NTFS o rozmiarze min. 25 GB z dużymi klastrami (16KB lub 64KB) do buforowania plików.',
+          reqFs: ['EXT4', 'NTFS'],
+          reqMinGB: 25,
+          reqClusters: ['16KB', '64KB'],
+          rewardPLN: 180,
+          rewardCrypto: 0.0002,
+          completed: false
+        },
+        {
+          id: 'c-2',
+          client: 'Syndykat Tachibana',
+          title: 'Skarbiec korporacyjny ZFS',
+          desc: 'Wymagane przygotowanie partycji ZFS o pojemności 50 GB pod bezpieczne sumy kontrolne.',
+          reqFs: ['ZFS'],
+          reqMinGB: 50,
+          reqClusters: ['4KB', '16KB'],
+          rewardPLN: 450,
+          rewardCrypto: 0.0008,
+          completed: false
+        },
+        {
+          id: 'c-3',
+          client: 'Cień The Wired',
+          title: 'Szyfrowana skrytka LUKS',
+          desc: 'Nie pytaj o zawartość. Przygotuj 30 GB z wojskowym szyfrowaniem LUKS i punktem montowania /mnt/darknet.',
+          reqFs: ['LUKS'],
+          reqMinGB: 30,
+          reqClusters: ['4KB'],
+          rewardPLN: 600,
+          rewardCrypto: 0.0025,
+          completed: false
+        }
+      ];
+    }
+  }
+
+  renderContracts() {
+    const list = document.getElementById('contracts-list');
+    list.innerHTML = '';
+    this.state.contracts.forEach(c => {
+      const item = document.createElement('div');
+      item.className = `contract-item ${c.completed ? 'completed' : ''} ${this.state.activeContract?.id === c.id ? 'active' : ''}`;
+      item.innerHTML = `
+        <div class="c-title">${c.title}</div>
+        <div class="c-reward">${c.completed ? 'ZAKOŃCZONE' : `Nagroda: +${c.rewardPLN} PLN`}</div>
+      `;
+      item.addEventListener('click', () => {
+        this.state.activeContract = c;
+        this.renderActiveContract(c);
+        this.renderContracts();
+        window.audioEngine?.playClick();
+      });
+      list.appendChild(item);
+    });
+  }
+
+  renderActiveContract(c) {
+    const view = document.getElementById('contract-active-view');
+    view.innerHTML = `
+      <h3>${c.title}</h3>
+      <div style="font-size: 11px; color: #889;">Nadawca: ${c.client}</div>
+      <p style="margin: 8px 0; font-size: 12px;">${c.desc}</p>
+      <div class="contract-spec-box">
+        WYMOGI KLIENTA:<br>
+        - System plików: ${c.reqFs.join(' lub ')}<br>
+        - Minimalny rozmiar: ${c.reqMinGB} GB<br>
+        - Dozwolone klastry: ${c.reqClusters.join(', ')}<br>
+        - Nagroda: ${c.rewardPLN} PLN + ${c.rewardCrypto} Ⓦ
+      </div>
+      <div style="margin-top: 10px;">
+        <button id="btn-fulfill-contract" class="cyber-btn highlight-btn" ${c.completed ? 'disabled' : ''}>
+          ${c.completed ? 'Zlecenie Zrealizowane' : 'Zweryfikuj i Oddaj Zlecenie'}
+        </button>
+      </div>
+    `;
+
+    document.getElementById('btn-fulfill-contract')?.addEventListener('click', () => {
+      this.fulfillContract(c);
+    });
+  }
+
+  fulfillContract(c) {
+    const all = window.servicesEngine.getAllPartitions();
+    const match = all.find(e => {
+      const p = e.part;
+      return p.sizeGB >= c.reqMinGB && c.reqFs.includes(p.fs) && c.reqClusters.includes(p.clusterSize);
+    });
+
+    if (!match) {
+      this.showToast("Brak spełniającej wymogi partycji w Twoim systemie!", "error");
+      return;
+    }
+
+    c.completed = true;
+    this.state.money += c.rewardPLN;
+    this.state.crypto += c.rewardCrypto;
+    this.state.reputation += 10;
+    window.audioEngine?.playBeep(1100, 0.2);
+    this.showToast(`Zlecenie zrealizowane! Otrzymano +${c.rewardPLN} PLN!`, "success");
+    this.renderActiveContract(c);
+    this.renderContracts();
+    this.state.notify();
+  }
+
+  // --- POWER & CLIMATE WINDOW ---
+  bindPowerActions() {
+    document.getElementById('btn-toggle-window-os').addEventListener('click', () => {
+      window.roomView?.triggerAction('window');
+    });
+    document.getElementById('btn-toggle-pump-os').addEventListener('click', () => {
+      window.roomView?.triggerAction('coolant');
+    });
+    document.getElementById('btn-reset-fuse-os').addEventListener('click', () => {
+      window.roomView?.triggerAction('fusebox');
+    });
+  }
+
+  // --- BANK & BILLS ---
+  bindBankActions() {
+    document.getElementById('btn-exchange-crypto').addEventListener('click', () => {
+      const input = document.getElementById('crypto-exchange-amount');
+      const amount = parseFloat(input.value);
+      if (isNaN(amount) || amount <= 0 || amount > this.state.crypto) {
+        this.showToast("Nieprawidłowa ilość lub brak wystarczającej ilości Ⓦ!", "error");
+        return;
+      }
+      this.state.crypto -= amount;
+      const plnEarned = amount * this.state.cryptoRate;
+      this.state.money += plnEarned;
+      window.audioEngine?.playBeep(880, 0.1);
+      this.showToast(`Wymieniono ${amount.toFixed(4)} Ⓦ na ${plnEarned.toFixed(2)} PLN!`, "success");
+      this.state.notify();
+    });
+
+    document.getElementById('btn-pay-rent').addEventListener('click', () => {
+      if (this.state.money < this.state.rentAmount) {
+        this.showToast(`Brak środków na opłacenie czynszu (${this.state.rentAmount} PLN)!`, "error");
+        return;
+      }
+      this.state.money -= this.state.rentAmount;
+      this.state.rentDueDays = 7;
+      window.audioEngine?.playBeep(650, 0.15);
+      this.showToast("Czynsz został opłacony na kolejne 7 dni!", "success");
+      this.state.notify();
+    });
+
+    document.getElementById('btn-pay-power').addEventListener('click', () => {
+      if (this.state.money < this.state.powerBillAmount) {
+        this.showToast("Brak środków na opłacenie rachunku za prąd!", "error");
+        return;
+      }
+      this.state.money -= this.state.powerBillAmount;
+      this.state.powerBillAmount = 0.0;
+      this.state.powerKwhAccrued = 0.0;
+      window.audioEngine?.playBeep(650, 0.15);
+      this.showToast("Uregulowano należność za energię elektryczną.", "success");
+      this.state.notify();
+    });
+  }
+
+  // --- TERMINAL CLI ---
+  bindTerminal() {
+    const input = document.getElementById('term-input');
+    const output = document.getElementById('term-output');
+
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        const cmd = input.value.trim();
+        if (cmd) {
+          this.executeTerminalCommand(cmd, output);
+        }
+        input.value = '';
+        output.scrollTop = output.scrollHeight;
+        window.audioEngine?.playClick();
+      }
+    });
+  }
+
+  executeTerminalCommand(cmd, output) {
+    const line = document.createElement('div');
+    line.className = 'term-line';
+    line.innerText = `root@lain-navi:~# ${cmd}`;
+    output.appendChild(line);
+
+    const parts = cmd.split(' ');
+    const root = parts[0].toLowerCase();
+
+    const print = (text) => {
+      const res = document.createElement('div');
+      res.className = 'term-line';
+      res.innerText = text;
+      output.appendChild(res);
+    };
+
+    switch (root) {
+      case 'help':
+        print('Dostępne komendy:');
+        print('  lsblk                - Wyświetla listę nośników i partycji');
+        print('  fdisk -l             - Szczegółowy raport tablic partycji');
+        print('  smartctl -a [dev]    - Diagnostyka S.M.A.R.T. dysku');
+        print('  top                  - Monitor procesów i poboru mocy');
+        print('  clear                - Czyści ekran konsoli');
+        print('  reboot               - Restartuje środowisko systemu');
+        break;
+      case 'lsblk':
+        print('NAME       SIZE  TYPE  FSTYPE   MOUNTPOINT');
+        for (const disk of this.state.disks) {
+          print(`${disk.dev.padEnd(10)} ${disk.sizeGB}G   disk  ${disk.tableType}`);
+          for (const p of disk.partitions) {
+            print(`  ${p.dev.padEnd(8)} ${p.sizeGB}G   part  ${p.fs.padEnd(8)} ${p.mount}`);
+          }
+        }
+        break;
+      case 'fdisk':
+        for (const disk of this.state.disks) {
+          print(`Dysk ${disk.dev}: ${disk.sizeGB} GB, model ${disk.model}, tablica: ${disk.tableType}`);
+          print(`Partycje: ${disk.partitions.length}`);
+        }
+        break;
+      case 'smartctl':
+        const targetDisk = this.state.disks[0];
+        print(`S.M.A.R.T. Raport dla ${targetDisk.dev}:`);
+        print(`  Stan zdrowia: ${targetDisk.health}%`);
+        print(`  Uszkodzone sektory: ${targetDisk.badSectors.length}`);
+        print(`  Zremapowane sektory: ${targetDisk.remappedSectors.length}`);
+        break;
+      case 'top':
+        print(`Pobór mocy: ${Math.round(this.state.currentWatts)}W / ${this.state.fuseMaxWatts}W`);
+        print(`Temperatura: ${this.state.roomTemp.toFixed(1)}°C`);
+        print(`Aktywne demony The Wired: ${this.state.services.length}`);
+        break;
+      case 'clear':
+        output.innerHTML = '';
+        break;
+      case 'reboot':
+        print('Restartowanie Copland OS...');
+        window.audioEngine?.playBeep(440, 0.4);
+        setTimeout(() => print('Copland OS uruchomiony ponownie.'), 1000);
+        break;
+      default:
+        print(`Nieznane polecenie: '${root}'. Wpisz 'help'.`);
+    }
+  }
+
+  // --- RENDER ALL UI SECTIONS ---
+  renderAll() {
+    this.renderTopStatus();
+    this.renderDiskManager();
+    this.renderServices();
+    this.renderPowerGrid();
+    this.renderBank();
+    this.updateTaskbar();
+  }
+
+  renderTopStatus() {
+    const t = this.state.inGameTime;
+    const timeStr = `Dzień ${t.day}, ${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}`;
+    const clockStr = `${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}`;
+    document.getElementById('time-display').innerText = timeStr;
+    document.getElementById('tray-clock').innerText = clockStr;
+    document.getElementById('money-display').innerText = `${this.state.money.toFixed(2)} PLN`;
+    document.getElementById('crypto-display').innerText = `${this.state.crypto.toFixed(4)} Ⓦ`;
+    document.getElementById('rent-timer').innerText = `Za ${this.state.rentDueDays} dni (${this.state.rentAmount} PLN)`;
+    document.getElementById('power-display').innerText = `${Math.round(this.state.currentWatts)}W / ${this.state.fuseMaxWatts}W`;
+    document.getElementById('temp-display').innerText = `${this.state.roomTemp.toFixed(1)}°C`;
+
+    // Network I/O Speed in tray
+    const totalTraffic = this.state.services.reduce((acc, s) => acc + parseFloat(s.trafficMBps || 0), 0);
+    document.getElementById('tray-net-speed').innerText = `I/O: ${totalTraffic.toFixed(1)} MB/s`;
+
+    // Threat indicator
+    const trayThreat = document.getElementById('tray-police-threat');
+    trayThreat.innerText = `POLICJA: ${Math.round(this.state.policeThreat)}%`;
+    if (this.state.policeThreat > 60) {
+      trayThreat.className = 'threat-indicator threat-warning';
+    } else {
+      trayThreat.className = 'threat-indicator';
+    }
+
+    // Room dock statuses
+    document.getElementById('dock-fuse-status').innerText = this.state.fuseTripped ? 'WYBITA!' : 'Sprawna';
+    document.getElementById('dock-window-status').innerText = this.state.windowOpen ? 'Otwarte' : 'Zamknięte';
+    document.getElementById('dock-food-status').innerText = `Głód: ${Math.round(this.state.hunger)}%`;
+    document.getElementById('dock-energy-status').innerText = `Energia: ${Math.round(this.state.energy)}%`;
+    document.getElementById('dock-coolant-status').innerText = `Zbiornik: ${Math.round(this.state.coolingFluidLevel)}%`;
+  }
+
+  renderDiskManager() {
+    const disk = window.diskEngine.getActiveDisk();
+    if (!disk) return;
+
+    // Sidebar disk list
+    const list = document.getElementById('disk-device-list');
+    list.innerHTML = '';
+    this.state.disks.forEach(d => {
+      const item = document.createElement('div');
+      item.className = `device-item ${d.id === disk.id ? 'active' : ''}`;
+      item.innerHTML = `
+        <div class="dev-name">${d.dev} [${d.sizeGB} GB]</div>
+        <div class="dev-meta">${d.model} (${d.type})</div>
+      `;
+      item.addEventListener('click', () => {
+        this.state.selectedDiskId = d.id;
+        this.state.selectedPartId = null;
+        this.renderDiskManager();
+        window.audioEngine?.playClick();
+      });
+      list.appendChild(item);
+    });
+
+    // Specs
+    document.getElementById('active-disk-specs').innerHTML = `
+      <strong>Interfejs:</strong> ${disk.interface}<br>
+      <strong>Tablica:</strong> ${disk.tableType}<br>
+      <strong>S.M.A.R.T. Zdrowie:</strong> ${disk.health}%<br>
+      <strong>Pobór:</strong> ${disk.powerWatts}W | <strong>Ogrzewanie:</strong> +${disk.heatRate.toFixed(2)}°C/h
+    `;
+
+    // Visual Strip Bar
+    const strip = document.getElementById('disk-visual-strip');
+    strip.innerHTML = '';
+    const { allocated, unallocated } = window.diskEngine.getDiskSpaceUsage(disk);
+
+    document.getElementById('disk-bar-name').innerText = `${disk.dev} [${disk.sizeGB} GB ${disk.type}]`;
+    document.getElementById('disk-bar-free').innerText = `Wolne: ${unallocated} GB / ${disk.sizeGB} GB`;
+
+    disk.partitions.forEach(p => {
+      const block = document.createElement('div');
+      const widthPct = (p.sizeGB / disk.sizeGB) * 100;
+      block.className = `part-block col-${p.fs.toLowerCase()} ${p.id === this.state.selectedPartId ? 'selected' : ''}`;
+      block.style.width = `${Math.max(4, widthPct)}%`;
+      block.innerHTML = `
+        <span class="block-label">${p.label} (${p.sizeGB}G)</span>
+        <span class="block-fs">${p.fs} [${p.clusterSize}]</span>
+      `;
+      block.addEventListener('click', () => {
+        this.state.selectedPartId = p.id;
+        this.renderDiskManager();
+        window.audioEngine?.playClick();
+      });
+      strip.appendChild(block);
+    });
+
+    // Unallocated block if free space exists
+    if (unallocated > 0) {
+      const freeBlock = document.createElement('div');
+      const widthPct = (unallocated / disk.sizeGB) * 100;
+      freeBlock.className = 'part-block col-unalloc';
+      freeBlock.style.width = `${Math.max(4, widthPct)}%`;
+      freeBlock.innerHTML = `<span class="block-label">Nieprzydzielone (${unallocated} GB)</span>`;
+      freeBlock.addEventListener('click', () => {
+        this.openPartitionModal('create', unallocated);
+      });
+      strip.appendChild(freeBlock);
+    }
+
+    // Partitions Table
+    const tbody = document.getElementById('partitions-tbody');
+    tbody.innerHTML = '';
+    disk.partitions.forEach(p => {
+      const tr = document.createElement('tr');
+      if (p.id === this.state.selectedPartId) tr.className = 'selected';
+      tr.innerHTML = `
+        <td><strong>${p.dev}</strong> (${p.label})</td>
+        <td>${p.sizeGB} GB</td>
+        <td><span class="color-box col-${p.fs.toLowerCase()}"></span> ${p.fs}</td>
+        <td>${p.clusterSize}</td>
+        <td>${p.mount}</td>
+        <td>${p.serviceId ? '🟢 ' + p.serviceId : '—'}</td>
+        <td>${p.encrypted ? '🔒 Szyfrowana' : 'Standard'}</td>
+      `;
+      tr.addEventListener('click', () => {
+        this.state.selectedPartId = p.id;
+        this.renderDiskManager();
+        window.audioEngine?.playClick();
+      });
+      tbody.appendChild(tr);
+    });
+
+    // Sector Grid (128 blocks)
+    const sectorGrid = document.getElementById('sector-grid');
+    sectorGrid.innerHTML = '';
+    document.getElementById('bad-sectors-count').innerText = `${disk.badSectors.length} bad sectorów`;
+
+    for (let i = 0; i < 128; i++) {
+      const s = document.createElement('div');
+      s.className = 'sector-block';
+      if (disk.badSectors.includes(i)) {
+        s.classList.add('bad');
+      } else if (disk.remappedSectors.includes(i)) {
+        s.classList.add('remapped');
+      } else if (allocated > 0 && i < Math.floor((allocated / disk.sizeGB) * 128)) {
+        s.classList.add('allocated');
+      }
+      sectorGrid.appendChild(s);
+    }
+  }
+
+  renderServices() {
+    const container = document.getElementById('services-grid-list');
+    container.innerHTML = '';
+    const all = window.servicesEngine.getAllPartitions();
+
+    window.servicesEngine.serviceCatalog.forEach(def => {
+      const isRunning = this.state.services.some(s => s.serviceId === def.id);
+      const card = document.createElement('div');
+      card.className = `service-card ${isRunning ? 'running' : ''}`;
+
+      let partOptions = '<option value="">-- Wybierz partycję do montowania --</option>';
+      all.forEach(({ disk, part }) => {
+        const selected = (part.serviceId === def.id) ? 'selected' : '';
+        partOptions += `<option value="${part.id}" ${selected}>${disk.dev} -> ${part.dev} (${part.label}, ${part.sizeGB}GB, ${part.fs}, ${part.clusterSize}, ${part.mount})</option>`;
+      });
+
+      card.innerHTML = `
+        <div class="service-card-top">
+          <span class="service-name">${def.name}</span>
+          <span class="service-status-tag ${isRunning ? 'status-active' : 'status-stopped'}">
+            ${isRunning ? 'AKTYWNY' : 'ZATRZYMANY'}
+          </span>
+        </div>
+        <div class="service-desc">${def.desc}</div>
+        <div class="service-requirements">
+          Wymogi: Min ${def.minSizeGB} GB | FS: ${def.requiredFs.join('/')} | Klastry: ${def.preferredClusters.join('/')} | Mont: ${def.requiredMount}<br>
+          Zysk: +${def.incomePerTick.toFixed(2)} PLN/cykl | Pobór: ${def.powerWatts}W | Ciepło: +${def.heatRate}°C/h
+        </div>
+        <div class="service-actions">
+          <select class="service-part-select" ${isRunning ? 'disabled' : ''}>
+            ${partOptions}
+          </select>
+          <button class="cyber-btn service-toggle-btn ${isRunning ? '' : 'highlight-btn'}">
+            ${isRunning ? 'Zatrzymaj' : 'Uruchom'}
+          </button>
+        </div>
+      `;
+
+      const select = card.querySelector('.service-part-select');
+      const toggleBtn = card.querySelector('.service-toggle-btn');
+
+      toggleBtn.addEventListener('click', () => {
+        if (isRunning) {
+          window.servicesEngine.stopService(def.id);
+          this.showToast(`Zatrzymano usługę: ${def.name}.`);
+        } else {
+          const partId = select.value;
+          if (!partId) {
+            this.showToast("Wybierz sformatowaną partycję z listy!", "error");
+            return;
+          }
+          const res = window.servicesEngine.startService(def.id, partId);
+          if (!res.success) {
+            this.showToast(res.msg, "error");
+          }
+        }
+      });
+
+      container.appendChild(card);
+    });
+  }
+
+  renderPowerGrid() {
+    const powerPct = Math.min(100, (this.state.currentWatts / this.state.fuseMaxWatts) * 100);
+    document.getElementById('power-bar-fill').style.width = `${powerPct}%`;
+    document.getElementById('power-val-detail').innerText = `${Math.round(this.state.currentWatts)}W`;
+    document.getElementById('power-max-detail').innerText = `${this.state.fuseMaxWatts}W (Limit Bezpiecznika)`;
+
+    const tempPct = Math.min(100, Math.max(0, (this.state.roomTemp - 15) / 40 * 100));
+    document.getElementById('temp-bar-fill').style.width = `${tempPct}%`;
+    document.getElementById('temp-val-detail').innerText = `${this.state.roomTemp.toFixed(1)}°C`;
+  }
+
+  renderBank() {
+    document.getElementById('bank-pln-val').innerText = `${this.state.money.toFixed(2)} PLN`;
+    document.getElementById('bank-crypto-val').innerText = `${this.state.crypto.toFixed(4)} Ⓦ`;
+    document.getElementById('bill-rent-days').innerText = `Płatne za: ${this.state.rentDueDays} dni`;
+    document.getElementById('bill-power-amount').innerText = `${this.state.powerBillAmount.toFixed(2)} PLN (${this.state.powerKwhAccrued.toFixed(2)} kWh)`;
+  }
+}
+
+// Global UI instance
+window.DesktopUI = DesktopUI;
+
+</script>
+  <script>
+/**
+ * NAVI // PARTITION.SYS - MAIN GAME LOOP & CONTROLLER
+ * Coordinates time ticks, biological needs, rent deadlines, police checks and event dispatch.
+ */
+
+class GameEngine {
+  constructor() {
+    this.state = window.gameState;
+    this.tickInterval = null;
+    this.autoSaveTimer = null;
+    this.init();
+  }
+
+  init() {
+    // Initialize 2D Canvas Room
+    window.roomView = new window.RoomView('room-canvas', this.state);
+
+    // Initialize Desktop UI & Windows
+    window.gameUI = new window.DesktopUI(this.state);
+
+    // Try loading existing save
+    this.state.loadGame();
+
+    // Start master game loop timer (1000ms / speed)
+    this.setupTickTimer();
+
+    // Start autosave every 30s
+    this.autoSaveTimer = setInterval(() => {
+      this.state.saveGame();
+    }, 30000);
+
+    // First user gesture initializes Web Audio
+    const startAudioOnGesture = () => {
+      window.audioEngine?.init();
+      window.removeEventListener('click', startAudioOnGesture);
+      window.removeEventListener('keydown', startAudioOnGesture);
+    };
+    window.addEventListener('click', startAudioOnGesture);
+    window.addEventListener('keydown', startAudioOnGesture);
+
+    // Welcome toast
+    setTimeout(() => {
+      window.gameUI.showToast("Witaj w NAVI // PARTITION.SYS. Spacja przełącza widok.", "success");
+    }, 600);
+  }
+
+  setupTickTimer() {
+    if (this.tickInterval) clearInterval(this.tickInterval);
+    this.tickInterval = setInterval(() => {
+      const speed = this.state.timeSpeed;
+      if (speed > 0) {
+        for (let i = 0; i < speed; i++) {
+          this.tick();
+        }
+      }
+    }, 1000);
+  }
+
+  tick() {
+    // 1 tick = 10 in-game minutes
+    const t = this.state.inGameTime;
+    t.minute += 10;
+    if (t.minute >= 60) {
+      t.minute = 0;
+      t.hour += 1;
+      this.hourlyTick();
+      if (t.hour >= 24) {
+        t.hour = 0;
+        t.day += 1;
+        this.dailyTick();
+      }
+    }
+
+    // Biological needs: Hunger & Fatigue
+    this.state.hunger = Math.min(100, this.state.hunger + 0.35);
+    const fatigueRate = this.state.hunger > 70 ? 0.6 : 0.3;
+    this.state.energy = Math.max(0, this.state.energy - fatigueRate);
+
+    // Exhaustion blackout
+    if (this.state.energy <= 0) {
+      this.state.energy = 50;
+      this.state.inGameTime.hour = (this.state.inGameTime.hour + 8) % 24;
+      window.gameUI?.showToast("MDLEJESZ Z WYCIEŃCZENIA! Ocknąłeś się po 8 godzinach snu na podłodze.", "error");
+    }
+
+    // Process storage and services engine
+    window.servicesEngine.tickProcess();
+
+    // Process random events
+    this.checkRandomEvents();
+
+    // Notify state listeners
+    this.state.notify();
+  }
+
+  hourlyTick() {
+    // Hourly ambient adjustments
+  }
+
+  dailyTick() {
+    // Countdown rent deadline
+    this.state.rentDueDays -= 1;
+    if (this.state.rentDueDays < 0) {
+      // Overdue rent penalty
+      this.state.money -= 100;
+      window.audioEngine?.playAlert();
+      window.gameUI?.showToast("ZALEGŁY CZYNSZ! Właściciel mieszkania naliczył karę 100 PLN i grozi eksmisją!", "error");
+      if (this.state.rentDueDays <= -3) {
+        // Game Over Eviction
+        alert("GAME OVER: Zostałeś eksmitowany z mieszkania za niepłacenie czynszu! Twoje stanowisko NAVI zostało zarekwirowane.");
+        this.state.resetToDefaults();
+        this.state.notify();
+        return;
+      }
+    } else if (this.state.rentDueDays === 1) {
+      window.gameUI?.showToast("OSTRZEŻENIE: Jutro mija termin opłaty czynszu za mieszkanie (500 PLN)!", "error");
+    }
+
+    // Daily market refresh / small price fluctuation
+    this.state.cryptoRate = Math.round(2200 + Math.random() * 600);
+  }
+
+  checkRandomEvents() {
+    // Random police network sweep
+    if (Math.random() < 0.03 && this.state.policeThreat > 20) {
+      this.state.policeThreat = Math.min(100, this.state.policeThreat + 5);
+      window.audioEngine?.playBeep(350, 0.1);
+      window.gameUI?.showToast("Wykryto automatyczny skan portów policji cybernetycznej. Zagrożenie wzrasta!");
+    }
+
+    // If police raid pending countdown
+    if (this.state.policeRaidPending) {
+      if (Math.random() < 0.15) {
+        // Raid executed!
+        this.executePoliceRaid();
+      }
+    }
+  }
+
+  executePoliceRaid() {
+    this.state.policeRaidPending = false;
+    let foundIllegal = false;
+
+    // Check if any partition contains unencrypted darknet data
+    for (const disk of this.state.disks) {
+      for (const p of disk.partitions) {
+        if (p.serviceId === 'darknet_mirror' && !p.encrypted && p.fs !== 'LUKS') {
+          foundIllegal = true;
+          break;
+        }
+      }
+    }
+
+    if (foundIllegal) {
+      window.audioEngine?.playAlert();
+      alert("NALOT CYBERPOLICJI: Funkcjonariusze weszli do mieszkania! Wykryto niezaszyfrowane nielegalne bazy danych na dyskach! Skonfiskowano sprzęt i nałożono 600 PLN grzywny.");
+      this.state.money = Math.max(0, this.state.money - 600);
+      this.state.policeThreat = 0;
+      // Stop all services
+      this.state.services = [];
+      this.state.disks.forEach(d => d.partitions.forEach(p => p.serviceId = null));
+    } else {
+      window.audioEngine?.playBeep(880, 0.1);
+      window.gameUI?.showToast("Nalot policji nie wykrył dowodów! Twoje szyfrowanie LUKS i formatowanie wytrzymały inspekcję.", "success");
+      this.state.policeThreat = 0;
+    }
+    this.state.notify();
+  }
+}
+
+// Launch the game engine once DOM is loaded
+window.addEventListener('DOMContentLoaded', () => {
+  window.gameEngine = new GameEngine();
+});
+
+</script>
+</body>
+</html>
