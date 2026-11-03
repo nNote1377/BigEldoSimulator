@@ -48,6 +48,11 @@ class GameState {
     this.toolTier = 1;
     this.reputation = 0;
 
+    // Interactive Tutorial state
+    this.tutorialStep = 1;
+    this.tutorialCompleted = false;
+    this.tutorialHidden = false;
+
     // Disks (Populated with initial starter drive)
     this.disks = [
       {
@@ -75,7 +80,8 @@ class GameState {
             mount: "/",
             encrypted: false,
             serviceId: null,
-            corrupted: false
+            corrupted: false,
+            isSystem: true
           }
         ]
       }
@@ -127,6 +133,9 @@ class GameState {
         fuseMaxWatts: this.fuseMaxWatts,
         toolTier: this.toolTier,
         reputation: this.reputation,
+        tutorialStep: this.tutorialStep,
+        tutorialCompleted: this.tutorialCompleted,
+        tutorialHidden: this.tutorialHidden,
         disks: this.disks,
         services: this.services,
         contracts: this.contracts,
@@ -160,7 +169,19 @@ class GameState {
       this.fuseMaxWatts = data.fuseMaxWatts ?? this.fuseMaxWatts;
       this.toolTier = data.toolTier ?? this.toolTier;
       this.reputation = data.reputation ?? this.reputation;
+      this.tutorialStep = data.tutorialStep ?? this.tutorialStep;
+      this.tutorialCompleted = data.tutorialCompleted ?? this.tutorialCompleted;
+      this.tutorialHidden = data.tutorialHidden ?? this.tutorialHidden;
       this.disks = data.disks || this.disks;
+      // Guarantee system partition protection even on legacy saves
+      for (const d of this.disks) {
+        for (const p of d.partitions) {
+          if (p.mount === '/' || p.label === 'SYSTEM_OS') {
+            p.isSystem = true;
+            p.mount = '/';
+          }
+        }
+      }
       this.services = data.services || this.services;
       this.contracts = data.contracts || this.contracts;
       this.policeThreat = data.policeThreat ?? this.policeThreat;

@@ -23,31 +23,49 @@ class DiskEngine {
   // Check if partition creation is valid under MBR / GPT constraints
   canCreatePartition(disk, sizeGB, requestedFs) {
     const { unallocated } = this.getDiskSpaceUsage(disk);
-    if (sizeGB <= 0 || sizeGB > unallocated) {
-      return { allowed: false, reason: `Brak wystarczającej ilości miejsca! Dostępne: ${unallocated} GB.` };
+    if (sizeGB <= 0) {
+      return { allowed: false, reason: "Rozmiar partycji musi być większy niż 0 GB!" };
+    }
+    if (sizeGB > unallocated) {
+      return { 
+        allowed: false, 
+        reason: `Brak wystarczającej ilości miejsca! Żądasz ${sizeGB} GB, a na dysku ${disk.dev} wolne jest tylko ${unallocated} GB. Zmniejsz rozmiar suwakiem.` 
+      };
     }
 
     if (disk.tableType === "MBR") {
       if (disk.partitions.length >= 4) {
-        return { allowed: false, reason: "Limit tablicy MBR: maksymalnie 4 partycje podstawowe! Przekonwertuj dysk na GPT." };
+        return { 
+          allowed: false, 
+          reason: "Limit tablicy MBR: Standard MBR obsługuje maksymalnie 4 partycje podstawowe! Aby mieć więcej partycji, przekonwertuj inny dysk na GPT lub usuń zbędną partycję." 
+        };
       }
       if (disk.sizeGB > 2048) {
-        return { allowed: false, reason: "Tablica MBR nie obsługuje dysków powyżej 2 TB (2048 GB). Wymagane GPT!" };
+        return { allowed: false, reason: "Tablica MBR nie obsługuje dysków powyżej 2 TB (2048 GB). Wymagana tablica GPT!" };
       }
     }
 
-    // Progression tier validation
+    // Progression tier validation with clear instructions where to buy
     if (requestedFs === "NTFS" || requestedFs === "EXT4" || requestedFs === "SWAP") {
       if (this.state.toolTier < 2) {
-        return { allowed: false, reason: "Twój system (fdisk 1.0) nie obsługuje jeszcze NTFS/EXT4. Wymagany Partition Wizard (Tier 2)!" };
+        return { 
+          allowed: false, 
+          reason: "Twój podstawowy program fdisk 1.0 obsługuje tylko FAT16/FAT32. Aby formatować w NTFS/EXT4/SWAP, kup licencję 'Partition Wizard 98 (Tier 2)' na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     } else if (requestedFs === "ZFS") {
       if (this.state.toolTier < 3) {
-        return { allowed: false, reason: "System plików ZFS wymaga pakietu GParted Pro / LVM (Tier 3)!" };
+        return { 
+          allowed: false, 
+          reason: "Zaawansowany system plików ZFS wymaga pakietu 'GParted LVM & ZFS Pro (Tier 3)'. Kup go na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     } else if (requestedFs === "LUKS") {
       if (this.state.toolTier < 4) {
-        return { allowed: false, reason: "Szyfrowanie wojskowe LUKS wymaga modułu NAVI Hyper-Storage (Tier 4)!" };
+        return { 
+          allowed: false, 
+          reason: "Wojskowe szyfrowanie partycji LUKS wymaga modułu 'NAVI Hyper-Storage (Tier 4)'. Kup go na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     }
 
@@ -99,8 +117,11 @@ class DiskEngine {
     const part = disk.partitions[index];
 
     // Check if system root partition
-    if (part.mount === "/") {
-      return { success: false, msg: "Ostrzeżenie jądra: nie możesz usunąć partycji głównej systemu montowania (/)!" };
+    if (part.isSystem || part.mount === "/" || part.label === "SYSTEM_OS") {
+      return { 
+        success: false, 
+        msg: "BLOKADA JĄDRA: Nie możesz usunąć partycji systemowej (SYSTEM_OS)! Bez niej Twój komputer ulegnie natychmiastowej awarii (Kernel Panic)." 
+      };
     }
 
     // Stop associated service if any
@@ -124,6 +145,17 @@ class DiskEngine {
     const part = disk.partitions.find(p => p.id === partId);
     if (!part) return { success: false, msg: "Nie znaleziono partycji." };
 
+    // Protect system partition from being broken
+    if (part.isSystem || part.mount === "/" || part.label === "SYSTEM_OS") {
+      if (fs === "SWAP") {
+        return { 
+          success: false, 
+          msg: "BŁĄD: Partycja systemowa nie może być przestrzenią SWAP! System operacyjny wymaga partycji ze strukturą plików (EXT4, NTFS lub ZFS)." 
+        };
+      }
+      mount = "/"; // Force keep root mount
+    }
+
     // Stop service if running
     if (part.serviceId) {
       window.servicesEngine?.stopService(part.serviceId);
@@ -145,8 +177,16 @@ class DiskEngine {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
+    const hasSystemPart = disk.partitions.some(p => p.isSystem || p.mount === "/" || p.label === "SYSTEM_OS");
+    if (hasSystemPart) {
+      return { 
+        success: false, 
+        msg: "BLOKADA JĄDRA: Dysk zawiera partycję systemową (SYSTEM_OS). Zmiana tablicy partycji skasowałaby system operacyjny!" 
+      };
+    }
+
     if (newType === "GPT" && this.state.toolTier < 3) {
-      return { success: false, msg: "Tablica GPT wymaga narzędzi GParted LVM Pro (Tier 3)!" };
+      return { success: false, msg: "Tablica GPT wymaga narzędzi GParted LVM Pro (Tier 3)! Kup licencję na Giełdzie w zakładce Narzędzia & Licencje." };
     }
 
     // Stop all running services on this disk
@@ -213,6 +253,14 @@ class DiskEngine {
   panicZeroWipe(diskId) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    const hasSystemPart = disk.partitions.some(p => p.isSystem || p.mount === "/" || p.label === "SYSTEM_OS");
+    if (hasSystemPart) {
+      return { 
+        success: false, 
+        msg: "BLOKADA BEZPIECZEŃSTWA: Dysk /dev/sda zawiera partycję systemową Copland OS. Nie możesz wyzerować własnego systemu operacyjnego!" 
+      };
+    }
 
     // Stop all services
     disk.partitions.forEach(p => {

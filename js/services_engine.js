@@ -105,16 +105,44 @@ class ServicesEngine {
     return list;
   }
 
+  // Check detailed diagnostics for a partition against a service
+  getPartitionDiagnostics(serviceDef, part) {
+    if (!part) return null;
+    const sizeOk = part.sizeGB >= serviceDef.minSizeGB;
+    const fsOk = serviceDef.requiredFs.includes(part.fs);
+    const mountOk = part.mount === serviceDef.requiredMount;
+    const clusterIdeal = serviceDef.preferredClusters.includes(part.clusterSize);
+    const willTripFuse = (this.state.currentWatts + serviceDef.powerWatts) > this.state.fuseMaxWatts;
+
+    return {
+      size: { ok: sizeOk, msg: `${part.sizeGB} GB (min. ${serviceDef.minSizeGB} GB)` },
+      fs: { ok: fsOk, msg: `${part.fs} (wymagane: ${serviceDef.requiredFs.join(', ')})` },
+      mount: { ok: mountOk, msg: `${part.mount} (wymagane: ${serviceDef.requiredMount})` },
+      cluster: { ok: clusterIdeal, msg: `${part.clusterSize} ${clusterIdeal ? '(optymalne)' : '(-20% wydajności)'}` },
+      power: { ok: !willTripFuse, msg: `+${serviceDef.powerWatts}W ${willTripFuse ? '⚠️ WYBIJE KORKI!' : '(w normie)'}` },
+      allValid: sizeOk && fsOk && mountOk
+    };
+  }
+
   // Check if a partition meets service requirements
   validatePartitionForService(serviceDef, part) {
     if (part.sizeGB < serviceDef.minSizeGB) {
-      return { valid: false, reason: `Zbyt mały rozmiar partycji (${part.sizeGB} GB < ${serviceDef.minSizeGB} GB).` };
+      return { 
+        valid: false, 
+        reason: `Za mały rozmiar partycji (${part.sizeGB} GB < ${serviceDef.minSizeGB} GB). Rozwiązanie: Stwórz w Menedżerze Dysków partycję o rozmiarze min. ${serviceDef.minSizeGB} GB.` 
+      };
     }
     if (!serviceDef.requiredFs.includes(part.fs)) {
-      return { valid: false, reason: `Nieobsługiwany system plików: ${part.fs}. Wymagany jeden z: ${serviceDef.requiredFs.join(", ")}.` };
+      return { 
+        valid: false, 
+        reason: `Nieobsługiwany system plików (${part.fs}). Usługa wymaga: ${serviceDef.requiredFs.join(' lub ')}. Rozwiązanie: W Menedżerze Dysków kliknij 'Formatuj' i wybierz ${serviceDef.requiredFs[0]}.` 
+      };
     }
     if (part.mount !== serviceDef.requiredMount) {
-      return { valid: false, reason: `Nieprawidłowy punkt montowania (${part.mount}). Wymagany: ${serviceDef.requiredMount}.` };
+      return { 
+        valid: false, 
+        reason: `Nieprawidłowy punkt montowania (${part.mount}). Usługa wymaga montowania w '${serviceDef.requiredMount}'. Rozwiązanie: W Menedżerze Dysków kliknij 'Formatuj' i zmień Punkt Montowania na '${serviceDef.requiredMount}'.` 
+      };
     }
 
     // Cluster efficiency factor (0.5 to 1.2x)

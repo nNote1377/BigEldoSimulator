@@ -1382,6 +1382,149 @@ body:not(.crt-enabled) .crt-flicker {
   to { transform: translateX(0); opacity: 1; }
 }
 
+/* --- INTERACTIVE TUTORIAL WIDGET --- */
+.tutorial-card {
+  position: fixed;
+  bottom: 45px;
+  left: 15px;
+  width: 380px;
+  background: #0f1523;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+  border-right: 2px solid #003344;
+  border-bottom: 2px solid #003344;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 240, 255, 0.25);
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s;
+}
+
+.tutorial-card.minimized .tutorial-body,
+.tutorial-card.minimized .tutorial-footer {
+  display: none;
+}
+
+.tutorial-card.hidden {
+  display: none !important;
+}
+
+.tutorial-header {
+  height: 30px;
+  background: linear-gradient(90deg, #004d66 0%, #081a26 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid #1a334d;
+}
+
+.tut-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tutorial-badge {
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  background: #00f0ff;
+  color: #000;
+  padding: 2px 4px;
+  font-weight: bold;
+}
+
+#tutorial-step-counter {
+  font-size: 11px;
+  color: #a0c0e0;
+}
+
+.tut-btns {
+  display: flex;
+  gap: 3px;
+}
+
+.tutorial-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+#tutorial-title {
+  color: #00f0ff;
+  font-size: 13px;
+}
+
+#tutorial-text {
+  color: #d0d8e8;
+  line-height: 1.4;
+}
+
+.tutorial-progress {
+  height: 6px;
+  background: #05080f;
+  border: 1px solid #1c2e44;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+#tutorial-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #33ff66);
+  transition: width 0.3s;
+}
+
+.tutorial-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #090d16;
+  border-top: 1px solid #162233;
+}
+
+/* --- SERVICE DIAGNOSTICS & SYSTEM PROTECTED BADGE --- */
+.diag-box {
+  background: #060912;
+  border: 1px solid #18283d;
+  padding: 5px 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diag-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diag-ok {
+  color: #33ff66;
+}
+
+.diag-err {
+  color: #ff4455;
+}
+
+.diag-warn {
+  color: #ffaa22;
+}
+
+.system-badge {
+  background: #4a2800;
+  color: #ffaa33;
+  border: 1px solid #ffaa33;
+  font-size: 9px;
+  padding: 1px 4px;
+  margin-left: 6px;
+  font-weight: bold;
+}
+
 </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -1412,6 +1555,7 @@ body:not(.crt-enabled) .crt-flicker {
       </div>
       <div class="top-controls">
         <button id="btn-toggle-view" class="cyber-btn highlight-btn">🖥️ PULPIT NAVI</button>
+        <button id="btn-tutorial-toggle" class="cyber-btn" title="Włącz/Wyłącz Samouczek">🎓 Samouczek</button>
         <button id="btn-speed-pause" class="cyber-btn icon-btn" title="Pauza">⏸</button>
         <button id="btn-speed-1x" class="cyber-btn icon-btn active-btn" title="1x">1x</button>
         <button id="btn-speed-2x" class="cyber-btn icon-btn" title="2x">2x</button>
@@ -1823,12 +1967,13 @@ body:not(.crt-enabled) .crt-flicker {
           <div class="form-group">
             <label>Punkt Montowania:</label>
             <select id="modal-part-mount">
-              <option value="/mnt/wired">/mnt/wired (Główny Węzeł The Wired)</option>
+              <option value="/mnt/wired" selected>/mnt/wired (Główny Węzeł The Wired)</option>
               <option value="/mnt/darknet">/mnt/darknet (Hosting Nielegalny / Dark)</option>
               <option value="/mnt/storage">/mnt/storage (Magazyn Danych / P2P)</option>
               <option value="/mnt/crypto">/mnt/crypto (Węzeł Walidacyjny Krypto)</option>
               <option value="/mnt/vault">/mnt/vault (Skarbiec Korporacyjny)</option>
               <option value="/swap">/swap (Przestrzeń Wymiany)</option>
+              <option value="/">/ (Główny System Plików - OS Root)</option>
             </select>
           </div>
         </div>
@@ -1836,6 +1981,31 @@ body:not(.crt-enabled) .crt-flicker {
           <button id="btn-modal-cancel" class="cyber-btn">Anuluj</button>
           <button id="btn-modal-confirm" class="cyber-btn highlight-btn">Utwórz i Formatuj</button>
         </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE TUTORIAL WIDGET -->
+    <div id="tutorial-widget" class="tutorial-card">
+      <div class="tutorial-header">
+        <div class="tut-tag-row">
+          <span class="tutorial-badge">🎓 SAMOUCZEK</span>
+          <span id="tutorial-step-counter">Krok 1 / 6</span>
+        </div>
+        <div class="tut-btns">
+          <button id="btn-tutorial-min" class="small-btn" title="Zwiń/Rozwiń">_</button>
+          <button id="btn-tutorial-close" class="small-btn" title="Zamknij">✕</button>
+        </div>
+      </div>
+      <div class="tutorial-body">
+        <h4 id="tutorial-title">1. Zasiądź do komputera</h4>
+        <p id="tutorial-text">Witaj w pokoju! Naciśnij klawisz <strong>[SPACJA]</strong> lub kliknij biurko NAVI w pokoju, aby usiąść przed monitorem.</p>
+        <div class="tutorial-progress">
+          <div id="tutorial-progress-bar" style="width: 16%;"></div>
+        </div>
+      </div>
+      <div class="tutorial-footer">
+        <button id="btn-tutorial-prev" class="small-btn">◀ Wstecz</button>
+        <button id="btn-tutorial-next" class="small-btn highlight-btn">Dalej ▶</button>
       </div>
     </div>
 
@@ -2121,6 +2291,11 @@ class GameState {
     this.toolTier = 1;
     this.reputation = 0;
 
+    // Interactive Tutorial state
+    this.tutorialStep = 1;
+    this.tutorialCompleted = false;
+    this.tutorialHidden = false;
+
     // Disks (Populated with initial starter drive)
     this.disks = [
       {
@@ -2148,7 +2323,8 @@ class GameState {
             mount: "/",
             encrypted: false,
             serviceId: null,
-            corrupted: false
+            corrupted: false,
+            isSystem: true
           }
         ]
       }
@@ -2200,6 +2376,9 @@ class GameState {
         fuseMaxWatts: this.fuseMaxWatts,
         toolTier: this.toolTier,
         reputation: this.reputation,
+        tutorialStep: this.tutorialStep,
+        tutorialCompleted: this.tutorialCompleted,
+        tutorialHidden: this.tutorialHidden,
         disks: this.disks,
         services: this.services,
         contracts: this.contracts,
@@ -2233,7 +2412,19 @@ class GameState {
       this.fuseMaxWatts = data.fuseMaxWatts ?? this.fuseMaxWatts;
       this.toolTier = data.toolTier ?? this.toolTier;
       this.reputation = data.reputation ?? this.reputation;
+      this.tutorialStep = data.tutorialStep ?? this.tutorialStep;
+      this.tutorialCompleted = data.tutorialCompleted ?? this.tutorialCompleted;
+      this.tutorialHidden = data.tutorialHidden ?? this.tutorialHidden;
       this.disks = data.disks || this.disks;
+      // Guarantee system partition protection even on legacy saves
+      for (const d of this.disks) {
+        for (const p of d.partitions) {
+          if (p.mount === '/' || p.label === 'SYSTEM_OS') {
+            p.isSystem = true;
+            p.mount = '/';
+          }
+        }
+      }
       this.services = data.services || this.services;
       this.contracts = data.contracts || this.contracts;
       this.policeThreat = data.policeThreat ?? this.policeThreat;
@@ -2277,31 +2468,49 @@ class DiskEngine {
   // Check if partition creation is valid under MBR / GPT constraints
   canCreatePartition(disk, sizeGB, requestedFs) {
     const { unallocated } = this.getDiskSpaceUsage(disk);
-    if (sizeGB <= 0 || sizeGB > unallocated) {
-      return { allowed: false, reason: `Brak wystarczającej ilości miejsca! Dostępne: ${unallocated} GB.` };
+    if (sizeGB <= 0) {
+      return { allowed: false, reason: "Rozmiar partycji musi być większy niż 0 GB!" };
+    }
+    if (sizeGB > unallocated) {
+      return { 
+        allowed: false, 
+        reason: `Brak wystarczającej ilości miejsca! Żądasz ${sizeGB} GB, a na dysku ${disk.dev} wolne jest tylko ${unallocated} GB. Zmniejsz rozmiar suwakiem.` 
+      };
     }
 
     if (disk.tableType === "MBR") {
       if (disk.partitions.length >= 4) {
-        return { allowed: false, reason: "Limit tablicy MBR: maksymalnie 4 partycje podstawowe! Przekonwertuj dysk na GPT." };
+        return { 
+          allowed: false, 
+          reason: "Limit tablicy MBR: Standard MBR obsługuje maksymalnie 4 partycje podstawowe! Aby mieć więcej partycji, przekonwertuj inny dysk na GPT lub usuń zbędną partycję." 
+        };
       }
       if (disk.sizeGB > 2048) {
-        return { allowed: false, reason: "Tablica MBR nie obsługuje dysków powyżej 2 TB (2048 GB). Wymagane GPT!" };
+        return { allowed: false, reason: "Tablica MBR nie obsługuje dysków powyżej 2 TB (2048 GB). Wymagana tablica GPT!" };
       }
     }
 
-    // Progression tier validation
+    // Progression tier validation with clear instructions where to buy
     if (requestedFs === "NTFS" || requestedFs === "EXT4" || requestedFs === "SWAP") {
       if (this.state.toolTier < 2) {
-        return { allowed: false, reason: "Twój system (fdisk 1.0) nie obsługuje jeszcze NTFS/EXT4. Wymagany Partition Wizard (Tier 2)!" };
+        return { 
+          allowed: false, 
+          reason: "Twój podstawowy program fdisk 1.0 obsługuje tylko FAT16/FAT32. Aby formatować w NTFS/EXT4/SWAP, kup licencję 'Partition Wizard 98 (Tier 2)' na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     } else if (requestedFs === "ZFS") {
       if (this.state.toolTier < 3) {
-        return { allowed: false, reason: "System plików ZFS wymaga pakietu GParted Pro / LVM (Tier 3)!" };
+        return { 
+          allowed: false, 
+          reason: "Zaawansowany system plików ZFS wymaga pakietu 'GParted LVM & ZFS Pro (Tier 3)'. Kup go na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     } else if (requestedFs === "LUKS") {
       if (this.state.toolTier < 4) {
-        return { allowed: false, reason: "Szyfrowanie wojskowe LUKS wymaga modułu NAVI Hyper-Storage (Tier 4)!" };
+        return { 
+          allowed: false, 
+          reason: "Wojskowe szyfrowanie partycji LUKS wymaga modułu 'NAVI Hyper-Storage (Tier 4)'. Kup go na Giełdzie w zakładce Narzędzia & Licencje!" 
+        };
       }
     }
 
@@ -2353,8 +2562,11 @@ class DiskEngine {
     const part = disk.partitions[index];
 
     // Check if system root partition
-    if (part.mount === "/") {
-      return { success: false, msg: "Ostrzeżenie jądra: nie możesz usunąć partycji głównej systemu montowania (/)!" };
+    if (part.isSystem || part.mount === "/" || part.label === "SYSTEM_OS") {
+      return { 
+        success: false, 
+        msg: "BLOKADA JĄDRA: Nie możesz usunąć partycji systemowej (SYSTEM_OS)! Bez niej Twój komputer ulegnie natychmiastowej awarii (Kernel Panic)." 
+      };
     }
 
     // Stop associated service if any
@@ -2378,6 +2590,17 @@ class DiskEngine {
     const part = disk.partitions.find(p => p.id === partId);
     if (!part) return { success: false, msg: "Nie znaleziono partycji." };
 
+    // Protect system partition from being broken
+    if (part.isSystem || part.mount === "/" || part.label === "SYSTEM_OS") {
+      if (fs === "SWAP") {
+        return { 
+          success: false, 
+          msg: "BŁĄD: Partycja systemowa nie może być przestrzenią SWAP! System operacyjny wymaga partycji ze strukturą plików (EXT4, NTFS lub ZFS)." 
+        };
+      }
+      mount = "/"; // Force keep root mount
+    }
+
     // Stop service if running
     if (part.serviceId) {
       window.servicesEngine?.stopService(part.serviceId);
@@ -2399,8 +2622,16 @@ class DiskEngine {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
 
+    const hasSystemPart = disk.partitions.some(p => p.isSystem || p.mount === "/" || p.label === "SYSTEM_OS");
+    if (hasSystemPart) {
+      return { 
+        success: false, 
+        msg: "BLOKADA JĄDRA: Dysk zawiera partycję systemową (SYSTEM_OS). Zmiana tablicy partycji skasowałaby system operacyjny!" 
+      };
+    }
+
     if (newType === "GPT" && this.state.toolTier < 3) {
-      return { success: false, msg: "Tablica GPT wymaga narzędzi GParted LVM Pro (Tier 3)!" };
+      return { success: false, msg: "Tablica GPT wymaga narzędzi GParted LVM Pro (Tier 3)! Kup licencję na Giełdzie w zakładce Narzędzia & Licencje." };
     }
 
     // Stop all running services on this disk
@@ -2467,6 +2698,14 @@ class DiskEngine {
   panicZeroWipe(diskId) {
     const disk = this.state.disks.find(d => d.id === diskId);
     if (!disk) return { success: false, msg: "Nie znaleziono dysku." };
+
+    const hasSystemPart = disk.partitions.some(p => p.isSystem || p.mount === "/" || p.label === "SYSTEM_OS");
+    if (hasSystemPart) {
+      return { 
+        success: false, 
+        msg: "BLOKADA BEZPIECZEŃSTWA: Dysk /dev/sda zawiera partycję systemową Copland OS. Nie możesz wyzerować własnego systemu operacyjnego!" 
+      };
+    }
 
     // Stop all services
     disk.partitions.forEach(p => {
@@ -2598,16 +2837,44 @@ class ServicesEngine {
     return list;
   }
 
+  // Check detailed diagnostics for a partition against a service
+  getPartitionDiagnostics(serviceDef, part) {
+    if (!part) return null;
+    const sizeOk = part.sizeGB >= serviceDef.minSizeGB;
+    const fsOk = serviceDef.requiredFs.includes(part.fs);
+    const mountOk = part.mount === serviceDef.requiredMount;
+    const clusterIdeal = serviceDef.preferredClusters.includes(part.clusterSize);
+    const willTripFuse = (this.state.currentWatts + serviceDef.powerWatts) > this.state.fuseMaxWatts;
+
+    return {
+      size: { ok: sizeOk, msg: `${part.sizeGB} GB (min. ${serviceDef.minSizeGB} GB)` },
+      fs: { ok: fsOk, msg: `${part.fs} (wymagane: ${serviceDef.requiredFs.join(', ')})` },
+      mount: { ok: mountOk, msg: `${part.mount} (wymagane: ${serviceDef.requiredMount})` },
+      cluster: { ok: clusterIdeal, msg: `${part.clusterSize} ${clusterIdeal ? '(optymalne)' : '(-20% wydajności)'}` },
+      power: { ok: !willTripFuse, msg: `+${serviceDef.powerWatts}W ${willTripFuse ? '⚠️ WYBIJE KORKI!' : '(w normie)'}` },
+      allValid: sizeOk && fsOk && mountOk
+    };
+  }
+
   // Check if a partition meets service requirements
   validatePartitionForService(serviceDef, part) {
     if (part.sizeGB < serviceDef.minSizeGB) {
-      return { valid: false, reason: `Zbyt mały rozmiar partycji (${part.sizeGB} GB < ${serviceDef.minSizeGB} GB).` };
+      return { 
+        valid: false, 
+        reason: `Za mały rozmiar partycji (${part.sizeGB} GB < ${serviceDef.minSizeGB} GB). Rozwiązanie: Stwórz w Menedżerze Dysków partycję o rozmiarze min. ${serviceDef.minSizeGB} GB.` 
+      };
     }
     if (!serviceDef.requiredFs.includes(part.fs)) {
-      return { valid: false, reason: `Nieobsługiwany system plików: ${part.fs}. Wymagany jeden z: ${serviceDef.requiredFs.join(", ")}.` };
+      return { 
+        valid: false, 
+        reason: `Nieobsługiwany system plików (${part.fs}). Usługa wymaga: ${serviceDef.requiredFs.join(' lub ')}. Rozwiązanie: W Menedżerze Dysków kliknij 'Formatuj' i wybierz ${serviceDef.requiredFs[0]}.` 
+      };
     }
     if (part.mount !== serviceDef.requiredMount) {
-      return { valid: false, reason: `Nieprawidłowy punkt montowania (${part.mount}). Wymagany: ${serviceDef.requiredMount}.` };
+      return { 
+        valid: false, 
+        reason: `Nieprawidłowy punkt montowania (${part.mount}). Usługa wymaga montowania w '${serviceDef.requiredMount}'. Rozwiązanie: W Menedżerze Dysków kliknij 'Formatuj' i zmień Punkt Montowania na '${serviceDef.requiredMount}'.` 
+      };
     }
 
     // Cluster efficiency factor (0.5 to 1.2x)
@@ -3459,6 +3726,7 @@ class DesktopUI {
     this.bindPowerActions();
     this.bindBankActions();
     this.bindTerminal();
+    this.bindTutorial();
     this.renderAll();
 
     // Subscribe to state changes
@@ -3498,6 +3766,7 @@ class DesktopUI {
       this.btnToggleView.classList.add('highlight-btn');
     }
     window.audioEngine?.playClick();
+    this.checkTutorialProgress();
   }
 
   bindGlobalControls() {
@@ -3648,6 +3917,7 @@ class DesktopUI {
     win.classList.remove('minimized');
     this.focusWindow(win);
     window.audioEngine?.playClick();
+    this.checkTutorialProgress();
   }
 
   updateTaskbar() {
@@ -3904,14 +4174,17 @@ class DesktopUI {
 
     const items = catalog[category] || [];
     items.forEach(item => {
+      const owned = this.isItemOwned(item, category);
       const card = document.createElement('div');
       card.className = 'store-card';
       card.innerHTML = `
-        <div class="store-title">${item.name}</div>
+        <div class="store-title">${item.name} ${owned ? '<span class="system-badge">POSIADASZ</span>' : ''}</div>
         <div class="store-meta">${item.desc || `Pojemność: ${item.size} GB | Interfejs: ${item.iface} | Pobór: ${item.watts}W`}</div>
         <div class="store-price-row">
           <span class="store-price">${item.price.toFixed(2)} PLN</span>
-          <button class="cyber-btn store-buy-btn">Kup</button>
+          <button class="cyber-btn store-buy-btn" ${owned ? 'disabled style="opacity: 0.5;"' : ''}>
+            ${owned ? 'ZAKUPIONO' : 'Kup'}
+          </button>
         </div>
       `;
 
@@ -3923,7 +4196,26 @@ class DesktopUI {
     });
   }
 
+  isItemOwned(item, category) {
+    if (category === 'software') {
+      if (item.tier && this.state.toolTier >= item.tier) return true;
+      if (item.roomTier && this.state.roomTier >= item.roomTier) return true;
+    }
+    if (category === 'power') {
+      if (item.maxWatts && this.state.fuseMaxWatts >= item.maxWatts) return true;
+    }
+    if (category === 'cooling' && item.id === 'liquid_kit') {
+      if (this.state.roomTier >= 3) return true;
+    }
+    return false;
+  }
+
   buyStoreItem(item, category) {
+    if (this.isItemOwned(item, category)) {
+      this.showToast(`To ulepszenie (${item.name}) zostało już zakupione!`, "error");
+      return;
+    }
+
     if (this.state.money < item.price) {
       this.showToast(`Niewystarczające środki! Potrzebujesz ${item.price} PLN.`, "error");
       return;
@@ -4235,6 +4527,160 @@ class DesktopUI {
     }
   }
 
+  // --- TUTORIAL LOGIC & STEP TRACKING ---
+  bindTutorial() {
+    this.tutorialWidget = document.getElementById('tutorial-widget');
+    this.btnTutorialToggle = document.getElementById('btn-tutorial-toggle');
+    this.btnTutorialMin = document.getElementById('btn-tutorial-min');
+    this.btnTutorialClose = document.getElementById('btn-tutorial-close');
+    this.btnTutorialPrev = document.getElementById('btn-tutorial-prev');
+    this.btnTutorialNext = document.getElementById('btn-tutorial-next');
+
+    this.tutorialSteps = [
+      {
+        step: 1,
+        title: "1. Zasiądź do komputera NAVI",
+        text: "Witaj w pokoju! Naciśnij klawisz <strong>[SPACJA]</strong> lub kliknij biurko NAVI w pokoju, aby usiąść przed pulpitem systemu operacyjnego.",
+        check: () => this.state.activeView === 'desktop'
+      },
+      {
+        step: 2,
+        title: "2. Otwórz Menedżer Dysków",
+        text: "Kliknij ikonę <strong>Menedżer Dysków</strong> na pulpicie. Zobaczysz swój dysk <code>/dev/sda</code> z chronioną partycją systemową <code>SYSTEM_OS</code> (oznaczoną tarczą 🛡️).",
+        check: () => {
+          const win = document.getElementById('app-disk-mgr');
+          return win && !win.classList.contains('minimized');
+        }
+      },
+      {
+        step: 3,
+        title: "3. Utwórz partycję dla The Wired",
+        text: "W Menedżerze Dysków kliknij <strong>'➕ Nowa Partycja'</strong> (lub wolne szare pole). Wybierz rozmiar (np. <strong>30 GB</strong>), system <strong>EXT4</strong>, klastry <strong>4KB</strong> i punkt montowania <strong>/mnt/wired</strong>. Następnie kliknij 'Utwórz i Formatuj'.",
+        check: () => {
+          return this.state.disks.some(d => d.partitions.some(p => p.mount === '/mnt/wired' && p.sizeGB >= 15));
+        }
+      },
+      {
+        step: 4,
+        title: "4. Uruchom usługę The Wired",
+        text: "Otwórz okno <strong>'Węzły The Wired'</strong>. Przy usłudze 'Węzeł Przekaźnikowy The Wired' wybierz z listy nową partycję (zobaczysz zielone checkmarki ✓ w polu diagnozy) i kliknij <strong>'Uruchom'</strong>!",
+        check: () => {
+          return this.state.services.some(s => s.serviceId === 'wired_relay');
+        }
+      },
+      {
+        step: 5,
+        title: "5. Pilnuj prądu i temperatury",
+        text: "Świetnie! Węzeł zarabia gotówkę (+PLN), ale pobiera waty (W) i podgrzewa pokój. Wróć do pokoju <strong>[SPACJA]</strong>. Kliknij <strong>okno</strong>, aby je otworzyć i schłodzić nośniki powietrzem z zewnątrz.",
+        check: () => this.state.windowOpen
+      },
+      {
+        step: 6,
+        title: "6. Ekonomia, Czynsz i Rozwój",
+        text: "Pamiętaj: co 7 dni musisz opłacić <strong>500 PLN czynszu</strong> w oknie Banku! Kupuj większe dyski i licencje na Giełdzie Sprzętu, remapuj uszkodzone sektory i rozbuduj swoje sanktuarium NAVI. Samouczek ukończony!",
+        check: () => this.state.tutorialCompleted
+      }
+    ];
+
+    if (this.btnTutorialToggle) {
+      this.btnTutorialToggle.addEventListener('click', () => {
+        this.state.tutorialHidden = !this.state.tutorialHidden;
+        this.renderTutorial();
+        window.audioEngine?.playClick();
+      });
+    }
+
+    if (this.btnTutorialMin) {
+      this.btnTutorialMin.addEventListener('click', () => {
+        this.tutorialWidget.classList.toggle('minimized');
+        window.audioEngine?.playClick();
+      });
+    }
+
+    if (this.btnTutorialClose) {
+      this.btnTutorialClose.addEventListener('click', () => {
+        this.state.tutorialHidden = true;
+        this.renderTutorial();
+        window.audioEngine?.playClick();
+      });
+    }
+
+    if (this.btnTutorialPrev) {
+      this.btnTutorialPrev.addEventListener('click', () => {
+        if (this.state.tutorialStep > 1) {
+          this.state.tutorialStep--;
+          this.renderTutorial();
+          window.audioEngine?.playClick();
+        }
+      });
+    }
+
+    if (this.btnTutorialNext) {
+      this.btnTutorialNext.addEventListener('click', () => {
+        if (this.state.tutorialStep < this.tutorialSteps.length) {
+          this.state.tutorialStep++;
+          this.renderTutorial();
+          window.audioEngine?.playClick();
+        } else {
+          if (!this.state.tutorialCompleted) {
+            this.state.tutorialCompleted = true;
+            this.state.money += 100;
+            window.audioEngine?.playBeep(1100, 0.25);
+            this.showToast("Gratulacje! Samouczek ukończony. Otrzymujesz +100 PLN nagrody!", "success");
+          }
+          this.state.tutorialHidden = true;
+          this.renderTutorial();
+        }
+      });
+    }
+
+    this.renderTutorial();
+  }
+
+  checkTutorialProgress() {
+    if (this.state.tutorialCompleted || !this.tutorialSteps) return;
+    const currentStep = this.tutorialSteps.find(s => s.step === this.state.tutorialStep);
+    if (currentStep && currentStep.check()) {
+      window.audioEngine?.playBeep(920, 0.15);
+      this.showToast(`Krok samouczka ukończony: ${currentStep.title}!`, "success");
+      if (this.state.tutorialStep < this.tutorialSteps.length) {
+        this.state.tutorialStep++;
+      } else {
+        this.state.tutorialCompleted = true;
+        this.state.money += 100;
+        this.showToast("Samouczek w pełni ukończony! +100 PLN!", "success");
+      }
+      this.renderTutorial();
+      this.state.notify();
+    }
+  }
+
+  renderTutorial() {
+    if (!this.tutorialWidget) return;
+    if (this.state.tutorialHidden) {
+      this.tutorialWidget.classList.add('hidden');
+      return;
+    }
+    this.tutorialWidget.classList.remove('hidden');
+
+    const cur = this.tutorialSteps.find(s => s.step === this.state.tutorialStep) || this.tutorialSteps[0];
+    document.getElementById('tutorial-step-counter').innerText = `Krok ${cur.step} / ${this.tutorialSteps.length}`;
+    document.getElementById('tutorial-title').innerText = cur.title;
+    document.getElementById('tutorial-text').innerHTML = cur.text;
+
+    const pct = (cur.step / this.tutorialSteps.length) * 100;
+    document.getElementById('tutorial-progress-bar').style.width = `${pct}%`;
+
+    const prevBtn = document.getElementById('btn-tutorial-prev');
+    const nextBtn = document.getElementById('btn-tutorial-next');
+    prevBtn.disabled = cur.step <= 1;
+    if (cur.step === this.tutorialSteps.length) {
+      nextBtn.innerText = 'Zakończ (+100 PLN)';
+    } else {
+      nextBtn.innerText = 'Dalej ▶';
+    }
+  }
+
   // --- RENDER ALL UI SECTIONS ---
   renderAll() {
     this.renderTopStatus();
@@ -4243,6 +4689,8 @@ class DesktopUI {
     this.renderPowerGrid();
     this.renderBank();
     this.updateTaskbar();
+    this.renderTutorial();
+    this.checkTutorialProgress();
   }
 
   renderTopStatus() {
@@ -4314,16 +4762,33 @@ class DesktopUI {
     strip.innerHTML = '';
     const { allocated, unallocated } = window.diskEngine.getDiskSpaceUsage(disk);
 
+    // Check if selected partition is system protected
+    const selectedPart = disk.partitions.find(p => p.id === this.state.selectedPartId);
+    const isSelectedPartSystem = selectedPart && (selectedPart.isSystem || selectedPart.mount === '/' || selectedPart.label === 'SYSTEM_OS');
+    const btnDelPart = document.getElementById('btn-delete-partition');
+    if (btnDelPart) {
+      if (isSelectedPartSystem) {
+        btnDelPart.disabled = true;
+        btnDelPart.style.opacity = '0.35';
+        btnDelPart.title = 'Partycja systemowa (OS) - zablokowana przed usunięciem!';
+      } else {
+        btnDelPart.disabled = false;
+        btnDelPart.style.opacity = '1';
+        btnDelPart.title = 'Usuń zaznaczoną partycję';
+      }
+    }
+
     document.getElementById('disk-bar-name').innerText = `${disk.dev} [${disk.sizeGB} GB ${disk.type}]`;
     document.getElementById('disk-bar-free').innerText = `Wolne: ${unallocated} GB / ${disk.sizeGB} GB`;
 
     disk.partitions.forEach(p => {
+      const isSys = p.isSystem || p.mount === '/' || p.label === 'SYSTEM_OS';
       const block = document.createElement('div');
       const widthPct = (p.sizeGB / disk.sizeGB) * 100;
       block.className = `part-block col-${p.fs.toLowerCase()} ${p.id === this.state.selectedPartId ? 'selected' : ''}`;
       block.style.width = `${Math.max(4, widthPct)}%`;
       block.innerHTML = `
-        <span class="block-label">${p.label} (${p.sizeGB}G)</span>
+        <span class="block-label">${p.label} (${p.sizeGB}G) ${isSys ? '🛡️' : ''}</span>
         <span class="block-fs">${p.fs} [${p.clusterSize}]</span>
       `;
       block.addEventListener('click', () => {
@@ -4351,16 +4816,17 @@ class DesktopUI {
     const tbody = document.getElementById('partitions-tbody');
     tbody.innerHTML = '';
     disk.partitions.forEach(p => {
+      const isSys = p.isSystem || p.mount === '/' || p.label === 'SYSTEM_OS';
       const tr = document.createElement('tr');
       if (p.id === this.state.selectedPartId) tr.className = 'selected';
       tr.innerHTML = `
-        <td><strong>${p.dev}</strong> (${p.label})</td>
+        <td><strong>${p.dev}</strong> (${p.label}) ${isSys ? '<span class="system-badge">🛡️ SYSTEM OS</span>' : ''}</td>
         <td>${p.sizeGB} GB</td>
         <td><span class="color-box col-${p.fs.toLowerCase()}"></span> ${p.fs}</td>
         <td>${p.clusterSize}</td>
         <td>${p.mount}</td>
         <td>${p.serviceId ? '🟢 ' + p.serviceId : '—'}</td>
-        <td>${p.encrypted ? '🔒 Szyfrowana' : 'Standard'}</td>
+        <td>${p.encrypted ? '🔒 Szyfrowana' : (isSys ? 'Chroniona' : 'Standard')}</td>
       `;
       tr.addEventListener('click', () => {
         this.state.selectedPartId = p.id;
@@ -4417,6 +4883,7 @@ class DesktopUI {
           Wymogi: Min ${def.minSizeGB} GB | FS: ${def.requiredFs.join('/')} | Klastry: ${def.preferredClusters.join('/')} | Mont: ${def.requiredMount}<br>
           Zysk: +${def.incomePerTick.toFixed(2)} PLN/cykl | Pobór: ${def.powerWatts}W | Ciepło: +${def.heatRate}°C/h
         </div>
+        <div class="diag-box" id="diag-box-${def.id}"></div>
         <div class="service-actions">
           <select class="service-part-select" ${isRunning ? 'disabled' : ''}>
             ${partOptions}
@@ -4429,6 +4896,43 @@ class DesktopUI {
 
       const select = card.querySelector('.service-part-select');
       const toggleBtn = card.querySelector('.service-toggle-btn');
+      const diagBox = card.querySelector(`#diag-box-${def.id}`);
+
+      const updateDiag = () => {
+        const val = select.value;
+        if (!val) {
+          diagBox.innerHTML = '<span style="color: #667e99;">Wybierz partycję z listy poniżej, aby sprawdzić zgodność parametrów.</span>';
+          return;
+        }
+        const entry = all.find(e => e.part.id === val);
+        if (!entry) {
+          diagBox.innerHTML = '';
+          return;
+        }
+        const diag = window.servicesEngine.getPartitionDiagnostics(def, entry.part);
+        if (!diag) return;
+
+        diagBox.innerHTML = `
+          <div class="diag-item ${diag.size.ok ? 'diag-ok' : 'diag-err'}">
+            ${diag.size.ok ? '✓' : '✗'} <strong>Rozmiar:</strong> ${diag.size.msg}
+          </div>
+          <div class="diag-item ${diag.fs.ok ? 'diag-ok' : 'diag-err'}">
+            ${diag.fs.ok ? '✓' : '✗'} <strong>System plików:</strong> ${diag.fs.msg}
+          </div>
+          <div class="diag-item ${diag.mount.ok ? 'diag-ok' : 'diag-err'}">
+            ${diag.mount.ok ? '✓' : '✗'} <strong>Punkt montowania:</strong> ${diag.mount.msg}
+          </div>
+          <div class="diag-item ${diag.cluster.ok ? 'diag-ok' : 'diag-warn'}">
+            ${diag.cluster.ok ? '✓' : 'ℹ'} <strong>Klastry:</strong> ${diag.cluster.msg}
+          </div>
+          <div class="diag-item ${diag.power.ok ? 'diag-ok' : 'diag-warn'}">
+            ${diag.power.ok ? '✓' : '⚠️'} <strong>Zasilanie:</strong> ${diag.power.msg}
+          </div>
+        `;
+      };
+
+      select.addEventListener('change', updateDiag);
+      updateDiag();
 
       toggleBtn.addEventListener('click', () => {
         if (isRunning) {

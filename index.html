@@ -34,6 +34,7 @@
       </div>
       <div class="top-controls">
         <button id="btn-toggle-view" class="cyber-btn highlight-btn">🖥️ PULPIT NAVI</button>
+        <button id="btn-tutorial-toggle" class="cyber-btn" title="Włącz/Wyłącz Samouczek">🎓 Samouczek</button>
         <button id="btn-speed-pause" class="cyber-btn icon-btn" title="Pauza">⏸</button>
         <button id="btn-speed-1x" class="cyber-btn icon-btn active-btn" title="1x">1x</button>
         <button id="btn-speed-2x" class="cyber-btn icon-btn" title="2x">2x</button>
@@ -445,12 +446,13 @@
           <div class="form-group">
             <label>Punkt Montowania:</label>
             <select id="modal-part-mount">
-              <option value="/mnt/wired">/mnt/wired (Główny Węzeł The Wired)</option>
+              <option value="/mnt/wired" selected>/mnt/wired (Główny Węzeł The Wired)</option>
               <option value="/mnt/darknet">/mnt/darknet (Hosting Nielegalny / Dark)</option>
               <option value="/mnt/storage">/mnt/storage (Magazyn Danych / P2P)</option>
               <option value="/mnt/crypto">/mnt/crypto (Węzeł Walidacyjny Krypto)</option>
               <option value="/mnt/vault">/mnt/vault (Skarbiec Korporacyjny)</option>
               <option value="/swap">/swap (Przestrzeń Wymiany)</option>
+              <option value="/">/ (Główny System Plików - OS Root)</option>
             </select>
           </div>
         </div>
@@ -458,6 +460,31 @@
           <button id="btn-modal-cancel" class="cyber-btn">Anuluj</button>
           <button id="btn-modal-confirm" class="cyber-btn highlight-btn">Utwórz i Formatuj</button>
         </div>
+      </div>
+    </div>
+
+    <!-- INTERACTIVE TUTORIAL WIDGET -->
+    <div id="tutorial-widget" class="tutorial-card">
+      <div class="tutorial-header">
+        <div class="tut-tag-row">
+          <span class="tutorial-badge">🎓 SAMOUCZEK</span>
+          <span id="tutorial-step-counter">Krok 1 / 6</span>
+        </div>
+        <div class="tut-btns">
+          <button id="btn-tutorial-min" class="small-btn" title="Zwiń/Rozwiń">_</button>
+          <button id="btn-tutorial-close" class="small-btn" title="Zamknij">✕</button>
+        </div>
+      </div>
+      <div class="tutorial-body">
+        <h4 id="tutorial-title">1. Zasiądź do komputera</h4>
+        <p id="tutorial-text">Witaj w pokoju! Naciśnij klawisz <strong>[SPACJA]</strong> lub kliknij biurko NAVI w pokoju, aby usiąść przed monitorem.</p>
+        <div class="tutorial-progress">
+          <div id="tutorial-progress-bar" style="width: 16%;"></div>
+        </div>
+      </div>
+      <div class="tutorial-footer">
+        <button id="btn-tutorial-prev" class="small-btn">◀ Wstecz</button>
+        <button id="btn-tutorial-next" class="small-btn highlight-btn">Dalej ▶</button>
       </div>
     </div>
 

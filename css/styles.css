@@ -1374,3 +1374,146 @@ body:not(.crt-enabled) .crt-flicker {
   from { transform: translateX(50px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
+
+/* --- INTERACTIVE TUTORIAL WIDGET --- */
+.tutorial-card {
+  position: fixed;
+  bottom: 45px;
+  left: 15px;
+  width: 380px;
+  background: #0f1523;
+  border-top: 2px solid #00f0ff;
+  border-left: 2px solid #00f0ff;
+  border-right: 2px solid #003344;
+  border-bottom: 2px solid #003344;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.9), 0 0 12px rgba(0, 240, 255, 0.25);
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s;
+}
+
+.tutorial-card.minimized .tutorial-body,
+.tutorial-card.minimized .tutorial-footer {
+  display: none;
+}
+
+.tutorial-card.hidden {
+  display: none !important;
+}
+
+.tutorial-header {
+  height: 30px;
+  background: linear-gradient(90deg, #004d66 0%, #081a26 100%);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  border-bottom: 1px solid #1a334d;
+}
+
+.tut-tag-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tutorial-badge {
+  font-family: var(--pixel-font);
+  font-size: 9px;
+  background: #00f0ff;
+  color: #000;
+  padding: 2px 4px;
+  font-weight: bold;
+}
+
+#tutorial-step-counter {
+  font-size: 11px;
+  color: #a0c0e0;
+}
+
+.tut-btns {
+  display: flex;
+  gap: 3px;
+}
+
+.tutorial-body {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 12px;
+}
+
+#tutorial-title {
+  color: #00f0ff;
+  font-size: 13px;
+}
+
+#tutorial-text {
+  color: #d0d8e8;
+  line-height: 1.4;
+}
+
+.tutorial-progress {
+  height: 6px;
+  background: #05080f;
+  border: 1px solid #1c2e44;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+#tutorial-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #00f0ff, #33ff66);
+  transition: width 0.3s;
+}
+
+.tutorial-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: #090d16;
+  border-top: 1px solid #162233;
+}
+
+/* --- SERVICE DIAGNOSTICS & SYSTEM PROTECTED BADGE --- */
+.diag-box {
+  background: #060912;
+  border: 1px solid #18283d;
+  padding: 5px 8px;
+  font-size: 11px;
+  line-height: 1.35;
+  margin-top: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.diag-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.diag-ok {
+  color: #33ff66;
+}
+
+.diag-err {
+  color: #ff4455;
+}
+
+.diag-warn {
+  color: #ffaa22;
+}
+
+.system-badge {
+  background: #4a2800;
+  color: #ffaa33;
+  border: 1px solid #ffaa33;
+  font-size: 9px;
+  padding: 1px 4px;
+  margin-left: 6px;
+  font-weight: bold;
+}
