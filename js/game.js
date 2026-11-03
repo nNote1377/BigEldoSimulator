@@ -89,8 +89,8 @@ class GameEngine {
     // Process random events
     this.checkRandomEvents();
 
-    // Notify state listeners
-    this.state.notify();
+    // Notify state listeners (HUD tick only)
+    this.state.notify('tick');
   }
 
   hourlyTick() {

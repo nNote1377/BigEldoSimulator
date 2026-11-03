@@ -18,11 +18,18 @@ class DesktopUI {
     this.bindPowerActions();
     this.bindBankActions();
     this.bindTerminal();
+    this.serviceSelectedPart = {};
     this.bindTutorial();
     this.renderAll();
 
-    // Subscribe to state changes
-    this.state.subscribe(() => this.renderAll());
+    // Subscribe to state changes (ticks only update HUD to prevent interrupting dropdowns)
+    this.state.subscribe((state, type) => {
+      if (type === 'tick') {
+        this.renderTickHUD();
+      } else {
+        this.renderAll();
+      }
+    });
   }
 
   initElements() {
@@ -985,6 +992,14 @@ class DesktopUI {
     this.checkTutorialProgress();
   }
 
+  // Fast HUD-only update on ticks (avoids destroying active dropdowns or selections)
+  renderTickHUD() {
+    this.renderTopStatus();
+    this.renderPowerGrid();
+    this.renderBank();
+    this.checkTutorialProgress();
+  }
+
   renderTopStatus() {
     const t = this.state.inGameTime;
     const timeStr = `Dzień ${t.day}, ${String(t.hour).padStart(2, '0')}:${String(t.minute).padStart(2, '0')}`;
@@ -1149,101 +1164,174 @@ class DesktopUI {
 
   renderServices() {
     const container = document.getElementById('services-grid-list');
-    container.innerHTML = '';
+    if (!container) return;
     const all = window.servicesEngine.getAllPartitions();
+
+    if (!this.serviceSelectedPart) {
+      this.serviceSelectedPart = {};
+    }
 
     window.servicesEngine.serviceCatalog.forEach(def => {
       const isRunning = this.state.services.some(s => s.serviceId === def.id);
-      const card = document.createElement('div');
-      card.className = `service-card ${isRunning ? 'running' : ''}`;
+      const runningInstance = this.state.services.find(s => s.serviceId === def.id);
+      let card = document.getElementById(`service-card-${def.id}`);
 
+      // Build options HTML
       let partOptions = '<option value="">-- Wybierz partycję do montowania --</option>';
       all.forEach(({ disk, part }) => {
-        const selected = (part.serviceId === def.id) ? 'selected' : '';
-        partOptions += `<option value="${part.id}" ${selected}>${disk.dev} -> ${part.dev} (${part.label}, ${part.sizeGB}GB, ${part.fs}, ${part.clusterSize}, ${part.mount})</option>`;
+        partOptions += `<option value="${part.id}">${disk.dev} -> ${part.dev} (${part.label}, ${part.sizeGB}GB, ${part.fs}, ${part.clusterSize}, ${part.mount})</option>`;
       });
 
-      card.innerHTML = `
-        <div class="service-card-top">
-          <span class="service-name">${def.name}</span>
-          <span class="service-status-tag ${isRunning ? 'status-active' : 'status-stopped'}">
-            ${isRunning ? 'AKTYWNY' : 'ZATRZYMANY'}
-          </span>
-        </div>
-        <div class="service-desc">${def.desc}</div>
-        <div class="service-requirements">
-          Wymogi: Min ${def.minSizeGB} GB | FS: ${def.requiredFs.join('/')} | Klastry: ${def.preferredClusters.join('/')} | Mont: ${def.requiredMount}<br>
-          Zysk: +${def.incomePerTick.toFixed(2)} PLN/cykl | Pobór: ${def.powerWatts}W | Ciepło: +${def.heatRate}°C/h
-        </div>
-        <div class="diag-box" id="diag-box-${def.id}"></div>
-        <div class="service-actions">
-          <select class="service-part-select" ${isRunning ? 'disabled' : ''}>
-            ${partOptions}
-          </select>
-          <button class="cyber-btn service-toggle-btn ${isRunning ? '' : 'highlight-btn'}">
-            ${isRunning ? 'Zatrzymaj' : 'Uruchom'}
-          </button>
-        </div>
-      `;
-
-      const select = card.querySelector('.service-part-select');
-      const toggleBtn = card.querySelector('.service-toggle-btn');
-      const diagBox = card.querySelector(`#diag-box-${def.id}`);
-
-      const updateDiag = () => {
-        const val = select.value;
-        if (!val) {
-          diagBox.innerHTML = '<span style="color: #667e99;">Wybierz partycję z listy poniżej, aby sprawdzić zgodność parametrów.</span>';
-          return;
-        }
-        const entry = all.find(e => e.part.id === val);
-        if (!entry) {
-          diagBox.innerHTML = '';
-          return;
-        }
-        const diag = window.servicesEngine.getPartitionDiagnostics(def, entry.part);
-        if (!diag) return;
-
-        diagBox.innerHTML = `
-          <div class="diag-item ${diag.size.ok ? 'diag-ok' : 'diag-err'}">
-            ${diag.size.ok ? '✓' : '✗'} <strong>Rozmiar:</strong> ${diag.size.msg}
+      if (!card) {
+        card = document.createElement('div');
+        card.id = `service-card-${def.id}`;
+        card.className = `service-card ${isRunning ? 'running' : ''}`;
+        card.innerHTML = `
+          <div class="service-card-top">
+            <span class="service-name">${def.name}</span>
+            <span class="service-status-tag ${isRunning ? 'status-active' : 'status-stopped'}">
+              ${isRunning ? 'AKTYWNY' : 'ZATRZYMANY'}
+            </span>
           </div>
-          <div class="diag-item ${diag.fs.ok ? 'diag-ok' : 'diag-err'}">
-            ${diag.fs.ok ? '✓' : '✗'} <strong>System plików:</strong> ${diag.fs.msg}
+          <div class="service-desc">${def.desc}</div>
+          <div class="service-requirements">
+            Wymogi: Min ${def.minSizeGB} GB | FS: ${def.requiredFs.join('/')} | Klastry: ${def.preferredClusters.join('/')} | Mont: ${def.requiredMount}<br>
+            Zysk: +${def.incomePerTick.toFixed(2)} PLN/cykl | Pobór: ${def.powerWatts}W | Ciepło: +${def.heatRate}°C/h
           </div>
-          <div class="diag-item ${diag.mount.ok ? 'diag-ok' : 'diag-err'}">
-            ${diag.mount.ok ? '✓' : '✗'} <strong>Punkt montowania:</strong> ${diag.mount.msg}
-          </div>
-          <div class="diag-item ${diag.cluster.ok ? 'diag-ok' : 'diag-warn'}">
-            ${diag.cluster.ok ? '✓' : 'ℹ'} <strong>Klastry:</strong> ${diag.cluster.msg}
-          </div>
-          <div class="diag-item ${diag.power.ok ? 'diag-ok' : 'diag-warn'}">
-            ${diag.power.ok ? '✓' : '⚠️'} <strong>Zasilanie:</strong> ${diag.power.msg}
+          <div class="diag-box" id="diag-box-${def.id}"></div>
+          <div class="service-actions">
+            <select class="service-part-select" id="service-select-${def.id}" ${isRunning ? 'disabled' : ''}>
+              ${partOptions}
+            </select>
+            <button class="cyber-btn service-toggle-btn ${isRunning ? '' : 'highlight-btn'}">
+              ${isRunning ? 'Zatrzymaj' : 'Uruchom'}
+            </button>
           </div>
         `;
-      };
 
-      select.addEventListener('change', updateDiag);
-      updateDiag();
+        const select = card.querySelector('.service-part-select');
+        const toggleBtn = card.querySelector('.service-toggle-btn');
+        const diagBox = card.querySelector(`#diag-box-${def.id}`);
 
-      toggleBtn.addEventListener('click', () => {
-        if (isRunning) {
-          window.servicesEngine.stopService(def.id);
-          this.showToast(`Zatrzymano usługę: ${def.name}.`);
-        } else {
-          const partId = select.value;
-          if (!partId) {
-            this.showToast("Wybierz sformatowaną partycję z listy!", "error");
+        const updateDiag = () => {
+          const val = select.value;
+          if (!val) {
+            diagBox.innerHTML = '<span style="color: #667e99;">Wybierz partycję z listy poniżej, aby sprawdzić zgodność parametrów.</span>';
             return;
           }
-          const res = window.servicesEngine.startService(def.id, partId);
-          if (!res.success) {
-            this.showToast(res.msg, "error");
+          const entry = all.find(e => e.part.id === val);
+          if (!entry) {
+            diagBox.innerHTML = '';
+            return;
+          }
+          const diag = window.servicesEngine.getPartitionDiagnostics(def, entry.part);
+          if (!diag) return;
+
+          diagBox.innerHTML = `
+            <div class="diag-item ${diag.size.ok ? 'diag-ok' : 'diag-err'}">
+              ${diag.size.ok ? '✓' : '✗'} <strong>Rozmiar:</strong> ${diag.size.msg}
+            </div>
+            <div class="diag-item ${diag.fs.ok ? 'diag-ok' : 'diag-err'}">
+              ${diag.fs.ok ? '✓' : '✗'} <strong>System plików:</strong> ${diag.fs.msg}
+            </div>
+            <div class="diag-item ${diag.mount.ok ? 'diag-ok' : 'diag-err'}">
+              ${diag.mount.ok ? '✓' : '✗'} <strong>Punkt montowania:</strong> ${diag.mount.msg}
+            </div>
+            <div class="diag-item ${diag.cluster.ok ? 'diag-ok' : 'diag-warn'}">
+              ${diag.cluster.ok ? '✓' : 'ℹ'} <strong>Klastry:</strong> ${diag.cluster.msg}
+            </div>
+            <div class="diag-item ${diag.power.ok ? 'diag-ok' : 'diag-warn'}">
+              ${diag.power.ok ? '✓' : '⚠️'} <strong>Zasilanie:</strong> ${diag.power.msg}
+            </div>
+          `;
+        };
+
+        select.addEventListener('change', () => {
+          this.serviceSelectedPart[def.id] = select.value;
+          updateDiag();
+        });
+
+        toggleBtn.addEventListener('click', () => {
+          const currentlyRunning = this.state.services.some(s => s.serviceId === def.id);
+          if (currentlyRunning) {
+            window.servicesEngine.stopService(def.id);
+            this.showToast(`Zatrzymano usługę: ${def.name}.`);
+          } else {
+            const partId = select.value;
+            if (!partId) {
+              this.showToast("Wybierz sformatowaną partycję z listy!", "error");
+              return;
+            }
+            const res = window.servicesEngine.startService(def.id, partId);
+            if (!res.success) {
+              this.showToast(res.msg, "error");
+            }
+          }
+        });
+
+        // Set initial select value
+        const initialVal = runningInstance ? runningInstance.partId : (this.serviceSelectedPart[def.id] || '');
+        if (initialVal) {
+          select.value = initialVal;
+        }
+        select.dataset.lastOptions = partOptions;
+        updateDiag();
+
+        container.appendChild(card);
+      } else {
+        // In-place update of existing card
+        card.className = `service-card ${isRunning ? 'running' : ''}`;
+        const statusTag = card.querySelector('.service-status-tag');
+        if (statusTag) {
+          statusTag.className = `service-status-tag ${isRunning ? 'status-active' : 'status-stopped'}`;
+          statusTag.innerText = isRunning ? 'AKTYWNY' : 'ZATRZYMANY';
+        }
+        const toggleBtn = card.querySelector('.service-toggle-btn');
+        if (toggleBtn) {
+          toggleBtn.className = `cyber-btn service-toggle-btn ${isRunning ? '' : 'highlight-btn'}`;
+          toggleBtn.innerText = isRunning ? 'Zatrzymaj' : 'Uruchom';
+        }
+        const select = card.querySelector('.service-part-select');
+        if (select) {
+          select.disabled = isRunning;
+          // Only update options if they changed and select is not actively focused/open
+          if (select.dataset.lastOptions !== partOptions && document.activeElement !== select) {
+            const prevVal = select.value || (runningInstance ? runningInstance.partId : this.serviceSelectedPart[def.id]);
+            select.innerHTML = partOptions;
+            select.dataset.lastOptions = partOptions;
+            if (prevVal) {
+              select.value = prevVal;
+            }
+            const diagBox = card.querySelector(`#diag-box-${def.id}`);
+            if (diagBox) {
+              const val = select.value;
+              const entry = all.find(e => e.part.id === val);
+              if (entry) {
+                const diag = window.servicesEngine.getPartitionDiagnostics(def, entry.part);
+                if (diag) {
+                  diagBox.innerHTML = `
+                    <div class="diag-item ${diag.size.ok ? 'diag-ok' : 'diag-err'}">
+                      ${diag.size.ok ? '✓' : '✗'} <strong>Rozmiar:</strong> ${diag.size.msg}
+                    </div>
+                    <div class="diag-item ${diag.fs.ok ? 'diag-ok' : 'diag-err'}">
+                      ${diag.fs.ok ? '✓' : '✗'} <strong>System plików:</strong> ${diag.fs.msg}
+                    </div>
+                    <div class="diag-item ${diag.mount.ok ? 'diag-ok' : 'diag-err'}">
+                      ${diag.mount.ok ? '✓' : '✗'} <strong>Punkt montowania:</strong> ${diag.mount.msg}
+                    </div>
+                    <div class="diag-item ${diag.cluster.ok ? 'diag-ok' : 'diag-warn'}">
+                      ${diag.cluster.ok ? '✓' : 'ℹ'} <strong>Klastry:</strong> ${diag.cluster.msg}
+                    </div>
+                    <div class="diag-item ${diag.power.ok ? 'diag-ok' : 'diag-warn'}">
+                      ${diag.power.ok ? '✓' : '⚠️'} <strong>Zasilanie:</strong> ${diag.power.msg}
+                    </div>
+                  `;
+                }
+              }
+            }
           }
         }
-      });
-
-      container.appendChild(card);
+      }
     });
   }
 

@@ -107,9 +107,9 @@ class GameState {
     this.subscribers.push(callback);
   }
 
-  notify() {
+  notify(type = 'structural') {
     for (const cb of this.subscribers) {
-      cb(this);
+      cb(this, type);
     }
   }
 
