@@ -311,9 +311,11 @@ body:not(.crt-enabled) .crt-flicker {
   top: 15px;
   left: 15px;
   display: grid;
-  grid-template-columns: repeat(1, 90px);
-  gap: 20px;
+  grid-template-columns: repeat(2, 90px);
+  gap: 10px 14px;
   z-index: 10;
+  max-height: calc(100% - 60px);
+  overflow-y: auto;
 }
 
 .desktop-icon {
@@ -1410,6 +1412,12 @@ body:not(.crt-enabled) .crt-flicker {
   justify-content: space-between;
   padding: 0 8px;
   border-bottom: 1px solid #1a334d;
+  cursor: grab;
+  user-select: none;
+}
+
+.tutorial-header:active {
+  cursor: grabbing;
 }
 
 .tut-tag-row {

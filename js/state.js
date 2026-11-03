@@ -134,9 +134,12 @@ class GameState {
       incomeServices: 0,
       incomeLeasing: 0,
       incomeMining: 0,
+      incomeForensics: 0,
       costPower: 0,
       costWear: 0,
-      costDebt: 0
+      costDebt: 0,
+      costPenalties: 0,
+      costFines: 0
     };
 
     // View state
@@ -243,7 +246,7 @@ class GameState {
       this.raidArrays = data.raidArrays || this.raidArrays;
       this.recoveredDataFiles = data.recoveredDataFiles || this.recoveredDataFiles;
       this.malwareActive = data.malwareActive || this.malwareActive;
-      this.pnlMetrics = data.pnlMetrics || this.pnlMetrics;
+      this.pnlMetrics = Object.assign(this.pnlMetrics, data.pnlMetrics || {});
       this.policeThreat = data.policeThreat ?? this.policeThreat;
 
       // Guarantee system partition protection even on legacy saves

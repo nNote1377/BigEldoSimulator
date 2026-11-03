@@ -799,37 +799,6 @@ class DesktopUI {
       });
     }
 
-    const btnRepayDebt = document.getElementById('btn-repay-debt');
-    if (btnRepayDebt) {
-      btnRepayDebt.addEventListener('click', () => {
-        if (this.state.debtBalance <= 0) {
-          this.showToast("Brak zadłużenia w banku.");
-          return;
-        }
-        const valInput = document.getElementById('debt-repay-amount');
-        const amount = parseFloat(valInput.value);
-        if (isNaN(amount) || amount <= 0) {
-          this.showToast("Podaj prawidłową kwotę spłaty długu!", "error");
-          return;
-        }
-        const repayAmt = Math.min(this.state.debtBalance, amount);
-        if (this.state.money < repayAmt) {
-          this.showToast(`Brak wystarczających środków! Masz tylko ${this.state.money.toFixed(2)} PLN.`, "error");
-          return;
-        }
-        this.state.money -= repayAmt;
-        this.state.debtBalance -= repayAmt;
-        if (this.state.debtBalance <= 0) {
-          this.state.debtBalance = 0;
-          this.state.debtDaysRemaining = 0;
-        }
-        window.audioEngine?.playBeep(920, 0.1);
-        this.showToast(`Spłacono ${repayAmt.toFixed(2)} PLN długu bankowego!`, "success");
-        this.renderBank();
-        this.state.notify();
-      });
-    }
-
     document.getElementById('btn-pay-rent').addEventListener('click', () => {
       if (this.state.money < this.state.rentAmount) {
         this.showToast(`Brak środków na opłacenie czynszu (${this.state.rentAmount} PLN)!`, "error");
@@ -947,6 +916,7 @@ class DesktopUI {
     this.btnTutorialMin = document.getElementById('btn-tutorial-min');
     this.btnTutorialClose = document.getElementById('btn-tutorial-close');
     this.btnTutorialPrev = document.getElementById('btn-tutorial-prev');
+    this.btnTutorialSkip = document.getElementById('btn-tutorial-skip');
     this.btnTutorialNext = document.getElementById('btn-tutorial-next');
 
     this.tutorialSteps = [
@@ -1028,6 +998,18 @@ class DesktopUI {
       });
     }
 
+    if (this.btnTutorialSkip) {
+      this.btnTutorialSkip.addEventListener('click', () => {
+        this.state.tutorialCompleted = true;
+        this.state.tutorialHidden = true;
+        this.state.money += 100;
+        window.audioEngine?.playBeep(1100, 0.25);
+        this.showToast("Samouczek pominięty (+100 PLN nagrody). Powodzenia!", "success");
+        this.renderTutorial();
+        this.state.notify('tutorial');
+      });
+    }
+
     if (this.btnTutorialNext) {
       this.btnTutorialNext.addEventListener('click', () => {
         if (this.state.tutorialStep < this.tutorialSteps.length) {
@@ -1043,7 +1025,44 @@ class DesktopUI {
           }
           this.state.tutorialHidden = true;
           this.renderTutorial();
+          this.state.notify('tutorial');
         }
+      });
+    }
+
+    // Draggable tutorial widget by header
+    const tutHeader = this.tutorialWidget?.querySelector('.tutorial-header');
+    if (tutHeader && this.tutorialWidget) {
+      let isDragging = false;
+      let startX, startY, initLeft, initTop;
+
+      tutHeader.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.tut-btns')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = this.tutorialWidget.getBoundingClientRect();
+        initLeft = rect.left;
+        initTop = rect.top;
+        this.tutorialWidget.style.bottom = 'auto';
+        this.tutorialWidget.style.left = `${initLeft}px`;
+        this.tutorialWidget.style.top = `${initTop}px`;
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        const maxW = (window.innerWidth || 1280) - 390;
+        const maxH = (window.innerHeight || 800) - 60;
+        const newX = Math.max(0, Math.min(maxW, initLeft + dx));
+        const newY = Math.max(38, Math.min(maxH, initTop + dy));
+        this.tutorialWidget.style.left = `${newX}px`;
+        this.tutorialWidget.style.top = `${newY}px`;
+      });
+
+      window.addEventListener('mouseup', () => {
+        isDragging = false;
       });
     }
 
@@ -1051,20 +1070,25 @@ class DesktopUI {
   }
 
   checkTutorialProgress() {
-    if (this.state.tutorialCompleted || !this.tutorialSteps) return;
-    const currentStep = this.tutorialSteps.find(s => s.step === this.state.tutorialStep);
-    if (currentStep && currentStep.check()) {
-      window.audioEngine?.playBeep(920, 0.15);
-      this.showToast(`Krok samouczka ukończony: ${currentStep.title}!`, "success");
-      if (this.state.tutorialStep < this.tutorialSteps.length) {
-        this.state.tutorialStep++;
-      } else {
-        this.state.tutorialCompleted = true;
-        this.state.money += 100;
-        this.showToast("Samouczek w pełni ukończony! +100 PLN!", "success");
+    if (this._checkingTutorial || this.state.tutorialCompleted || !this.tutorialSteps) return;
+    this._checkingTutorial = true;
+    try {
+      const currentStep = this.tutorialSteps.find(s => s.step === this.state.tutorialStep);
+      if (currentStep && currentStep.check()) {
+        window.audioEngine?.playBeep(920, 0.15);
+        this.showToast(`Krok samouczka ukończony: ${currentStep.title}!`, "success");
+        if (this.state.tutorialStep < this.tutorialSteps.length) {
+          this.state.tutorialStep++;
+        } else {
+          this.state.tutorialCompleted = true;
+          this.state.money += 100;
+          this.showToast("Samouczek w pełni ukończony! +100 PLN!", "success");
+        }
+        this.renderTutorial();
+        this.state.notify('tutorial');
       }
-      this.renderTutorial();
-      this.state.notify();
+    } finally {
+      this._checkingTutorial = false;
     }
   }
 
@@ -1143,20 +1167,6 @@ class DesktopUI {
       trayThreat.className = 'threat-indicator threat-warning';
     } else {
       trayThreat.className = 'threat-indicator';
-    }
-
-    const debtPill = document.getElementById('debt-pill');
-    if (debtPill) {
-      if (this.state.debtBalance > 0) {
-        debtPill.classList.remove('hidden');
-        document.getElementById('debt-display').innerText = `${this.state.debtBalance.toFixed(2)} PLN`;
-      } else {
-        debtPill.classList.add('hidden');
-      }
-    }
-    const weatherDisplay = document.getElementById('weather-display');
-    if (weatherDisplay) {
-      weatherDisplay.innerText = `${this.state.outdoorTemp.toFixed(1)}°C`;
     }
 
     const debtPill = document.getElementById('debt-pill');
@@ -1599,9 +1609,9 @@ class DesktopUI {
     const costWr = document.getElementById('pnl-cost-wear');
     if (costWr) costWr.innerText = `${p.costWear.toFixed(2)} PLN`;
     const costPen = document.getElementById('pnl-cost-penalties');
-    if (costPen) costPen.innerText = `${p.costPenalties.toFixed(2)} PLN`;
+    if (costPen) costPen.innerText = `${(p.costPenalties || 0).toFixed(2)} PLN`;
     const costFine = document.getElementById('pnl-cost-fines');
-    if (costFine) costFine.innerText = `${p.costFines.toFixed(2)} PLN`;
+    if (costFine) costFine.innerText = `${(p.costFines || 0).toFixed(2)} PLN`;
 
     const noiseVal = document.getElementById('pnl-noise-val');
     if (noiseVal) noiseVal.innerText = `${this.state.noiseLevel} dB`;
